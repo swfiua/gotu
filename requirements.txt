@@ -1,3 +1,4 @@
 blume
 curio
 matplotlib
+astropy
