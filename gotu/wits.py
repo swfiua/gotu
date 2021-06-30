@@ -24,22 +24,56 @@ from astropy import coordinates, constants, time
 
 from datetime import datetime
 
+import argparse
 
-now = time.Time(datetime.now())
+from matplotlib import patches, pyplot
 
-sun = coordinates.get_sun(now)
+def get_args():
 
-print(sun)
+    parser = argparse.ArgumentParser()
 
-# do some more
-names = 'earth moon'.split()
+    parser.add_argument('--planets', action='store_true')
 
-planets = 'mercury venus mars jupiter saturn'.split()
-names += planets
+    return parser.parse_args()
 
-for name in names:
+def main():
+    
+    args = get_args()
 
-    body = coordinates.get_body(name, now)
-    print(name)
-    print(body)
-    print()
+    now = time.Time(datetime.now())
+
+    sun = coordinates.get_sun(now)
+
+    print(f"The time is {now}")
+    print("The sun is:")
+    print(sun)
+
+    # do some more
+    names = 'earth moon'.split()
+
+    planets = 'mercury venus mars jupiter saturn'.split()
+
+    if args.planets:
+        names += planets
+
+    ax = pyplot.axes(projection = 'polar')
+
+    for name in names:
+
+        body = coordinates.get_body(name, now)
+        print(name)
+        print(body)
+        print()
+
+        pyplot.plot(body.ra, .5)
+
+    #c = patches.Ellipse((.5, .5), .1, .1)
+    #print(c)
+    #ax.add_patch(c)
+    pyplot.show()
+
+
+if __name__ == '__main__':
+
+    main()
+
