@@ -13,15 +13,16 @@ It makes some very bold claims, and backs them up with very strong
 philosophical arguments, rigorous mathematics, and a wonderful
 historical account of how we got where we are.
 
-Written by Colin Rourke, emeritus professor of mathematics at the
-University of Warwick.
+The book was written by Colin Rourke, emeritus professor of
+mathematics at the University of Warwick.
 
 Recently retired after completing 50 years of lectures.
 
 His interests were in topology and he had a particular interest in the
 Poincaré Conjecture. 
 
-Poincaré very much plays a part in the story told in the book.
+Poincaré very much plays a part in the story told in the book, a
+little diversion is in order.
 
 The conjecture is about 3-dimensional spaces and states::
 
@@ -31,18 +32,18 @@ The conjecture is about 3-dimensional spaces and states::
 For our purpose, the conjecture says any 3-dimensional space is the
 same as a 3-sphere, provided the space has certain properties.
 
-For an excellent guide to the 
+`Poincaré Conjecture` is an excellent essay on the subject, written by
+Colin Rourke.
 
 The theorem was eventually proven by Grigori Perelman in 2006.
 
 Knowing that the theorem holds, we can proceed forward knowing that if
 part of the universe has the qualities described in the conjecture,
-then it is essentially a 3-sphere.  As such, it is highly symmetric.
+then it is essentially a 3-sphere.  
 
-Locally, we can construct frames of reference that locally of a
-3-sphere of space dimensions composed with a dimension of time
-
-This is what de Sitter space is, more on this below.
+Locally, we can construct frames of reference that entail a 3-sphere
+of space dimensions intertwined with a dimension of time.  If we fix
+one dimension, then 3-spheres emerge.
 
 The first two chapters of the book introduce a cast of some 20 or more
 key characters in the story.  Some familiar names: Kepler, Newton,
@@ -54,14 +55,24 @@ aspects of modern cosmology that finally lead to the adoption of
 hypotheses such as the Big Bang.
 
 Fred Hoyle, an advocate of a static universe, coined the phrase Big
-Bang, mocking the idea.  
+Bang, mocking the idea.  He proposed a continuous creation model, but
+observations of quasars, which have high red-shift were assumed to be
+very distant, extraordinarily powerful, systems.  We do not see any of
+these objects nearby and so this was taken as evidence supporting an
+early stage, post big bang, of the evolution of the universe.
+
+`The Geometry of the Universe`_ argues that a large part of the red
+shift we observe is gravitational and that, quasars are, in general,
+relatively close objects where the light they emit is subject to
+considerable gravitational red-shift, in accordance with general
+relativity. 
 
 One of the less known characters in the story is Willem de Sitter, who
 came up with the concept of de Sitter space, as a solution to
 Einstein's general relativity equations.
 
-It is, in-fact, a sphere, a 4-sphere, 3 of space, with a dimension of
-time interweaved.
+de Sitter Space is, in-fact, a sphere, a 4-sphere, 3 of space, with a
+dimension of time interweaved.
 
 The book proposes that de Sitter Space is a natural model for the
 universe.  Indeed, it is generally accepted that the universe is
@@ -69,10 +80,11 @@ entering a de Sitter phase.  One of the book's key arguments is that
 it has in fact likely been in such a state for a very long time
 indeed.
 
-It is, in fact, the simplest possible model, essentially being just a
-sphere.
+It is the simplest possible model for the universe, essentially being
+just a sphere.
 
-It is a vacuum solution to Einstein's general relativity.
+It is also a vacuum solution to Einstein's general relativity, which
+creates a fascinating twist in the story.
 
 A key observation is that modern cosmology is in fact ignoring
 precisely half of de Sitter space.
@@ -81,17 +93,15 @@ precisely half of de Sitter space.
 we arrived at that situation, whilst shining a bright light to the way
 ahead. 
 
-Appendix F. does an analysis of pairs of geodesics in de Sitter
-Space.  Imagine one geodesic is an observer bound to some spiral
-galaxy and the other geodesic is a distant galaxy, arriving at the
-edge of our observalbe universe.
+Imagine an observer such as ourselves, here on earth, and a source of
+light, a distant galaxy arriving at the edge of our visible universe.
 
 It is shown that any such galaxy is seen red-shifted for all but a
 small, finite time, creating an extreme case of observer selection
 bias: we only see a source blue shifted for a small, finite time of
 the infinite time it is visible to us.
 
-Hence our observations are dominated by red-shifted sources and we
+lHence our observations are dominated by red-shifted sources and we
 consequently mis-interpret the small sample of blue-shifted signals,
 such as gamma-ray bursts.
 
@@ -114,7 +124,6 @@ galaxies way beyond the Hubble distance.  At the centre of each galaxy
 a giant, rotating black hole.  What would it all look like?  What
 effect would these distant, giant rotating mass have on our frame of
 reference?
-
 
 This subject is introduced with a discussion of Mach's Principle.
 Ernst Mach, another important member of the cast, criticised Newton's
@@ -160,7 +169,11 @@ This in turn leads to the Big Bang theory.
 References
 ==========
 
-.. _Geometry of the Universe: https://www.worldscientific.com/worldscibooks/10.1142/12195
-.. _poincaré_conjecture: http://msp.warwick.ac.uk/~cpr/poincare.pdf
-.. _Appendix A: https://www.worldscientific.com/worldscibooks/10.1142/12195
+`Geometry of the Universe`_  World Scientific Publishing.
 
+`Poincaré Conjecture`_ Essay by Colin Rourke on the Poincaré Conjecture.
+
+.. _Geometry of the Universe: https://www.worldscientific.com/worldscibooks/10.1142/12195
+.. _Poincaré Conjecture: http://msp.warwick.ac.uk/~cpr/poincare.pdf
+.. _Appendix A: Introduction to special and general relativity
+.. _Appendix F: 
