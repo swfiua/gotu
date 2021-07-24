@@ -33,7 +33,7 @@ For our purpose, the conjecture says any 3-dimensional space is the
 same as a 3-sphere, provided the space has certain properties.
 
 `Poincaré Conjecture` is an excellent essay on the subject, written by
-Colin Rourke.
+none other than, Colin Rourke.
 
 The theorem was eventually proven by Grigori Perelman in 2006.
 
@@ -46,26 +46,34 @@ of space dimensions intertwined with a dimension of time.  If we fix
 one dimension, then 3-spheres emerge.
 
 The first two chapters of the book introduce a cast of some 20 or more
-key characters in the story.  Some familiar names: Kepler, Newton,
-Einstein.
+key characters in the story as we are taken on a journey, from the
+Greeks to Einstein.  Some familiar names: Kepler, Newton, Einstein,
+but also some less well known, who played key parts in the story.
 
 It becomes clear that there were many others very heavily involved in
 the evolution of theories.  There was considerable debate about many
-aspects of modern cosmology that finally lead to the adoption of
-hypotheses such as the Big Bang.
+aspects of modern cosmology that finally lead to the adoption the Big
+Bang theory.
 
-Fred Hoyle, an advocate of a static universe, coined the phrase Big
-Bang, mocking the idea.  He proposed a continuous creation model, but
-observations of quasars, which have high red-shift were assumed to be
+Fred Hoyle wrote a book, `The Nature of the Universe`_ almost 70 years ago,
+with a second edition around 1960.
+
+It was Hoyle, an advocate of a static universe, that coined the phrase
+Big Bang, mocking the idea.  He proposed a continuous creation model.
+
+Only a single particle needs to be created per year, for each cubic
+kilometer of space, in order to balance the expansion.
+
+Observations of quasars, which have high red-shift were assumed to be
 very distant, extraordinarily powerful, systems.  We do not see any of
 these objects nearby and so this was taken as evidence supporting an
 early stage, post big bang, of the evolution of the universe.
 
 `The Geometry of the Universe`_ argues that a large part of the red
 shift we observe is gravitational and that, quasars are, in general,
-relatively close objects where the light they emit is subject to
-considerable gravitational red-shift, in accordance with general
-relativity. 
+relatively close objects, of very modest power, where the light they
+emit is subject to considerable gravitational red-shift, in accordance
+with general relativity.
 
 One of the less known characters in the story is Willem de Sitter, who
 came up with the concept of de Sitter space, as a solution to
@@ -101,9 +109,9 @@ small, finite time, creating an extreme case of observer selection
 bias: we only see a source blue shifted for a small, finite time of
 the infinite time it is visible to us.
 
-lHence our observations are dominated by red-shifted sources and we
-consequently mis-interpret the small sample of blue-shifted signals,
-such as gamma-ray bursts.
+Hence our observations are dominated by red-shifted sources and we
+mis-interpret the small sample of blue-shifted signals, such as
+gamma-ray bursts.
 
 Growing evidence that the big bang is a mistake is presented.  Fully
 formed spiral galaxies are visible in the Hubble deep field, just a
@@ -159,15 +167,34 @@ general relativity change when the rotational frame dragging is added
 to the picture.
 
 Amongst the formula in the appendix there are some wonderful nuggets,
-including the staement that that Einstein's biggest blunder was not in
+including the statement that that Einstein's biggest blunder was not in
 fact his introduction of the cosmological constant, but the
 reintroduction of a universal time in his models for the universe in
 the large.
 
 This in turn leads to the Big Bang theory.
 
+Which leads us to a book published over 30 years ago, Stephen
+Hawking's, `A Brief History of Time`_.  It is interesting to note how
+much theory had shifted in the intervening time.
+
+The Big Bang theory was now firmly established.  Observations in the
+intervening time had been deemed to be an excellent fit with the
+theory, and hence confirmation.
+
+The `cmb.rst`_
+
+
+
+
+
+
+
+
 References
 ==========
+
+`Cosmic Microwave Background`_  FOO
 
 `Geometry of the Universe`_  World Scientific Publishing.
 
