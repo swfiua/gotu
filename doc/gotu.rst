@@ -16,6 +16,27 @@ historical account of how we got where we are.
 The book was written by Colin Rourke, emeritus professor of
 mathematics at the University of Warwick.
 
+In many ways it is the antidote to the biggest selling book on
+theoretical physics, *A brief history of time*.   Time is central to this
+story of geometry.
+
+Stephen Hawking went out of his way to avoid mathematical formulae in
+his book, believing that every equation had the potential to halve his
+audience.
+
+Colin Rourke takes the approach of splitting the book into three
+parts.  The first three chapters are intended to be accessible to a
+wider audience, this is followed by a more technical treatment in the
+followin chapters, with six appendices of yet more technical detail.
+
+Chapter 1, leads us on a journey from the ancient Greeks to Einstein
+and it is only page 8 before we are introduced to some geometry.
+Diagrams showing triangles 
+
+`gotu.triangle`
+
+
+
 Recently retired after completing 50 years of lectures.
 
 His interests were in topology and he had a particular interest in the
