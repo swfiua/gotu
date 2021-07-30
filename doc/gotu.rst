@@ -22,7 +22,12 @@ His interests were in topology and he had a particular interest in the
 Poincaré Conjecture. 
 
 Poincaré very much plays a part in the story told in the book, a
-little diversion is in order.
+little diversion is in order.   More of that later.
+
+The book provides a gravitational model that matches galactic rotation
+curves, without having to resort to dark matter.
+
+
 
 The conjecture is about 3-dimensional spaces and states::
 
@@ -59,7 +64,9 @@ Fred Hoyle wrote a book, `The Nature of the Universe`_ almost 70 years ago,
 with a second edition around 1960.
 
 It was Hoyle, an advocate of a static universe, that coined the phrase
-Big Bang, mocking the idea.  He proposed a continuous creation model.
+Big Bang, mocking the idea.  He proposed a continuous creation model,
+whereby the expansion we observe is balanced by continuous creation of
+new matter.
 
 Only a single particle needs to be created per year, for each cubic
 kilometer of space, in order to balance the expansion.
@@ -70,7 +77,7 @@ these objects nearby and so this was taken as evidence supporting an
 early stage, post big bang, of the evolution of the universe.
 
 `The Geometry of the Universe`_ argues that a large part of the red
-shift we observe is gravitational and that, quasars are, in general,
+shift we observe is, in fact, gravitational and that, quasars are
 relatively close objects, of very modest power, where the light they
 emit is subject to considerable gravitational red-shift, in accordance
 with general relativity.
@@ -174,16 +181,17 @@ the large.
 
 This in turn leads to the Big Bang theory.
 
-Which leads us to a book published over 30 years ago, Stephen
-Hawking's, `A Brief History of Time`_.  It is interesting to note how
-much theory had shifted in the intervening time.
+And a book published over 30 years ago, Stephen Hawking's, `A Brief
+History of Time`_.
 
-The Big Bang theory was now firmly established.  Observations in the
-intervening time had been deemed to be an excellent fit with the
-theory, and hence confirmation.
+It is interesting to note how much theory had shifted in the
+intervening time.
 
-The `cmb.rst`_
+The Big Bang theory was now firmly established.  New observations in
+the intervening time had been deemed to be an excellent fit with the
+theory, and hence confirmation, of the big bang theory.
 
+Of particular note is the cosmic micro-wave background (CMB).
 
 
 

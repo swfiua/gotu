@@ -21,19 +21,26 @@ Let's see if astropy can help.
 """
 import math
 
+from collections import deque
+
 from astropy import coordinates, constants, time
 
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot
 
 import argparse
 
-from matplotlib import patches, pyplot
+from blume import magic, farm
+
+
 
 def get_args():
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--planets', action='store_true')
+    parser.add_argument('--fontsize', type=int, default=6)
 
     return parser.parse_args()
 
@@ -44,53 +51,99 @@ def get_body(name, at=None):
 
     return coordinates.get_body(name, time.Time(at))
 
-def main(args=None):
+class SolarSystem(magic.Ball):
 
-    args = args or get_args()
+    def __init__(self, args):
 
-    now = time.Time(datetime.now())
+        super().__init__()
 
-    sun = coordinates.get_sun(now)
+        
+        self.__dict__.update(vars(args or get_args()).items())
 
-    print(f"The time is {now}")
-    print("The sun is:")
-    print(sun)
+        self.inc = 3600
+        self.now = time.Time(datetime.now())
 
-    # do some more
-    names = 'sun earth moon'.split()
+        self.modes = deque(['icrs', 'gcrs'])
+        self.views = deque(['mollweide', 'polar'])
 
-    planets = 'mercury venus mars jupiter saturn'.split()
+        sun = get_body('sun', self.now)
 
-    if args.planets:
-        names += planets
+        print(f"The time is {self.now}")
+        print("The sun is:")
+        print(sun)
 
-    #ax = pyplot.subplot()
-    ax = pyplot.subplot(projection = 'mollweide')
+        self.radii.add_filter('N', self.reset)
 
-    for name in names:
+    async def reset(self):
 
-        body = coordinates.get_body(name, now)
-        print(name)
-        print(body)
-        print()
+        self.now = time.Time(datetime.now())
 
-        ra, dec = body.ra.rad, body.dec.rad
-        if ra > math.pi:
-           ra = ra - (2 * math.pi)
+    async def run(self):
+        
 
-        label = f'{name} {body.ra.deg:.0f} {body.dec.deg:.0f}'
-        pyplot.plot([ra], [dec], 'o', label=label)
+        # do some more
+        names = 'sun earth moon'.split()
 
-    #c = patches.Ellipse((.5, .5), .1, .1)
-    #print(c)
-    #ax.add_patch(c)
-    pyplot.grid(True)
-    pyplot.legend(loc=0)
-    pyplot.show()
+        planets = 'mercury venus mars jupiter saturn'.split()
+
+        if self.planets:
+            names += planets
+
+        #ax = pyplot.subplot()
+        mode = self.modes[0]
+        view = self.views[0]
+        if view == 'polar':
+            ax = pyplot.subplot()
+        else:
+            ax = pyplot.subplot(projection = view)
+            
+
+        for name in names:
+
+            body = get_body(name, self.now)
+            #print(name)
+            #print(body)
+            #print()
+
+            if mode == 'gcrs':
+                bod = body.gcrs
+            else:
+                bod = body.icrs
+
+            ra, dec = bod.ra.rad, bod.dec.rad
+            if ra > math.pi:
+               ra = ra - (2 * math.pi)
+
+            dra, ddec, dist = bod.ra.deg, bod.dec.deg, bod.distance.au
+            label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
+
+            if view == 'polar':
+                pyplot.polar([ra], [dist], 'o', label=label)
+            else:
+                pyplot.plot([ra], [dec], 'o', label=label)
+
+        #c = patches.Ellipse((.5, .5), .1, .1)
+        #print(c)
+        #ax.add_patch(c)
+        pyplot.grid(True)
+        pyplot.title(self.now)
+        pyplot.legend(loc=0, fontsize=self.fontsize)
+        await self.put()
+        self.tick()
+
+    def tick(self):
+
+        self.now += timedelta(seconds=self.inc)
 
 
 
 if __name__ == '__main__':
 
-    main()
+    ss = SolarSystem(get_args())
+
+    fm = farm.Farm()
+
+    fm.add(ss)
+    fm.shep.path.append(ss)
+    farm.run(fm)
 
