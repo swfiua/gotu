@@ -2,10 +2,10 @@
 
 This turns out to be part of this mystery.
 
-We know where the sun is, but where is it in relation to the centre of
+We know where the Sun is, but where is it in relation to the centre of
 our galaxy?
 
-Specifically, the centre of our own galaxy, the milky way?
+Specifically, the centre of our own galaxy, the Milky Way?
 
 The conventional wisdom is that Sagittarius A* is an impressive sized
 black hole, around 4 million times the mass of our sun.
@@ -17,6 +17,23 @@ A mass of tens if not hundreds of billions times the mass of the sun
 is required.
 
 Let's see if astropy can help.
+
+It seems astropy can help a great deal.
+
+A coordinate or frame in the Geocentric Celestial Reference System (GCRS).
+
+Running help(coordinates.GCRS) lead me to this link:
+
+https://arxiv.org/abs/astro-ph/0602086
+
+It is a wonderful paper discussing the subtleties of celestial frames
+of reference.   
+
+Earth based astronomy is very interested in how the earth rotates and
+moves, but is also vey interested in the whole solar system as that
+has an impact on how the earth moves.
+
+
 
 """
 
@@ -57,15 +74,17 @@ def main():
         names += planets
 
     ax = pyplot.axes(projection = 'polar')
+    earth = coordinates.get_body('earth', now)
 
     for name in names:
 
         body = coordinates.get_body(name, now)
         print(name)
+        print('distance to earth:', earth.separation_3d(body))
         print(body)
         print()
 
-        pyplot.plot(body.ra, .5)
+        pyplot.polar(body.ra, body.distance)
 
     #c = patches.Ellipse((.5, .5), .1, .1)
     #print(c)
