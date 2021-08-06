@@ -30,8 +30,13 @@ that we do not see these objects nearer to us is deemed to be an
 indication that quasars were an earlier stage of the evolution of the
 universe, and hence very much further away.
 
-Back to *gotu*.   Rourke shows how quasars could in fact be relatively
-close, low power objects, where the emitted radiation is red-shifted
-due to the intense gravitational field, in accordance with general
-relativity.  
+Fast forward to today, and Rourke shows how quasars could in fact be
+relatively close, low power objects, where the emitted radiation is
+red-shifted due to the intense gravitational field, in accordance with
+general relativity.
+
+Hawking's worked in theoretical physics, focussing on quantum theories
+of gravity, and much of the book focusses on quantum effects and notes
+similarities between the event horizon of a black hole and the big
+bang singularity.
 

@@ -58,6 +58,9 @@ def get_args():
 
     parser.add_argument('--planets', action='store_true')
     parser.add_argument('--fontsize', type=int, default=6)
+    parser.add_argument('--inc', type=float)
+    parser.add_argument('--log', action='store_true')
+    parser.add_argument('--rotate', action='store_true')
 
     return parser.parse_args()
 
@@ -77,7 +80,6 @@ class SolarSystem(magic.Ball):
         
         self.__dict__.update(vars(args or get_args()).items())
 
-        self.inc = 3600
         self.now = time.Time(datetime.now())
 
         self.modes = deque(['icrs', 'gcrs'])
@@ -107,6 +109,11 @@ class SolarSystem(magic.Ball):
 
         mode = self.modes[0]
         view = self.views[0]
+        if self.rotate:
+            if  mode == 'gcrs':
+                self.views.rotate()
+            self.modes.rotate()
+
         if view == 'polar':
             ax = pyplot.subplot()
         else:
@@ -133,6 +140,8 @@ class SolarSystem(magic.Ball):
             label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
 
             if view == 'polar':
+                if self.log and dist:
+                    dist = math.log(dist)
                 pyplot.polar([ra], [dist], 'o', label=label)
             else:
                 pyplot.plot([ra], [dec], 'o', label=label)
@@ -142,13 +151,16 @@ class SolarSystem(magic.Ball):
         #ax.add_patch(c)
         pyplot.grid(True)
         pyplot.title(self.now)
-        pyplot.legend(loc=0, fontsize=self.fontsize)
+        pyplot.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
         await self.put()
         self.tick()
 
     def tick(self):
 
-        self.now += timedelta(seconds=self.inc)
+        if self.inc is None:
+            self.now = time.Time(datetime.now())
+        else:
+            self.now += timedelta(seconds=self.inc or 0)
 
 
 if __name__ == '__main__':
