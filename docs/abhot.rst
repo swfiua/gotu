@@ -40,3 +40,24 @@ of gravity, and much of the book focusses on quantum effects and notes
 similarities between the event horizon of a black hole and the big
 bang singularity.
 
+Both Hoyle and Hawking have chapters entitled, "The Expanding
+Universe".
+
+Hawking asks four questions regarding the origin of the universe::
+
+  1. Why was the early universe so hot?
+
+  2. Why is the universe so uniform on a large scale?
+
+  3. Why did the universe start out with so nearly the critical rate
+     of expansion that separates models that collapse from those that
+     go on expanding forever?
+
+  4. Despite the fact that the universe is so uniform and homogeneous
+     on a large scale it contains local irregularities, such as stars
+     and galaxies.
+
+     What is the origin of these density fluctuations?
+
+
+
