@@ -114,18 +114,11 @@ class SolarSystem(magic.Ball):
                 self.views.rotate()
             self.modes.rotate()
 
-        if view == 'polar':
-            ax = pyplot.subplot()
-        else:
-            ax = pyplot.subplot(projection = view)
-            
+        ax = pyplot.subplot(projection=view)
 
         for name in names:
 
             body = get_body(name, self.now)
-            #print(name)
-            #print(body)
-            #print()
 
             if mode == 'gcrs':
                 bod = body.gcrs
@@ -142,13 +135,10 @@ class SolarSystem(magic.Ball):
             if view == 'polar':
                 if self.log and dist:
                     dist = math.log(dist)
-                pyplot.polar([ra], [dist], 'o', label=label)
+                pyplot.plot([ra], [dist], 'o', label=label)
             else:
                 pyplot.plot([ra], [dec], 'o', label=label)
 
-        #c = patches.Ellipse((.5, .5), .1, .1)
-        #print(c)
-        #ax.add_patch(c)
         pyplot.grid(True)
         pyplot.title(self.now)
         pyplot.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
