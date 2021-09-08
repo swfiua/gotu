@@ -2,12 +2,49 @@
  A Brief History of Time
 =========================
 
-In many ways `The Geometry of the Universe`_ is the dual of Stephen
+It is helpful to compare `The Geometry of the Universe`_ to Stephen
 Hawking's, A Brief History of Time.
 
-Published in 1988, some 30 years have passed, since Fred Hoyle's, `notu`.
+A best selling book that aimed to be accessible to a very wide
+audience, aiming to explain nothing other than the history of the
+universe. 
 
-Go back another 30 years and Fred Hoyle wrote `notu`_.
+Published in 1988, some 30 years have passed, since Fred Hoyle's, `notu`_.
+
+It is a period during which observational astronomy has made dramatic
+strides.
+
+Hoyle sets the scene for this sixty year adventure, describing the
+1960's view of how the universe may have come about.
+
+It includes a chapter entitled, "The Expanding Universe", as does
+Hawking's brief history.
+
+Hoyle speculated that the aparent expansion would be a balanced if
+matter was spontaneously created at a fairly modest rate.
+
+Hoyle was writing at the birth of radio astronomy, where objects such
+as quasars were deemed to be very distant objects with extraordinary
+power, in line with the belief that all red shift was caused by Hubble
+expansion.
+
+In the interim period there have been great advances of observational
+astronomy.
+
+By the time of Hawking, black holes had evolved from hypothetical
+object to indirect observation.
+
+Hawking was very much focussed on unifying quantum mechanics and
+Einstein's general relativity.
+
+At the big bang, quantum effects come into the equation, so to
+understand the fundamental features of the universe you needed to
+model the very first instant of the explosion, when everything is so
+close and a quantum mystery.
+
+There are mathematical connections with black holes and Hawking
+describes how, taking quantum mechanics into account these holes can
+evaporate over time.
 
 These two book give a good reminder of how new a theory the `Big Bang`
 theory is, and also the pace at which we are able to make new
@@ -60,4 +97,79 @@ Hawking asks four questions regarding the origin of the universe::
      What is the origin of these density fluctuations?
 
 
+It is left to Rourke to untangle this puzzle.  If you enjoy a good
+brain teaser then this book is for you.
+
+The short answer, imagine what if there was an essentially infinite
+space of galaxies, just like we see, what would the whole look like?
+
+Q1. Why was it so hot?  It still is, it's bigger than you realise.
+
+Q2. Why so uniform?  It may have been there a very, very long time.
+
+Q3. See Q2. The universe has had a long time to achieve some sort of
+dynamic equilibrium.
+
+Q4. Everything is still resonating, a self sustaining wobble as seen
+in the CMB.
+
+Rourke takes the simplest model that fits the equations and shows
+space time is more complex than we realise.
+
+Happily, with an adjusted perspective, a very elegant and economical
+model shows how to interpret our observations.
+
+For good measure Rourke addresses all these issues::
+
+     * redshift
+
+     * quasars
+
+     * Cosmic Microwave Background
+
+     * Gamma Ray Bursts
+
+     * Dark Matter - not required.
+
+
+One subject not covered by Hawking, is dark matter, much of his early
+research happened before the galactic rotation problem became widely
+apparent.
+
+It is helpful to think of dark matter as the error term in general
+relativity.
+
+Indeed, this is what Rourke does, with a minor adjustment to the
+standard solutions to Einstein's equations.  An assumption that the
+rotation of any body also affects the surrounding space time.
+
+
+Interlude
+=========
+
+At this point it should be apparent that this is a complex story.
+
+Much of the complexity comes from the incredible success of the last
+sixty years of astronomical observation: radio telescopes, space
+telescopes, satellite observations, planetary observations and
+gravitational wave observatories.
+
+These observations have provided a ripe field for speculation and
+ingenious solutions.
+
+The big bang theory imposes a 14 billion year time scale on matters
+and this is increasingly becoming problematic.
+
+The introduction of dark matter further muddies the water as it can
+always be invoked whenever observations are otherwise hard to
+explain.
+
+In short, anyone faced with arguing that the Big Bang theory is a
+mistake is faced with a veritable mountain range of peaks to overcome
+before being able to make their argument.
+
+Rourke slowly unpicks the puzzle.
+
+There are some bold predictions along the way, in particular about Sag
+A*, the giant black hole thought to be at the centre of the Milky Way.
 
