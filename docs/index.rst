@@ -9,6 +9,7 @@ The Geometry of the Universe
 
    gotu
    pc
+   
 
 A space time trilogy
 ====================
@@ -29,6 +30,33 @@ Cosmic Microwave Background
 
 Black Holes
 ===========
+
+A module for each chapter
+=========================
+
+.. toctree::
+
+   tbrgb
+
+   triangle
+
+   events
+
+   dss
+
+   spiral
+
+   quasar
+
+   wits
+
+   relativity
+
+   grb
+
+   cmb
+
+
 
 Indices and tables
 ==================
