@@ -8,3 +8,4 @@ Where is the Sun?
     :members:
 
 
+.. image:: images/wits.png
