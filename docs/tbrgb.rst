@@ -21,4 +21,4 @@ It feels an appropriate title for the project as it is very much a
 story of how geometry changes wavelength over time, with red shift at
 the centre of the story.
 
-.. Image:: tbrgb.png
+.. Image:: images/tbrab.jpg
