@@ -2,14 +2,15 @@
  A Brief History of Time
 =========================
 
-It is helpful to compare `The Geometry of the Universe`_ to Stephen
+It is helpful to compare *The Geometry of the Universe* to Stephen
 Hawking's, A Brief History of Time.
 
 A best selling book that aimed to be accessible to a very wide
-audience, aiming to explain nothing other than the history of the
-universe. 
+audience, aiming to explain nothing less than the entire history of
+the universe.
 
-Published in 1988, some 30 years have passed, since Fred Hoyle's, `notu`_.
+Published in 1988, some 30 years have passed, since Fred
+Hoyle's, *The Nature of the Universe*.
 
 It is a period during which observational astronomy has made dramatic
 strides.
@@ -17,25 +18,19 @@ strides.
 Hoyle sets the scene for this sixty year adventure, describing the
 1960's view of how the universe may have come about.
 
-It includes a chapter entitled, "The Expanding Universe", as does
+It includes a chapter entitled, *The Expanding Universe*, as does
 Hawking's brief history.
 
 Hoyle speculated that the aparent expansion would be a balanced if
 matter was spontaneously created at a fairly modest rate.
 
-Hoyle was writing at the birth of radio astronomy, where objects such
-as quasars were deemed to be very distant objects with extraordinary
-power, in line with the belief that all red shift was caused by Hubble
-expansion.
-
-In the interim period there have been great advances of observational
-astronomy.
-
 By the time of Hawking, black holes had evolved from hypothetical
-object to indirect observation.
+object to indirect observation.  
 
 Hawking was very much focussed on unifying quantum mechanics and
-Einstein's general relativity.
+Einstein's general relativity.  With the big bang theory, comes the
+belief that at some point the universe was in such a tiny space that
+quantum effects must be taken into account.
 
 At the big bang, quantum effects come into the equation, so to
 understand the fundamental features of the universe you needed to
@@ -51,10 +46,6 @@ theory is, and also the pace at which we are able to make new
 observations of the universe.
 
 Black holes were barely discussed by Hoyle.
-
-30 years later, the Big Bang is taken as an assumption and much of the
-book is about the similarities between the beginning of time at a Big
-Bang.
 
 By 1988, the theory is firmly established, with observations such as
 the Cosmic Microwave Background having been taken as confirmation of
@@ -76,9 +67,6 @@ Hawking's worked in theoretical physics, focussing on quantum theories
 of gravity, and much of the book focusses on quantum effects and notes
 similarities between the event horizon of a black hole and the big
 bang singularity.
-
-Both Hoyle and Hawking have chapters entitled, "The Expanding
-Universe".
 
 Hawking asks four questions regarding the origin of the universe::
 
