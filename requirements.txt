@@ -2,3 +2,4 @@ blume
 curio
 matplotlib
 astropy
+networkx
