@@ -9,14 +9,15 @@ A best selling book that aimed to be accessible to a very wide
 audience, aiming to explain nothing less than the entire history of
 the universe.
 
-Published in 1988, some 30 years have passed, since Fred
+Published in 1988, some 30 years had passed, since Fred
 Hoyle's, *The Nature of the Universe*.
 
-It is a period during which observational astronomy has made dramatic
+It is a period during which observational astronomy had made dramatic
 strides.
 
-Hoyle sets the scene for this sixty year adventure, describing the
-1960's view of how the universe may have come about.
+Hoyle sets the scene for this sixty year adventure, a brief history of
+our time, describing the 1960's view of how the universe may have come
+about.
 
 It includes a chapter entitled, *The Expanding Universe*, as does
 Hawking's brief history.
@@ -24,44 +25,55 @@ Hawking's brief history.
 Hoyle speculated that the aparent expansion would be a balanced if
 matter was spontaneously created at a fairly modest rate.
 
+Black holes were not a major focus at this time, nor was there mention
+of dark matter.
+
 By the time of Hawking, black holes had evolved from hypothetical
 object to indirect observation.  
 
 Hawking was very much focussed on unifying quantum mechanics and
 Einstein's general relativity.  With the big bang theory, comes the
 belief that at some point the universe was in such a tiny space that
-quantum effects must be taken into account.
+quantum weirdness really matters.
 
 At the big bang, quantum effects come into the equation, so to
-understand the fundamental features of the universe you needed to
+understand the fundamentals of the universe you needed to
 model the very first instant of the explosion, when everything is so
-close and a quantum mystery.
+close quantum weirdness enters as you try to model gravity.
 
-There are mathematical connections with black holes and Hawking
-describes how, taking quantum mechanics into account these holes can
-evaporate over time.
+Hawking shows connections between event horizons of black holes and
+the early moments of the universe.
 
-These two book give a good reminder of how new a theory the `Big Bang`
+Exploring the mathematics of both general relativity and quantum
+mechanics Hawking showed how black holes could evaporate over time. 
+
+These two books give a good reminder of how new a theory the *Big Bang*
 theory is, and also the pace at which we are able to make new
-observations of the universe.
-
-Black holes were barely discussed by Hoyle.
+observations of the universe during this time.
 
 By 1988, the theory is firmly established, with observations such as
-the Cosmic Microwave Background having been taken as confirmation of
-the theory.
+the `Cosmic Microwave Background`_ having been taken as confirmation of
+the big bang theory.  The background is extaordinarily smooth. It has
+curious spherical resonances over vast distances.
 
-Hawking mentions the discovery of quasars led to Hoyle abandonning his
-continuous creation model.   Quasars are highly red-shifted and so are
-assumed to be very distant objects of extraordinary power.   The fact
-that we do not see these objects nearer to us is deemed to be an
+Hawking mentions the how discovery of quasars led to Hoyle abandonning
+his continuous creation model.  `Quasars`_ are highly red-shifted and so
+are assumed to be very distant objects of extraordinary power.  The
+fact that we do not see these objects nearer to us is deemed to be an
 indication that quasars were an earlier stage of the evolution of the
 universe, and hence very much further away.
 
-Fast forward to today, and Rourke shows how quasars could in fact be
-relatively close, low power objects, where the emitted radiation is
-red-shifted due to the intense gravitational field, in accordance with
-general relativity.
+Fast forward to today.  Observational astronomy is living in a golden
+age with satellite observatories and gravitational wave detectors.
+
+In the early part of Hawking's career the dark matter problem had not
+yet entered the mainstream.
+
+It was observations of the characteristic spirals of galactic rotation
+curves that were not compatible with general relativity.
+
+The conclusion?  There must be some magical `Dark Matter`_, carefully
+placed to make the galaxies spin as they do.
 
 Hawking's worked in theoretical physics, focussing on quantum theories
 of gravity, and much of the book focusses on quantum effects and notes
@@ -109,15 +121,15 @@ model shows how to interpret our observations.
 
 For good measure Rourke addresses all these issues::
 
-     * redshift
+     * `Red Shift`_
 
-     * quasars
+     * `Quasars`_
 
-     * Cosmic Microwave Background
+     * `Cosmic Microwave Background`_
 
-     * Gamma Ray Bursts
+     * `Gamma Ray Bursts`_
 
-     * Dark Matter - not required.
+     * `Dark Matter - not required.`_
 
 
 One subject not covered by Hawking, is dark matter, much of his early
@@ -160,4 +172,52 @@ Rourke slowly unpicks the puzzle.
 
 There are some bold predictions along the way, in particular about Sag
 A*, the giant black hole thought to be at the centre of the Milky Way.
+
+
+
+Red Shift
+=========
+
+Quasars
+=======
+
+and Rourke shows how quasars could in fact be
+relatively close, low power objects, where the emitted radiation is
+red-shifted due to the intense gravitational field, in accordance with
+general relativity.
+
+Cosmic Microwave Background
+===========================
+
+Dark Matter
+===========
+
+not required!
+-------------
+
+Gamma Ray Bursts
+================
+
+Where is the sun?
+=================
+
+Or more particularly, where is the centre of our galaxy?
+
+How far is the sun from that centre?
+
+Sag A*
+======
+
+
+Relativity
+==========
+
+
+Black Hole collisions?
+======================
+
+
+
+Critique
+========
 

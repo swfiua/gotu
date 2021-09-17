@@ -1,7 +1,9 @@
-==================================================
- The Nature of the Universe - Part 1 of a trilogy
-==================================================
+============================
+ The Nature of the Universe
+============================
 
+ - Part 1 of a trilogy
+   
 A collection of lectures given by Hoyle in the 1950's at the
 University of Cambridge.
 

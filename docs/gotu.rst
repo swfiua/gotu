@@ -33,9 +33,6 @@ Chapter 1, leads us on a journey from the ancient Greeks to Einstein
 and it is only page 8 before we are introduced to some geometry.
 Diagrams showing triangles 
 
-`gotu.triangle`
-
-
 
 Recently retired after completing 50 years of lectures.
 
@@ -58,7 +55,7 @@ The conjecture is about 3-dimensional spaces and states::
 For our purpose, the conjecture says any 3-dimensional space is the
 same as a 3-sphere, provided the space has certain properties.
 
-`Poincaré Conjecture` is an excellent essay on the subject, written by
+`Poincaré Conjecture`_ is an excellent essay on the subject, written by
 none other than, Colin Rourke.
 
 The theorem was eventually proven by Grigori Perelman in 2006.
