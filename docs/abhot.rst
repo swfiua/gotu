@@ -2,12 +2,15 @@
  A Brief History of Time
 =========================
 
-It is helpful to compare *The Geometry of the Universe* to Stephen
+It is interesting to compare *The Geometry of the Universe* to Stephen
 Hawking's, A Brief History of Time.
 
 A best selling book that aimed to be accessible to a very wide
 audience, aiming to explain nothing less than the entire history of
 the universe.
+
+Hawking feared every equation would halve his audience, so including
+only a single equation.
 
 Published in 1988, some 30 years had passed, since Fred
 Hoyle's, *The Nature of the Universe*.
@@ -75,10 +78,16 @@ curves that were not compatible with general relativity.
 The conclusion?  There must be some magical `Dark Matter`_, carefully
 placed to make the galaxies spin as they do.
 
-Hawking's worked in theoretical physics, focussing on quantum theories
-of gravity, and much of the book focusses on quantum effects and notes
-similarities between the event horizon of a black hole and the big
-bang singularity.
+As noted above, Hawking worked in theoretical physics, focussing on
+quantum theories of gravity, and much of the book focusses on quantum
+effects and notes similarities between the event horizon of a black
+hole and the big bang singularity.
+
+It is here that there may be some salvation for much of the work done
+under the assumption that there was a Big Bang some 13.7 billion years
+ago: much of the physics of the early universe, if fact, once you get
+past the inflationary phase, is relevant to the quasar models that
+Rourke describes.
 
 Hawking asks four questions regarding the origin of the universe::
 
@@ -113,8 +122,8 @@ dynamic equilibrium.
 Q4. Everything is still resonating, a self sustaining wobble as seen
 in the CMB.
 
-Rourke takes the simplest model that fits the equations and shows
-space time is more complex than we realise.
+Rourke takes the simplest model that fits the equations and
+observations and shows space time is more complex than we realise.
 
 Happily, with an adjusted perspective, a very elegant and economical
 model shows how to interpret our observations.
@@ -173,10 +182,25 @@ Rourke slowly unpicks the puzzle.
 There are some bold predictions along the way, in particular about Sag
 A*, the giant black hole thought to be at the centre of the Milky Way.
 
+The prediction?  At a modest 4 million solar masses it is just not big
+enough to drive a spiral galaxy the size of the Milky Way.
 
+He suggests that there should be a mass of some 10-100 billion solar
+masses and that the Sun is likely some 50,000 light years from the
+centre, with Sag A* likely at the end of one arm of the central
+bulge. 
 
 Red Shift
 =========
+
+The interplay of distance and time.
+
+Symmetries of space time and the mysterious hyperbolic rotations.
+
+`de Sitter Space`_ is introduced as the simplest possible space time,
+based on special relativity.
+
+
 
 Quasars
 =======

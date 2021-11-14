@@ -25,6 +25,7 @@ Sixty years of space exploration.
    gotu
 
 
+
 Cosmic Microwave Background
 ===========================
 
@@ -57,6 +58,13 @@ A module for each chapter
    cmb
 
 
+About
+=====
+
+.. toctree::
+
+   about
+   
 
 Indices and tables
 ==================
