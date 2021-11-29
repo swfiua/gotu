@@ -168,5 +168,9 @@ Everything that is here is just my work and notes as I work through
 the book.  I very much recommend, that if you have made it this far,
 go read the book, the first chapter at least, I am here for questions.
 
+If anything here does not make sense, it is more than likely that I
+have got something spectacularly wrong here.   Check the source first.
+
+
 
 .. _Poincaré Conjecture: http://msp.warwick.ac.uk/~cpr/poincare.pdf
