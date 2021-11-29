@@ -1,7 +1,7 @@
 
-===================================
-Relativity, adjusting for rotation
-===================================
+======================
+Relativity, Appendix A
+======================
 
 
 .. automodule:: gotu.relativity

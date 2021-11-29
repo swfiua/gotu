@@ -1,6 +1,10 @@
+.. _gotu:
+
 ==============================
  The Geometry of the Universe
 ==============================
+
+.. image:: images/gotu.png
 
 A bold claim for a magnificent book, published July 2021.
 
@@ -78,7 +82,7 @@ the evolution of theories.  There was considerable debate about many
 aspects of modern cosmology that finally lead to the adoption the Big
 Bang theory.
 
-Fred Hoyle wrote a book, `The Nature of the Universe`_ almost 70 years ago,
+Fred Hoyle wrote a book, :ref:`notu` almost 70 years ago,
 with a second edition around 1960.
 
 It was Hoyle, an advocate of a static universe, that coined the phrase
@@ -199,8 +203,7 @@ the large.
 
 This in turn leads to the Big Bang theory.
 
-And a book published over 30 years ago, Stephen Hawking's, `A Brief
-History of Time`_.
+And a book published over 30 years ago, Stephen Hawking's, :ref:`abhot`.
 
 It is interesting to note how much theory had shifted in the
 intervening time.
@@ -219,8 +222,6 @@ Of particular note is the cosmic micro-wave background (CMB).
 
 References
 ==========
-
-`Cosmic Microwave Background`_  FOO
 
 `Geometry of the Universe`_  World Scientific Publishing.
 

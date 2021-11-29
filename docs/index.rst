@@ -5,10 +5,12 @@ The Geometry of the Universe
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   about
    gotu
    pc
+
+   contents
    
 
 A space time trilogy
@@ -56,6 +58,8 @@ A module for each chapter
    grb
 
    cmb
+
+   gaia
 
 
 About

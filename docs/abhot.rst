@@ -1,3 +1,5 @@
+.. _abhot:
+
 =========================
  A Brief History of Time
 =========================
@@ -130,15 +132,15 @@ model shows how to interpret our observations.
 
 For good measure Rourke addresses all these issues::
 
-     * `Red Shift`_
+     * Red Shift
 
-     * `Quasars`_
+     * Quasars
 
-     * `Cosmic Microwave Background`_
+     * Cosmic Microwave Background
 
-     * `Gamma Ray Bursts`_
+     * Gamma Ray Bursts
 
-     * `Dark Matter - not required.`_
+     * Dark Matter - not required.
 
 
 One subject not covered by Hawking, is dark matter, much of his early
@@ -197,7 +199,7 @@ The interplay of distance and time.
 
 Symmetries of space time and the mysterious hyperbolic rotations.
 
-`de Sitter Space`_ is introduced as the simplest possible space time,
+:ref:`dss` is introduced as the simplest possible space time,
 based on special relativity.
 
 
