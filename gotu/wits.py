@@ -52,6 +52,22 @@ nutation, of the earth as it spins on its axis, needs to be taken into
 account to make observations.  It is possible to predict this nutation
 out some considerable time into the future (???).
 
+Where is the centre of our galaxy?
+==================================
+
+According to :ref:`gotu`
+
+Sgr A* is just about half-way in towards the centre from the Sun.  It
+is roughly on line to the centre, but visibly NOT directly on line.
+
+It appears to have recently moved into a star producing region (page
+119) which accounts for the *paradox of youth* whereby many of its
+stars appear to be young, so it could be inside an active arm.
+
+With a little work on the :ref:`gaia` module it should be possible to
+zoom into the gaia data and get an idea of the view around Sgr A*, or
+indeed any other location across the galaxy.
+
 """
 import math
 

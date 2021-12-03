@@ -189,8 +189,9 @@ enough to drive a spiral galaxy the size of the Milky Way.
 
 He suggests that there should be a mass of some 10-100 billion solar
 masses and that the Sun is likely some 50,000 light years from the
-centre, with Sag A* likely at the end of one arm of the central
-bulge. 
+centre, with Sag A* only about halfway to the centre, and whilst
+roughly on line to the centre, it is visibly NOT directly on line.
+
 
 Red Shift
 =========
@@ -231,7 +232,7 @@ Or more particularly, where is the centre of our galaxy?
 
 How far is the sun from that centre?
 
-Sag A*
+Sgr A*
 ======
 
 

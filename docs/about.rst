@@ -26,13 +26,15 @@ University mathematics program.
 
 The wellington boots and the gnome like beard more than compensated
 for the calculus.  He was part of a great mathematics department that
-Professor Zeeman had put together.
+`Christopher Zeeman`_ had put together.
 
-He had recently given the Royal Institution Chrismas lectures, which I
-guess was in part why I ended up at Warwick.
+`Christopher Zeeman`_ had recently given the Royal Institution
+Christmas lectures, which I guess was in part why I ended up at
+Warwick.
 
-By this time it was the expanding universe was general knowledge, red
-shift, the big bangs and cosmic microwave backgrounds too.
+Back to our story. By this time the expanding universe was general
+knowledge, red shift, the big bang, and cosmic microwave backgrounds
+too.
 
 Everything in cosmology seemed to be explained down to the first tiny
 fraction of a second, although nobody is sure how it will end, or
@@ -109,7 +111,7 @@ quasars, Cosmic Micro-wave Background, the mix of light elements and more.
 The book carefully explains special and general relativity, a not
 insignificant task, in of itself.
 
-:ref:dss is introduced as a model for the Universe and it is shown
+:ref:`dss` is introduced as a model for the Universe and it is shown
 that the expanding Universe we see is just part of this space.
 
 We are ignoring a dual contracting space.  In relativity, dimensions
@@ -122,7 +124,13 @@ Gamma-Ray bursts, thought to be incredibly distant, super energetic
 bodies from a previous time, nearer the Big Bang is what conventional
 theory says.  These are just intrinsic features of the geometry of the
 universe, optical illusions caused by the arrival of a new galaxy at
-the edge of our visible universe, says Rourke.
+the edge of our visible universe, says Rourke. in joint work with
+Robert MacKay.
+
+I believe it was Robert MacKay that described the whole thing as an
+extreme example of *observer selection bias*: each source of light we
+see blue-shifted for all but a, relatively small, finite time and then
+see it increasingly red shifted for the rest of our eternity.
 
 The cosmic microwave background being the thermalised radiation from
 the less dramatic arrivals.
@@ -171,6 +179,15 @@ go read the book, the first chapter at least, I am here for questions.
 If anything here does not make sense, it is more than likely that I
 have got something spectacularly wrong here.   Check the source first.
 
+Christopher Zeeman
+==================
 
+Christopher Zeeman also proved a key result in our story: *Causality
+implies the Lorentz Group*.
+
+It places some very significant restrictions on the geometry of 
+Universe, restrictions that explain why de Sitter Space is a natural
+choice for the simplest possible space-time.
 
 .. _Poincaré Conjecture: http://msp.warwick.ac.uk/~cpr/poincare.pdf
+

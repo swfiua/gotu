@@ -68,6 +68,13 @@ About
 .. toctree::
 
    about
+
+Latest News
+===========
+
+.. toctree::
+
+   news
    
 
 Indices and tables
