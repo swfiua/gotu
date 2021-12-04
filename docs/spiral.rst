@@ -1,3 +1,4 @@
+.. _spiral:
 
 ===================================
 Spiral Galaxies, no dark matter

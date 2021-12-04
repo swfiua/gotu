@@ -124,19 +124,19 @@ Gamma-Ray bursts, thought to be incredibly distant, super energetic
 bodies from a previous time, nearer the Big Bang is what conventional
 theory says.  These are just intrinsic features of the geometry of the
 universe, optical illusions caused by the arrival of a new galaxy at
-the edge of our visible universe, says Rourke. in joint work with
+the edge of our visible universe, says Rourke, in joint work with
 Robert MacKay.
 
 I believe it was Robert MacKay that described the whole thing as an
 extreme example of *observer selection bias*: each source of light we
-see blue-shifted for all but a, relatively small, finite time and then
-see it increasingly red shifted for the rest of our eternity.
+see blue-shifted for all but a relatively small, finite time and then
+see it increasingly red shifted for the rest of eternity.
 
 The cosmic microwave background being the thermalised radiation from
 the less dramatic arrivals.
 
 If you got this far, I think you will agree that this is a book making
-some fascinating and dramatic claims.
+some fascinating and significant claims.
 
 It is coming at a time that observational physics has never been
 stronger and I believe there is now considerable observational
@@ -152,15 +152,15 @@ million light years (I may have these numbers wrong!), with 1000 or so
 stars.  The article noted that the babies seemed to have higher
 velocity than galaxies bound to us would have.  
 
-The goal of this project is to help act as a guide to the ideas in the
+One goal of this project is to help act as a guide to the ideas in the
 book and to encourage people to go and read it.
 
-The goal is provide simple tools visualising some of the mathematics
+Another goal is provide simple tools visualising some of the mathematics
 as well as exploring the latest astronomical data sets, and along the
-way providing a guide to the universe.
+way, providing a guide to the universe.
 
 :ref:`wits` is just one question that I will be looking to
-answer, in particular, the relative positions of the Sun, Sag A* and
+answer, in particular, the relative positions of the Sun, Sgr A* and
 the galactic centre.
 
 Returning to the title, this indeed is one of the greatest scientific
@@ -177,7 +177,9 @@ the book.  I very much recommend, that if you have made it this far,
 go read the book, the first chapter at least, I am here for questions.
 
 If anything here does not make sense, it is more than likely that I
-have got something spectacularly wrong here.   Check the source first.
+have got something spectacularly wrong.
+
+Check the source first, it is well worth a read.
 
 Christopher Zeeman
 ==================

@@ -10,8 +10,6 @@ The Geometry of the Universe
    gotu
    pc
 
-   contents
-   
 
 A space time trilogy
 ====================
