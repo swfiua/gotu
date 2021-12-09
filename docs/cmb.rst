@@ -1,4 +1,4 @@
-.. cmb_:
+.. _cmb:
 
 =============================
  Cosmic Microwave Background
