@@ -1,5 +1,9 @@
 .. _wits:
 
+====
+WITS
+====
+
 .. automodule:: gotu.wits
     :members:
 

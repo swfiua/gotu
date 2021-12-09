@@ -70,6 +70,8 @@ About
 
    about
 
+   ws
+   
 Latest News
 ===========
 

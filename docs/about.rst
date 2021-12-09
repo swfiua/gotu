@@ -194,7 +194,7 @@ Here's just one that is involved in the story in many ways.
 Later I hope to have a full cast of characters to explore.
 
 Christopher Zeeman
-==================
+------------------
 
 Christopher Zeeman also proved a key result in our story: *Causality
 implies the Lorentz Group*.
