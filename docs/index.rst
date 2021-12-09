@@ -59,6 +59,9 @@ A module for each chapter
 
    gaia
 
+   bb
+
+   observations
 
 About
 =====

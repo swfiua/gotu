@@ -174,12 +174,24 @@ Caveat
 
 Everything that is here is just my work and notes as I work through
 the book.  I very much recommend, that if you have made it this far,
-go read the book, the first chapter at least, I am here for questions.
+go read the book, the first chapter at least.  Check the :ref:`ws`
+website for free chapters.
+
+I am here for questions.  
 
 If anything here does not make sense, it is more than likely that I
-have got something spectacularly wrong.
+have got something spectacularly wrong.  It happens a lot in this
+space. 
 
 Check the source first, it is well worth a read.
+
+I should also add that I am really terrible at ackowledging the
+contributions of others to .   There is such a cast of characters
+involved. :ref:`gotu` does an excellent job of this.
+
+Here's just one that is involved in the story in many ways.
+
+Later I hope to have a full cast of characters to explore.
 
 Christopher Zeeman
 ==================
