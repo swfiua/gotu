@@ -1,5 +1,147 @@
 """de Sitter Space
 
 It's a ball, expanding and contracting, like an Escher drawing.
+
+Are gamma-ray bursts optical illusions?
+
+Robert S Mackay, Colin Rourke.
+
+https://pjm.ppu.edu/paper/247
+
+The paper describes the relationships between pairs of geodesics in de
+Sitter Space.
+
+One geodesic corresponds to the path of a distant galaxy and the other
+a receiver geodesic.
+
+Each emitter arrives in our visible universe highly blue shifted, then
+becomes increasingly red-shifted as time goes by.
+
+The actual blue shift period and full details depend on two
+parameters, $\phi$ and \$theta.
+
+\phi corresponds to the minimum distance between the receiver and
+emitter, in other words, the emitter's closest point of approach.
+
+\theta measures the angle of approach.
+
+
+
 """
-__all__ = []
+
+# we are going to need this
+import math
+import numpy as np
+from matplotlib import pyplot as plt
+
+from traceback import print_exc
+
+import curio
+
+from blume import magic
+from blume import magic
+from blume import farm as fm
+
+class Dss(magic.Ball):
+
+    def __init__(self):
+        """ initialise """
+        super().__init__()
+
+        self.theta = 0.1
+        self.phi = 5
+        self.size = 50
+        self.aaa = magic.modes
+        
+        self.alpha, self.beta, self.gamma, self.delta = symbols(
+            'alpha beta gamma delta')
+
+    def set_abcd(self):
+
+        self.a = (self.alpha + self.beta - self.gamma - self.delta) / 2
+        self.b = (self.alpha - self.beta - self.gamma + self.delta) / 2
+        self.c = (self.alpha + self.beta + self.gamma + self.delta) / 2
+        self.d = (self.alpha - self.beta + self.gamma - self.delta) / 2
+        
+
+    def constraints(self):
+
+        print(self.alpha**2 - self.gamma**2 >= 1.)
+
+        print(self.alpha > 0)
+
+        a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
+
+        print((a * b - c * d) <= (a*a - c*c - 1) * (b*b - d*d -1))
+
+        print((a*d - b*c) <= (a*a - c*c - b*b + d*d -1))
+
+    def blue_shift_time(self, alpha=None, delta=None):
+        """ """
+        a = alpha or self.alpha
+        d = delta or self.delta
+
+        etb = sqrt((1+a)/(a+d)) + sqrt((1-d)/(a-d))
+        
+        return log(etb)
+
+    def deSitter(self):
+
+        return predefined.DeSitter()
+
+
+    async def run(self):
+
+        size = self.size
+        epsilon = 1e-3
+
+        img = np.zeros((size, size))
+
+        for row in range(1, size+1):
+
+            delta = math.cos(math.pi * row/(size+1))
+            for col in range(1, size+1):
+                alpha = math.cosh(self.phi * col/(size+1))
+
+                try:
+                    img[row-1][col-1] = self.blue_shift_time(
+                        alpha or epsilon, delta or epsilon)
+                except:
+                    print_exc()
+                    print(alpha, delta)
+                    raise
+ 
+            #print(img[row-1])
+
+            await curio.sleep(0)
+
+        plt.imshow(img, cmap=magic.random_colour())
+        plt.colorbar()
+        await self.put(magic.fig2data(plt))
+
+async def run():
+
+    dss = Dss()
+
+    dss.set_abcd()
+    dss.constraints()
+
+    farm = fm.Farm()
+    
+    farm.add(dss)
+    
+    await farm.start()
+
+    print(dss.deSitter())
+
+    farm.shep.path.append(dss)
+
+    await farm.run()
+        
+
+
+if __name__ == '__main__':
+
+    init_printing(pretty_print=True)
+
+    curio.run(run(), with_monitor=True)

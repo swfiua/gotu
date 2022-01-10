@@ -63,7 +63,7 @@ This observation is what lead to the dark matter assumption: there
 must be some matter we can't see that is dragging the stars along.
 
 Colin Rourke, says nonesense, there must be a giant rotating mass at
-the centre, dragging thigs along.
+the centre, dragging things along.
 
 
 Einstein's general relativity withstands double pulsar's Scrutiny
@@ -91,24 +91,28 @@ observed system.  Lets call it Jumb0 737, from the J designate, or
 Jumbo for short.
 
 The rotations of the Jumbo are incredibly stable, at the level of an
-atomic clocl, allowing very precise measurements of the time delays of
+atomic clock, allowing very precise measurements of the time delays of
 the pulses of energy as the system makes each rotation.
+
+In addition, Jumbo is nearer than the Hulse-Taylor system and there is
+much less uncertainty in our estimate of its distance from earth.
 
 It all gets complicated, since as although the system is in our own
 galaxy, the intervening spacetime modulates the signal we receive.
 
 The new paper explains the precise measurements that can now be made
-and how variations on the base general relativity, can, in some cases,
-be tested.
+and how variations on general relativity, can, in some cases, be
+tested.
 
-In particular, the paper now mentions the rotation of the larger body
+In particular, the paper now mentions that rotation of the larger body
 now has to be taken into account in the equations of state of the
 entire system.
 
 The aproach that is taken is to assume the Lense-Thiring effect.  
 
 This is discussed in some detail in chapter 3 of the book, *the
-biggest blunder...*.   Particular attention around page 60.
+biggest blunder...*.  Particular attention should be paid to the
+discussion around page 60.
 
 There are some quite technical arguments.  The Lense Thiring effect is
 intuitively compelling.  General relativity tells us that if
@@ -118,7 +122,10 @@ that fits Einstein's equations.
 This is problematic for the book's arguments as the Kerr metric falls
 off as 1/(r**3) whereas the book argues it should fall off as 1/r.
 
-Rather, we should wonder at how hard it is to change perspectives.
+Rourke makes the assumption that linear motion has no inertial effect
+and notes that you can change angular momentum by adding a linear
+motion, whereas angular velocity cannot be changed in this way.
+
 
 Is space time a vacuum?
 -----------------------
@@ -143,12 +150,22 @@ What about Jumbo?
 So the cool news is that we now get estimates of the angular velocity
 of each body and it's moment of inertia.
 
-The latter adds some uncertainty to model fits as there is uncertainty
-of the exact distribution of the matter within each neutron star.
+The latter adds some uncertainty to model fit as there is uncertainty
+of the exact distribution of the matter within each neutron star,
+which is important to know, as the model being used assumed it is
+angular momentum that drives the rotational frame dragging.
 
-In contrast, Rourke argues that it is angular velocity, rather than
+As noted above, Rourke argues that it is angular velocity, rather than
 angular momentum that matters in the calculation, in short the matter
 distribution within the black hole is not required for his model.
+
+Further, that the Lense-Thiring effect drops off as 1/r, not the
+1/r**3 that is presumably being used by the new paper.  Unless the
+orbits are highly oblique, this difference is not going to be
+detectable with a single system.
+
+This should mean that a fit using Rourke's model reduces the
+uncertainty in all the parameters that the fitting process estimates.
 
 What about the spiral module?
 =============================
