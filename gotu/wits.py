@@ -176,6 +176,7 @@ class SolarSystem(magic.Ball):
             self.modes.rotate()
 
         ax = await self.get()
+        ax.projection(view)
 
         for name in names:
 
@@ -197,16 +198,16 @@ class SolarSystem(magic.Ball):
             if view == 'polar':
                 if self.log and dist:
                     dist = math.log(dist)
-                pyplot.plot([ra], [dist], 'o', label=label)
+                ax.plot([ra], [dist], 'o', label=label)
             else:
-                pyplot.plot([ra], [dec], 'o', label=label)
+                ax.plot([ra], [dec], 'o', label=label)
 
         ax.grid(True)
-        ax.title(self.now)
+        ax.set_title(self.now)
         ax.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
 
         # draw the axes
-        ax.draw_artist(ax)
+        ax.show()
         #await self.put()
         
         self.tick()
