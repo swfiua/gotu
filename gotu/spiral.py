@@ -104,9 +104,10 @@ The new paper explains the precise measurements that can now be made
 and how variations on general relativity, can, in some cases, be
 tested.
 
-In particular, the paper now mentions that rotation of the larger body
-now has to be taken into account in the equations of state of the
-entire system.
+In particular, the paper now mentions that rotation of the faster
+rotating body now has to be taken into account in the equations of
+state of the entire system.  The other body is rotating around one
+hundred times slower so the effect can largely be ignored.
 
 The aproach that is taken is to assume the Lense-Thiring effect.  
 
@@ -126,9 +127,11 @@ Rourke makes the assumption that linear motion has no inertial effect
 and notes that you can change angular momentum by adding a linear
 motion, whereas angular velocity cannot be changed in this way.
 
-
 Is space time a vacuum?
 -----------------------
+
+The impasse is resolved if we assume that space is not in fact a
+vacuum.
 
 For starters, there is an awful lot of microwave radiation buzzing
 around:  the cosmic microwave background.
@@ -165,13 +168,32 @@ orbits are highly oblique, this difference is not going to be
 detectable with a single system.
 
 This should mean that a fit using Rourke's model reduces the
-uncertainty in all the parameters that the fitting process estimates.
+uncertainty in all the parameters that the fitting process estimates,
+since the uncertainty in the matter distribution no longer comes into
+play.
+
+Another project would be to fit the model to the latest Hulse-Taylor
+data and see what changes.
+
+I am also curious how Rourke's model affects the long term evolution
+of these systems.  My hunch (actually I think I read something along
+these lines in the book) is that the feedback from the rotation keeps
+these binary systems stable and that it is highly improbable that they
+will in-spiral and coalesce.   
+
+Which raises the interesting question of what is the source of the
+waves that our gravitational wave detectors are seeing?   
+
+Which reminds me, I need to work on the grb module.
+
 
 What about the spiral module?
 =============================
 
 The idea is to create a visualisation of the formation of spiral
 galaxies with a *\omega m / r* model.
+
+It would be good to also be able to model binary systems while we are at it.
 
 """
 
