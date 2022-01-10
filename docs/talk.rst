@@ -37,6 +37,31 @@ other claims in the book::
     angular velocity and inversely proportional to the distance from
     the centre of the mass.
 
+What has it got to do with python?
+
+There is a lot of incredible work going on in universities across the
+world.  Very complex data analysis, with python at the core of it.
+
+In observational astrophysics new instruments are constantly coming on
+line and new observations become available.
+
+The key papers are international collaborations typically involving
+fifty or more authors.   There are a lot of parts to data pipelines.
+
+The good news is that once a pipeline is established, it can be fed
+with new data as it becomes available.
+
+With software at the heart of analyses it is often also possible to
+test a number of different ieas with only a small marginal amount
+of work for each idea.
+
+With floods of new observations every year it is important that a wide
+enough range of models are considered.
+
+Our understanding of the universe has been a history of climbing hills
+looking out over the plane and failing to see the giant mountain
+towering above us, if we would only turn round and look.
+
 
 The Eyes
 ========
