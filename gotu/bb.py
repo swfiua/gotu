@@ -1,28 +1,40 @@
-"""The big bang theory.
+"""Big Bang or Biggest Blunder?
 
-What is the problem?
 
-In many respects the big bang theory is an excellent theory.  
+According to the big bang theory, all matter in the universe was at
+essentially the same point in space just 13.7 billion years ago.
 
-It does seem to fit the observations very well.
 
-We see everything receding faster, the further back in time we look.
+This provides a universal clock that all observers can use to agree on
+what happened where and when: just measure time since the big bang.
 
-If we reverse this movie, surely at some point it was all crushed into
-almost nothing?
 
-Is there not an excellent model for such a universe, and a whole
-llambda cold dark matter model that fits everything perfectly?
+Chapter 2 of the book covers the period of model building, following
+Einstein's discovery of general relativity, applying the theory to
+the universe as a hole.  And it appears that Einstein favoured a
+*cylinder* model that had a universal time.
 
-The short answer is that the Big Bang Theory requires numerous fixes
-to convential physics in order to match the observations, including
-harmonics in the cosmic microwave background.
+This is problematic for special relativity, where space and time get
+inextricably intertwined and observers in relative motion to each
+other do not agree on what happened where and when.
 
-These harmonics are very much easier to explain if the universe is
-very much older than the 13.7 billion years of the big bang theory.
+It leads to the assumption that space time is restricted to a subspace
+of the full de Sitter Space, that which originated at a single point a
+mere 13.7 billion years ago.
 
-:ref:`gotu` shows how an essentially static universe would appear as
-an expanding universe.
+
+The Big Bang theory
+===================
+
+Einstein's biggest blunder?  
+
+It is more than a little unreasonable to question the models of the
+day given today's observational astrophysics.
+
+I think it is safe to admit that there will, in time be plenty of
+worthy winners, but in most cases the blunders will turn out to be
+extremely informative, once viewed with a new perspective.
+
 
 """
 

@@ -151,7 +151,7 @@ class SolarSystem(magic.Ball):
         print("The sun is:")
         print(sun)
 
-        self.radii.add_filter('N', self.reset)
+        self.add_filter('N', self.reset)
 
     async def reset(self):
         """ Reset the time to now """
@@ -175,7 +175,8 @@ class SolarSystem(magic.Ball):
                 self.views.rotate()
             self.modes.rotate()
 
-        ax = pyplot.subplot(projection=view)
+        ax = await self.get()
+        ax.projection(view)
 
         for name in names:
 
@@ -192,18 +193,23 @@ class SolarSystem(magic.Ball):
 
             dra, ddec, dist = bod.ra.deg, bod.dec.deg, bod.distance.au
             label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
+            print(label)
 
             if view == 'polar':
                 if self.log and dist:
                     dist = math.log(dist)
-                pyplot.plot([ra], [dist], 'o', label=label)
+                ax.plot([ra], [dist], 'o', label=label)
             else:
-                pyplot.plot([ra], [dec], 'o', label=label)
+                ax.plot([ra], [dec], 'o', label=label)
 
-        pyplot.grid(True)
-        pyplot.title(self.now)
-        pyplot.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
-        await self.put()
+        ax.grid(True)
+        ax.set_title(self.now)
+        ax.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
+
+        # draw the axes
+        ax.show()
+        #await self.put()
+        
         self.tick()
 
     def tick(self):
