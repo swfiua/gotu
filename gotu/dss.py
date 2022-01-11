@@ -53,8 +53,7 @@ class Dss(magic.Ball):
         self.size = 50
         self.aaa = magic.modes
         
-        self.alpha, self.beta, self.gamma, self.delta = symbols(
-            'alpha beta gamma delta')
+        self.alpha, self.beta, self.gamma, self.delta = (1,1,1,1)
 
     def set_abcd(self):
 
@@ -81,13 +80,14 @@ class Dss(magic.Ball):
         a = alpha or self.alpha
         d = delta or self.delta
 
+        sqrt = math.sqrt
         etb = sqrt((1+a)/(a+d)) + sqrt((1-d)/(a-d))
         
-        return log(etb)
+        return math.log(etb)
 
     def deSitter(self):
 
-        return predefined.DeSitter()
+        pass
 
 
     async def run(self):
@@ -115,9 +115,13 @@ class Dss(magic.Ball):
 
             await curio.sleep(0)
 
-        plt.imshow(img, cmap=magic.random_colour())
-        plt.colorbar()
-        await self.put(magic.fig2data(plt))
+        ax = await self.get()
+        
+        aximg = ax.imshow(img, cmap=magic.random_colour())
+        ax.figure.colorbar(aximg)
+
+        ax.show()
+
 
 async def run():
 
@@ -139,9 +143,7 @@ async def run():
     await farm.run()
         
 
-
 if __name__ == '__main__':
 
-    init_printing(pretty_print=True)
-
-    curio.run(run(), with_monitor=True)
+    wm = False
+    curio.run(run(), with_monitor=wm)
