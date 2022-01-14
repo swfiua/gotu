@@ -133,11 +133,10 @@ class SolarSystem(magic.Ball):
 
     """
 
-    def __init__(self, args):
+    def __init__(self, args=None):
 
         super().__init__()
 
-        
         self.__dict__.update(vars(args or get_args()).items())
 
         self.now = time.Time(datetime.now())

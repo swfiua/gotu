@@ -203,6 +203,8 @@ import random
 
 import math
 
+from collections import deque
+
 import curio
 
 import astropy.units as u
@@ -350,6 +352,18 @@ class Spiral(magic.Ball):
 
         super().__init__()
 
+        self.modes = deque(
+            ('sun',
+             'galaxy'))
+
+        # set up an initial mode
+        self.mode = None
+        self.mode_switch()
+
+        self.details = True
+
+    def galaxy(self):
+        """ Set parameters for a galaxy """
         # A = K * \omega_0.  K = M for Sciama principle
         self.A = 0.0005
 
@@ -375,7 +389,52 @@ class Spiral(magic.Ball):
         self.rmin = 5000
         self.rmax = 50000
 
-        self.details = True
+
+    def sun(self):
+
+        solar_mass = 3/9460730000000
+        solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
+        
+        self.Mcent = solar_mass
+        self.omega0 = solar_angular_velocity
+
+        # astronomical unit in light years
+        au = 1 / 63241.08
+        
+        self.rmin = 0.1 * au
+        self.rmax = 50 * au
+
+        # Central mass.  Mass converted to Schwartzschild radius (in light years)
+        # Mass of 1 is approximately 3e12 solar masses.
+        self.Mcent = 0.03
+        self.Mball = 0.
+        self.Mdisc = 0.
+
+        self.K = self.Mcent
+
+        # solar wind goes from 30 km/s at 3 AU to 500 km/s at 40 AU
+        # so set A to 2 * 500 km/s in our units
+        # A = K * \omega_0.  K = M for Sciama principle
+        self.A = 0.001
+
+        # magic constant determined by overall energy in the orbit
+        self.EE = -0.00000345
+
+        # constant, can be read from tangential velocity for small r
+        self.CC = -10
+
+        # range of radius r to consider, in light years
+        self.rmin = 5000
+        self.rmax = 50000
+
+        # Apparent rate of precession of the roots of the spiral.
+        self.B = self.A / self.rmin
+
+        print('omega0', self.omega0)
+        print('A/K', self.A / self.K)
+        print('rmin_check', self.rmin_check())
+        
+        self.omega0 = self.A / self.K   # angular velocity in radians per year
 
 
     def rmin_check(self):
@@ -459,9 +518,18 @@ class Spiral(magic.Ball):
         
         return energy
 
+    def mode_switch(self):
+
+        if self.mode != self.modes[0]:
+            self.mode = self.modes[0]
+
+            # run the mode
+            getattr(self, self.mode)()
+
+    
     async def run(self):
 
-        rr = np.arange(self.rmin, self.rmax, 10)
+        rr = np.arange(self.rmin, self.rmax, 100)
         #vv = [self.v(r) for r in rr]
         vv = self.v(rr)
         ii = self.vinert(rr, vv)
@@ -479,6 +547,7 @@ class Spiral(magic.Ball):
             ax.plot(rr, rdot, label='rdot')
             #ax.plot(rr, energy, label='energy')
             ax.legend(loc=0)
+            ax.show()
 
             ax = await self.get()
             ax.plot(rr, rdd, label='rdoubledot')

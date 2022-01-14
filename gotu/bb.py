@@ -38,3 +38,22 @@ extremely informative, once viewed with a new perspective.
 
 """
 
+from .spiral import Spiral
+from .dss import Dss
+from .wits import SolarSystem
+
+from blume import farm, magic
+
+if __name__ == '__main__':
+
+    widgets = [Spiral(), Dss(), SolarSystem()]
+
+    fm = farm.Farm()
+
+    for widget in widgets:
+        fm.add(widget)
+
+    fm.shep.path.append(widgets[0])
+    farm.run(fm)
+    
+
