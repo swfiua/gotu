@@ -35,6 +35,14 @@ I think it is safe to admit that there will, in time be plenty of
 worthy winners, but in most cases the blunders will turn out to be
 extremely informative, once viewed with a new perspective.
 
+It is the experiments that don't work as expected that tend to have
+the biggest effect.  Michelson-Morley is one.
+
+It is the mistakes we make that we do not know we have made that are
+most problematic.
+
+For now, this model will just be a collection of visualisations from
+the project.
 
 """
 
