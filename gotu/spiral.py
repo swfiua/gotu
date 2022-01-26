@@ -434,14 +434,16 @@ class Spiral(magic.Ball):
         self.omega0 = self.A / self.K   # angular velocity in radians per year
 
         # constant, can be read from tangential velocity for small r
-        self.CC = self.find_cc(
+        
+        self.CC = self.find_cc(self.A/100)
+
 
     def find_cc(self, tangential_velocity):
 
         # constant, can be read from tangential velocity for small r
         A, K, r = self.A, self.K, self.rmin
         
-        tv = (2 * A) - (2 * A *K) math.log((r/K) + 1)
+        tv = (2 * A) - (2 * A *K) * math.log((r/K) + 1)
 
         self.CC = tangential_velocity - tv
         print('tv', tangential_velocity, self.CC, tv)
