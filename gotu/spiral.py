@@ -353,8 +353,7 @@ class Spiral(magic.Ball):
         super().__init__()
 
         self.modes = deque(
-            ('sun',
-             'galaxy'))
+            ('galaxy', 'sun'))
 
         # set up an initial mode
         self.mode = None
@@ -397,17 +396,18 @@ class Spiral(magic.Ball):
         solar_mass = 3/9460730000000
         solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
         
+        # Central mass.  Mass converted to Schwartzschild radius (in light years)
+        # Mass of 1 is approximately 3e12 solar masses.
         self.Mcent = solar_mass
+        self.Mball = 0.
+        self.Mdisc = 0.
         self.omega0 = solar_angular_velocity
 
         # astronomical unit in light years
         au = 1 / 63241.08
         
-        # Central mass.  Mass converted to Schwartzschild radius (in light years)
-        # Mass of 1 is approximately 3e12 solar masses.
-        self.Mcent = 0.03
-        self.Mball = 0.
-        self.Mdisc = 0.
+        self.rmin = 0.1 * au
+        self.rmax = 50 * au
 
         self.K = self.Mcent
 
@@ -417,25 +417,27 @@ class Spiral(magic.Ball):
         self.A = 0.001
 
         # magic constant determined by overall energy in the orbit
-        self.EE = -0.00000345
+        self.EE = 0.0
 
 
-        # range of radius r to consider, in light years
-        self.rmin = 0.1 * au
-        self.rmax = 50 * au
+        # constant, can be read from tangential velocity for small r
+        self.CC = -0.1
 
         # Apparent rate of precession of the roots of the spiral.
         self.B = self.A / self.rmin
+
+        self.omega0 = self.A / self.K   # angular velocity in radians per year
 
         print('omega0', self.omega0)
         print('A/K', self.A / self.K)
         print('rmin_check', self.rmin_check())
         
-        self.omega0 = self.A / self.K   # angular velocity in radians per year
 
         # constant, can be read from tangential velocity for small r
-        
-        self.CC = self.find_cc(self.A/100)
+        #self.CC = self.find_cc(self.A/100)
+
+        tv = self.rmin * self.omega
+        self.CC = self.find_cc(tv)
 
 
     def find_cc(self, tangential_velocity):
@@ -535,7 +537,7 @@ class Spiral(magic.Ball):
 
         if self.mode != self.modes[0]:
             self.mode = self.modes[0]
-
+            print('switching mode', self.mode)
             # run the mode
             getattr(self, self.mode)()
 
@@ -554,6 +556,7 @@ class Spiral(magic.Ball):
         #ii = [self.vinert(r, v) for (r, v) in zip(rr, vv)]
         #rdd = [self.rdoubledot(r, v) for (r, v) in zip(rr, ii)]
         rdot = np.sqrt(2 * energy)
+        print('energy', max(energy), min(energy))
         #print('spiral', len(rr), len(rdot))
 
         if self.details:

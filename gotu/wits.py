@@ -192,7 +192,6 @@ class SolarSystem(magic.Ball):
 
             dra, ddec, dist = bod.ra.deg, bod.dec.deg, bod.distance.au
             label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
-            print(label)
 
             if view == 'polar':
                 if self.log and dist:
