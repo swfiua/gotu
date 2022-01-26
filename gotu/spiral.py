@@ -353,8 +353,7 @@ class Spiral(magic.Ball):
         super().__init__()
 
         self.modes = deque(
-            ('sun',
-             'galaxy'))
+            ('galaxy', 'sun'))
 
         # set up an initial mode
         self.mode = None
@@ -395,7 +394,11 @@ class Spiral(magic.Ball):
         solar_mass = 3/9460730000000
         solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
         
+        # Central mass.  Mass converted to Schwartzschild radius (in light years)
+        # Mass of 1 is approximately 3e12 solar masses.
         self.Mcent = solar_mass
+        self.Mball = 0.
+        self.Mdisc = 0.
         self.omega0 = solar_angular_velocity
 
         # astronomical unit in light years
@@ -403,12 +406,6 @@ class Spiral(magic.Ball):
         
         self.rmin = 0.1 * au
         self.rmax = 50 * au
-
-        # Central mass.  Mass converted to Schwartzschild radius (in light years)
-        # Mass of 1 is approximately 3e12 solar masses.
-        self.Mcent = 0.03
-        self.Mball = 0.
-        self.Mdisc = 0.
 
         self.K = self.Mcent
 
@@ -418,14 +415,10 @@ class Spiral(magic.Ball):
         self.A = 0.001
 
         # magic constant determined by overall energy in the orbit
-        self.EE = -0.00000345
+        self.EE = 0.0
 
         # constant, can be read from tangential velocity for small r
-        self.CC = -10
-
-        # range of radius r to consider, in light years
-        self.rmin = 5000
-        self.rmax = 50000
+        self.CC = -0.1
 
         # Apparent rate of precession of the roots of the spiral.
         self.B = self.A / self.rmin
@@ -522,7 +515,7 @@ class Spiral(magic.Ball):
 
         if self.mode != self.modes[0]:
             self.mode = self.modes[0]
-
+            print('switching mode', self.mode)
             # run the mode
             getattr(self, self.mode)()
 
@@ -538,6 +531,7 @@ class Spiral(magic.Ball):
         #ii = [self.vinert(r, v) for (r, v) in zip(rr, vv)]
         #rdd = [self.rdoubledot(r, v) for (r, v) in zip(rr, ii)]
         rdot = np.sqrt(2 * energy)
+        print('energy', max(energy), min(energy))
         #print('spiral', len(rr), len(rdot))
 
         if self.details:
