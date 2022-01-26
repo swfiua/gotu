@@ -18,22 +18,23 @@ Each emitter arrives in our visible universe highly blue shifted, then
 becomes increasingly red-shifted as time goes by.
 
 The actual blue shift period and full details depend on two
-parameters, $\phi$ and \$theta.
+parameters, phi and theta.
 
-\phi corresponds to the minimum distance between the receiver and
+phi corresponds to the minimum distance between the receiver and
 emitter, in other words, the emitter's closest point of approach.
 
-\theta measures the angle of approach.
+theta measures the angle of approach.
 
 
 
 """
 
 # we are going to need this
+import random
 import math
 import numpy as np
 from matplotlib import pyplot as plt
-
+from scipy import integrate
 from traceback import print_exc
 
 import curio
@@ -84,6 +85,15 @@ class Dss(magic.Ball):
         etb = sqrt((1+a)/(a+d)) + sqrt((1-d)/(a-d))
         
         return math.log(etb)
+
+    def time_until_red_shift_matches_expected_for_distance(self, error=0):
+        """ Curious how this value varies with phi and theta """
+        raise NotImplemented        
+
+    def time_until_red_shift_turns_light_into_microwaves(self, error=0):
+        """ Curious how this value varies with phi and theta """
+        raise NotImplemented        
+
 
     def deSitter(self):
 
@@ -144,6 +154,20 @@ async def run():
         
 
 if __name__ == '__main__':
+
+    # theta distributed as cos(theta) * delta_theta
+    theta = math.cos(random.random() * math.pi) * math.pi
+    # phi distributed as sinh ** 2 * delta_phi
+    phi = None
+
+    thetas = np.array([math.cos(theta * math.pi * xx) for xx in range(1, 1000)])
+
+    shines = np.array([math.sinh(x/100) ** 2 for x in range(1,1000)])
+
+    weights = integrate.cumulative_trapezoid(shines, initial=0)
+    plt(weights)
+    plt.show()
+    0/1
 
     wm = False
     curio.run(run(), with_monitor=wm)

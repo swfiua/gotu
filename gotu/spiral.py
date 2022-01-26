@@ -363,6 +363,7 @@ class Spiral(magic.Ball):
 
     def galaxy(self):
         """ Set parameters for a galaxy """
+        print('Galaxy!' * 6)
         # A = K * \omega_0.  K = M for Sciama principle
         self.A = 0.0005
 
@@ -391,6 +392,7 @@ class Spiral(magic.Ball):
 
     def sun(self):
 
+        print('SUN!' * 10)
         solar_mass = 3/9460730000000
         solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
         
@@ -417,18 +419,35 @@ class Spiral(magic.Ball):
         # magic constant determined by overall energy in the orbit
         self.EE = 0.0
 
+
         # constant, can be read from tangential velocity for small r
         self.CC = -0.1
 
         # Apparent rate of precession of the roots of the spiral.
         self.B = self.A / self.rmin
 
+        self.omega0 = self.A / self.K   # angular velocity in radians per year
+
         print('omega0', self.omega0)
         print('A/K', self.A / self.K)
         print('rmin_check', self.rmin_check())
         
-        self.omega0 = self.A / self.K   # angular velocity in radians per year
 
+        # constant, can be read from tangential velocity for small r
+        tv = self.rmin * self.omega
+        self.CC = self.find_cc(tv)
+
+    def find_cc(self, tangential_velocity):
+
+        # constant, can be read from tangential velocity for small r
+        A, K, r = self.A, self.K, self.rmin
+        
+        tv = (2 * A) - (2 * A *K) math.log((r/K) + 1)
+
+        self.CC = tangential_velocity - tv
+        print('tv', tangential_velocity, self.CC, tv)
+
+        return self.CC
 
     def rmin_check(self):
         """ The length of the roots of the spirals 
@@ -521,6 +540,9 @@ class Spiral(magic.Ball):
 
     
     async def run(self):
+
+        # switch mode if it is time to do so
+        self.mode_switch()
 
         rr = np.arange(self.rmin, self.rmax, 100)
         #vv = [self.v(r) for r in rr]
