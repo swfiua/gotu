@@ -63,14 +63,14 @@ A module for each chapter
 
    observations
 
-About
-=====
 
+About the Author
+================
+   
 .. toctree::
 
-   about
+   cpr
 
-   ws
    
 Latest News
 ===========

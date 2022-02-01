@@ -203,5 +203,5 @@ It places some very significant restrictions on the geometry of
 Universe, restrictions that explain why de Sitter Space is a natural
 choice for the simplest possible space-time.
 
-.. _Poincaré Conjecture: http://msp.warwick.ac.uk/~cpr/poincare.pdf
+.. _Poincaré Conjecture: http://homepages.warwick.ac.uk/~masaw/poincare.pdf
 
