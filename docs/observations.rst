@@ -79,3 +79,90 @@ above 30 km s −1 . Reasonable assumptions for the tidal radius result
 in stellar orbits consistent with an isotropic distribution in the
 velocities. These more realistic models only show strong constraints
 for the mass of the central black hole.
+
+
+Einstein's general relativity withstands double pulsar's Scrutiny
+=================================================================
+
+https://physics.aps.org/articles/v14/173
+
+Strong-Field Gravity Tests with the Double Pulsar
+
+M. Kramer et al.
+
+Phys. Rev. X 11, 041050 (2021)
+
+Published December 13, 2021
+
+
+See `gotu.spiral`_ module for more information and ideas from this
+paper.
+
+
+Microwave background temperature at a redshift of 6.34 from H2O absorption
+==========================================================================
+
+https://doi.org/10.1038/s41586-021-04294-5
+Received: 12 February 2021
+
+Roberto Decarli 6 & Roberto Neri 7
+
+Accepted: 30 November 2021
+
+Published online: 2 February 2022
+
+The observation here is a strong absorption line, consistent with
+water absorption, when redshift is taken into account.
+
+There is a plot of the observed spectrum, in the 70-120 GHz range,
+which with a redshift of 6.34 correspondsponding to emission
+frequency in the range 500-900 GHz
+
+The paper seems to be assuming that all the redshift is cosmological
+and that absorption is happening relatively close to the quasar, so
+that it is subject to the same cosmological redshift.
+
+The paper proposes a model for the origin of the observed absorbtion
+lines.  The model allows the temperature of the dust to be fitted to
+observations, giving an estimate of the Cosmic Microwave Background
+temperature at that distance.
+
+Recall, this is a very high redshift quasar, believed to be at
+considerable distance.
+
+It is a technique that has been used before on other systems.   There
+appears to be an emerging relation between distance (as determined by
+redshift) and Cosmic Microwave Background temperature.
+
+What is really happening?
+-------------------------
+
+Here's an alternative explanation.
+
+The amount that the theory needs to raise the CMB background goes up
+as redshifts become larger because the error in our estimate of the
+distance of the system is larger.
+
+What if the light leaving the quasar is subject to very significant
+gravitational red shift explaining most of the redshift?
+
+Our estimate of the power output of the system will be significantly
+inflated.
+
+The dust surrounding the quasar is far enough from the centre that it
+is not subject to significant gravitational redshift.
+
+Perhaps the absorbtion line we are viewing is something other than
+H2O, or perhaps it is close enough to the quasar, that light from it
+too is subject to similar cosmological redshift.
+
+We might expect the nature of the absorbtion to change as the
+gravitational redshift increases, since a different spectrum arrives
+at the dust layer, unless this was the case.
+
+Stick with the theory it is an H2O observation.
+
+Now is the paper really telling us how much a quasar can heat the
+surrounding dust?
+
+With the higher redshift quasars having hotter dust?
