@@ -137,11 +137,8 @@ redshift) and Cosmic Microwave Background temperature.
 What is really happening?
 -------------------------
 
-Here's an alternative explanation.
-
-The amount that the theory needs to raise the CMB background goes up
-as redshifts become larger because the error in our estimate of the
-distance of the system is larger.
+The redshift is a combination of cosmological and gravitational
+redshift. 
 
 What if the light leaving the quasar is subject to very significant
 gravitational red shift explaining most of the redshift?
@@ -149,20 +146,14 @@ gravitational red shift explaining most of the redshift?
 Our estimate of the power output of the system will be significantly
 inflated.
 
-The dust surrounding the quasar is far enough from the centre that it
-is not subject to significant gravitational redshift.
+There is no reason to assume that dust is not also close to the source
+of the radiation and as such will likely be warmer than the CMB.
 
-Perhaps the absorbtion line we are viewing is something other than
-H2O, or perhaps it is close enough to the quasar, that light from it
-too is subject to similar cosmological redshift.
+Now if we assume that most of the redshift is gravitational and that
+these objects are actually quite close, we might expect to find a
+natural relationship between the mass of the quasar and the
+temperature of its surrounding water clouds.
 
-We might expect the nature of the absorbtion to change as the
-gravitational redshift increases, since a different spectrum arrives
-at the dust layer, unless this was the case.
+In turn, since redshift depends on the mass, there is a relation
+between temperature and redshift.
 
-Stick with the theory it is an H2O observation.
-
-Now is the paper really telling us how much a quasar can heat the
-surrounding dust?
-
-With the higher redshift quasars having hotter dust?
