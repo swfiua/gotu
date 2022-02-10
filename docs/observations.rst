@@ -157,3 +157,9 @@ temperature of its surrounding water clouds.
 In turn, since redshift depends on the mass, there is a relation
 between temperature and redshift.
 
+Todo
+----
+
+Appendix C of the book has lots of good information on quasars.
+
+Should use this to examine relationship between redshift and temperature.
