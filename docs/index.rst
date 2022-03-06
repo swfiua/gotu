@@ -63,14 +63,21 @@ A module for each chapter
 
    observations
 
-About
-=====
+Cast of Characters
+==================
 
 .. toctree::
 
-   about
+   cast/index.rst
 
-   ws
+
+About the Author
+================
+   
+.. toctree::
+
+   cpr
+
    
 Latest News
 ===========

@@ -5,11 +5,12 @@
 Abstract
 ========
 
-For the past four years I have been studying the work of my former
-mathematics professor, Colin Rourke.
+I have been studying the work of my former mathematics professor,
+Colin Rourke, since I discovered his work through his *A new paradigm
+for the universe* which was published in 2017.
 
-A new edition of his earlier work, *A new paradigm for the universe*
-was published under the title  *The Geometry of the Universe* in 2021.
+In July 2021 a revised and updated verson was published was published
+under the title *The Geometry of the Universe*.
 
 The book challenges much of standard cosmological theory, whilst
 providing a simple elegant model for the universe.
