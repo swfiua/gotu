@@ -154,8 +154,8 @@ these objects are actually quite close, we might expect to find a
 natural relationship between the mass of the quasar and the
 temperature of its surrounding water clouds.
 
-In turn, since redshift depends on the mass, there is a relation
-between temperature and redshift.
+In turn, since redshift depends on the mass, there is, presumably a
+relation between temperature and redshift.
 
 Todo
 ----

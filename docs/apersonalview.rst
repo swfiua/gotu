@@ -2,6 +2,10 @@
  A Personal View
 =================
 
+** Work in progress -- much rambling ahead, for now this is just
+random thoughts to be resorted **
+
+
 Borrowing the title of Fred Hoyle's epilogue to his *Nature of the
 Universe*.
 

@@ -99,6 +99,29 @@ class Dss(magic.Ball):
 
         pass
 
+    def cmb(self):
+        """Show why there is gravitational fog.
+        
+
+        What would the distant light from a universe a few orders of
+        magnitude larger and older than the Hubble distance look like?
+
+        Curvature means that light that appears to come from a
+        specific, very distant point, is actually a mixture of light
+        from all points on the sphere at that radius.
+
+        At least that's how I think de Sitter Space works.
+
+        The goal here is to explore what we might expect to see.
+
+        Bonus marks for a model which produces the spherical harmonics
+        observed in the cmb.
+
+        Perhaps restrict to a circle of radius phi and use 0 theta for the
+        angle around the circle.
+
+        """
+        raise NotImplemented
 
     async def run(self):
 

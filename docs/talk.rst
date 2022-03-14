@@ -53,7 +53,7 @@ The good news is that once a pipeline is established, it can be fed
 with new data as it becomes available.
 
 With software at the heart of analyses it is often also possible to
-test a number of different ieas with only a small marginal amount
+test a number of different ideas with only a small marginal amount
 of work for each idea.
 
 With floods of new observations every year it is important that a wide
