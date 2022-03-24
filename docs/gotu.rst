@@ -20,36 +20,16 @@ historical account of how we got where we are.
 The book was written by Colin Rourke, emeritus professor of
 mathematics at the University of Warwick.
 
-In many ways it is the antidote to the biggest selling book on
-theoretical physics, *A brief history of time*.   Time is central to this
-story of geometry.
-
-Stephen Hawking went out of his way to avoid mathematical formulae in
-his book, believing that every equation had the potential to halve his
-audience.
-
-Colin Rourke takes the approach of splitting the book into three
-parts.  The first three chapters are intended to be accessible to a
-wider audience, this is followed by a more technical treatment in the
-followin chapters, with six appendices of yet more technical detail.
-
-Chapter 1, leads us on a journey from the ancient Greeks to Einstein
-and it is only page 8 before we are introduced to some geometry.
-Diagrams showing triangles 
-
-
 Recently retired after completing 50 years of lectures.
 
 His interests were in topology and he had a particular interest in the
 Poincaré Conjecture. 
 
+Poincaré Conjecture
+-------------------
+
 Poincaré very much plays a part in the story told in the book, a
-little diversion is in order.   More of that later.
-
-The book provides a gravitational model that matches galactic rotation
-curves, without having to resort to dark matter.
-
-
+little diversion is in order.
 
 The conjecture is about 3-dimensional spaces and states::
 
@@ -72,10 +52,40 @@ Locally, we can construct frames of reference that entail a 3-sphere
 of space dimensions intertwined with a dimension of time.  If we fix
 one dimension, then 3-spheres emerge.
 
-The first two chapters of the book introduce a cast of some 20 or more
-key characters in the story as we are taken on a journey, from the
-Greeks to Einstein.  Some familiar names: Kepler, Newton, Einstein,
-but also some less well known, who played key parts in the story.
+A not so brief history
+---------------------
+
+The book many ways it is the antidote to the biggest selling book on
+theoretical physics, *A brief history of time*.
+
+Time is also central to this story of geometry, but one of the book's
+central arguments is that the history of time if very likely anything
+but brief!
+
+Stephen Hawking went out of his way to avoid mathematical formulae in
+his book, believing that every equation had the potential to halve his
+audience.
+
+His book delved into the physics of the event horizon's of black holes
+and it's curious similarity to the physics of the big bang.
+
+Colin Rourke takes the approach of splitting the book into three
+parts.  The first three chapters are intended to be accessible to a
+wider audience, this is followed by a more technical treatment in the
+following chapters, with six appendices of yet more technical detail.
+
+Chapter 1, leads us on a journey from the ancient Greeks to
+Einstein.
+
+It is only page 8 before we are introduced to some geometry, but it is
+perfectly possible to skip the proofs and follow the narrative of the
+book.
+
+The first two chapters of the book introduce a `cast`_ of some 20 or
+more key characters in the story as we are taken on a journey, from
+the Greeks to Einstein.  Some familiar names: Kepler, Newton,
+Einstein, but also some less well known, who played key parts in the
+story.
 
 It becomes clear that there were many others very heavily involved in
 the evolution of theories.  There was considerable debate about many
@@ -98,8 +108,8 @@ very distant, extraordinarily powerful, systems.  We do not see any of
 these objects nearby and so this was taken as evidence supporting an
 early stage, post big bang, of the evolution of the universe.
 
-`The Geometry of the Universe`_ argues that a large part of the red
-shift we observe is, in fact, gravitational and that, quasars are
+`The Geometry of the Universe`_ argues that a large part of the quasar
+red shift we observe is, in fact, gravitational and that, quasars are
 relatively close objects, of very modest power, where the light they
 emit is subject to considerable gravitational red-shift, in accordance
 with general relativity.
@@ -124,7 +134,10 @@ It is also a vacuum solution to Einstein's general relativity, which
 creates a fascinating twist in the story.
 
 A key observation is that modern cosmology is in fact ignoring
-precisely half of de Sitter space.
+precisely half[1] of de Sitter space.
+
+[1] Or rather, mapping half the universe onto a subspace of `dss`_, a
+space which had a common origin a mere 13.7 billion years ago.
 
 `The Geometry of the Universe`_ tells a compelling tale explaining how
 we arrived at that situation, whilst shining a bright light to the way
@@ -139,7 +152,7 @@ bias: we only see a source blue shifted for a small, finite time of
 the infinite time it is visible to us.
 
 Hence our observations are dominated by red-shifted sources and we
-mis-interpret the small sample of blue-shifted signals, such as
+mis-interpret the small sample of blue-shifted signals, which we see as
 gamma-ray bursts.
 
 Growing evidence that the big bang is a mistake is presented.  Fully
@@ -152,6 +165,13 @@ neighbourhood of space. Galaxies as far as the lenses can see.
 
 It is going to be interesting to see what the James Webb Space
 Telescope reveals when it is launched later this year.
+
+As a sensitive infra-red telescope it should pick up nearby baby
+galaxies with a significant red-shift and light from the edge of our
+universe too.
+
+What to do?
+-----------
 
 One way forward is to ask what an essentially infinite space filled
 with galaxies would actually look like?
@@ -178,7 +198,7 @@ rotating masses drag the nearby inertial frames coherently with the
 rotation.
 
 More specificly, that the effect is proportional to the mass of the
-body and drops of linearly with distance.
+body and drops of with the reciprocal of the distance.
 
 With this assumption, he is also able to reproduce galactic rotation
 curves without need for dark matter.
@@ -214,7 +234,14 @@ theory, and hence confirmation, of the big bang theory.
 
 Of particular note is the cosmic micro-wave background (CMB).
 
+Thermal radiation, with curious spherical harmonics.
 
+The large scale harmonics in the cosmic microwave background are much
+less of a puzzle if the universe has had rather more time than 13.7
+billion years for the harmonics to emerge.
+
+The radiation we see as the `cmb`_?   It is the thermalised radiation
+from the missing parts of de Sitter Space.
 
 
 
