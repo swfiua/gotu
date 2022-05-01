@@ -170,7 +170,7 @@ detectable with a single system.
 This should mean that a fit using Rourke's model reduces the
 uncertainty in all the parameters that the fitting process estimates,
 since the uncertainty in the matter distribution no longer comes into
-play.
+play, just the uncertainty in angular velocity.
 
 Another project would be to fit the model to the latest Hulse-Taylor
 data and see what changes.
@@ -208,6 +208,7 @@ from collections import deque
 import curio
 
 import astropy.units as u
+import astropy.constants as constants
 import astropy.coordinates as coord
 
 from blume import magic
@@ -223,6 +224,24 @@ from scipy import integrate
 
 
 class SkyMap(magic.Ball):
+    """ Yet another table viewer? 
+
+    parsing csv and figuring out what it means.
+
+    or just give me lists of fields i can pick form for
+    any purpose?
+
+    Or yet another universe viewer.
+
+    And so we descend into the world of coordinate systems.
+
+    Something astronomers understand very well.
+    
+    See :mod:`gotu.wits` for more on this subject.
+
+    Maybe SkyMap allows systems to evolve over time, according to the paradigm.
+
+    """
 
     def __init__(self, gals):
 
@@ -259,32 +278,31 @@ class SkyMap(magic.Ball):
         
     async def run(self):
 
-        fig = plt.figure()
-
-        fig.clear()
                 
         #ax = fig.add_axes((0,0,1,1), projection='mollweide')
-        ax = fig.add_subplot(1, 1, 1,
-                             projection='mollweide')
+        ax = await self.get()
+        ax.projection('mollweide')
 
-        locs = [self.decra2rad(ball['dec'], ball['ra'])
+        locs = [self.decra2rad(ball['DEC'], ball['RA'])
                     for ball in self.balls]
             
         self.offset = 0
             
 
-        ball_colours = [x['distance'] for x in self.balls]
+        ball_colours = [x['DISTANCE'] for x in self.balls]
         
         ax.scatter([self.spinra(xx[1]) for xx in locs],
                    [xx[0] for xx in locs],
                    c=ball_colours,
-                   s=[x['major_axis'] or 1 for x in self.balls])
+                   s=[x['ABS_BMAG'] or 1 for x in self.balls])
 
         norm = colors.Normalize(min(ball_colours), max(ball_colours))
-        cm = plt.get_cmap()
+        cm = magic.random_colour()
         for ball, loc, colour in zip(self.balls, locs, ball_colours):
-            ma = ball['major_axis'] or 1
-            ngn = ball.get('neighbor_galaxy_name', '')
+            ma = ball['LINEAR_DIAMETER'] or 1
+            
+            #ngn = ball.get('neighbor_galaxy_name', '')
+            ngn = 'foo'
             constellation = ''
             #if (ma or 1) > 20:
             if 'ilky' in ngn or 'ilky' in constellation:
@@ -303,14 +321,14 @@ class SkyMap(magic.Ball):
                                    
         ax.axis('off')
 
-        await self.put(magic.fig2data(plt))
+        ax.show()
+        #await self.put(magic.fig2data(plt))
 
 
-        fig.clear()
-
-        ax = fig.add_subplot(111)
-        rv = [xx.get('radial_velocity', 0.0) or 0. for xx in self.balls]
-        distance = [xx.get('distance', 0.0) or 0. for xx in self.balls]
+        ax = await self.get()
+        
+        rv = [xx['RADIAL_VELOCITY'] or 0. for xx in self.balls]
+        distance = [xx['DISTANCE'] or 0. for xx in self.balls]
 
         rrv = []
         dd = []
@@ -325,20 +343,21 @@ class SkyMap(magic.Ball):
             dd.append(dist)
 
         ax.scatter(dd, rrv)
+        ax.show()
 
         #await curio.sleep(self.sleep)
         #await self.outgoing.put(magic.fig2data(fig))
         #await curio.sleep(self.sleep)
 
         #await self.outgoing.put(magic.fig2data(fig))
-        fig.clear()
-        ax = fig.add_subplot(111)
+        ax = await self.get()
         ax.plot(distance)
+        ax.show()
         #await self.outgoing.put(magic.fig2data(fig))
 
-        fig.clear()
-        ax = fig.add_subplot(111)
+        ax = await self.get()
         ax.plot([xx[1] for xx in locs])
+        ax.show()
         #await self.outgoing.put(magic.fig2data(fig))
 
 
@@ -346,6 +365,8 @@ class Spiral(magic.Ball):
     """  Model a spiral galaxy
 
     Or any rotating mass?
+
+    Want to convert this to use astropy units.
     """
 
     def __init__(self):
@@ -389,11 +410,13 @@ class Spiral(magic.Ball):
         self.rmin = 5000
         self.rmax = 50000
 
+        self.print_parms()
+        print()
 
     def sun(self):
 
         print('SUN!' * 10)
-        solar_mass = 3/9460730000000
+        solar_mass = 1 * units.solMass
         solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
         
         # Central mass.  Mass converted to Schwartzschild radius (in light years)
@@ -404,7 +427,8 @@ class Spiral(magic.Ball):
         self.omega0 = solar_angular_velocity
 
         # astronomical unit in light years
-        au = 1 / 63241.08
+        # au = 1 / 63241.08  ### can't remember how I calculated this
+        au = units.au
         
         self.rmin = 0.1 * au
         self.rmax = 50 * au
@@ -413,33 +437,36 @@ class Spiral(magic.Ball):
 
         # solar wind goes from 30 km/s at 3 AU to 500 km/s at 40 AU
         # so set A to 2 * 500 km/s in our units
+        # ??
+
         # A = K * \omega_0.  K = M for Sciama principle
-        self.A = 0.001
+        self.A = self.K * solar_angular_velocity
 
         # magic constant determined by overall energy in the orbit
         self.EE = 0.0
 
 
         # constant, can be read from tangential velocity for small r
-        self.CC = -0.1
+        self.find_cc(tangential_velocity=self.rmin * self.omega0)
+        #self.CC = -0.1
 
         # Apparent rate of precession of the roots of the spiral.
         self.B = self.A / self.rmin
 
         self.omega0 = self.A / self.K   # angular velocity in radians per year
 
+        self.print_parms()
+        print()
+
+    def print_parms(self):
+        
         print('omega0', self.omega0)
+        print('CC', self.CC)
         print('A/K', self.A / self.K)
         print('rmin_check', self.rmin_check())
         
 
-        # constant, can be read from tangential velocity for small r
-        #self.CC = self.find_cc(self.A/100)
-
-        tv = self.rmin * self.omega
-        self.CC = self.find_cc(tv)
-
-
+    
     def find_cc(self, tangential_velocity):
 
         # constant, can be read from tangential velocity for small r
@@ -683,8 +710,22 @@ def near_galaxies(infile):
     https://heasarc.gsfc.nasa.gov/w3browse/all/neargalcat.html
 
     """
-    for item in taybell.read(infile):
-        yield cleanse(item)
+    from astroquery import heasarc
+    from astropy import coordinates
+
+    heas = heasarc.Heasarc()
+
+    coord = coordinates.SkyCoord('12h00m00 + 0d0m0s', frame='gcrs')
+    table = heas.query_region(
+        mission='heasarc_neargalcat',
+        position=coord,
+        radius='360 deg')
+
+    for item in table:
+        yield item
+
+    print(item.keys())
+
 
 def parse_radec(value):
 
@@ -704,14 +745,15 @@ def cleanse(data):
 
     clean = {}
 
-    for key, value in data.items():
-
+    for key in data.keys():
+        value = data[key]
         try:
             value = float(value)
         except:
             pass
 
-        if key in ('ra', 'dec'):
+        if key.lower() in ('ra', 'dec'):
+            print(key, value)
             value = parse_radec(value)
             
         clean[key] = value

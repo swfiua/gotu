@@ -149,10 +149,14 @@ class Dss(magic.Ball):
             await curio.sleep(0)
 
         ax = await self.get()
-        
-        aximg = ax.imshow(img, cmap=magic.random_colour())
-        ax.figure.colorbar(aximg)
 
+        extent = [0, math.pi, 0, self.phi]
+        aximg = ax.imshow(
+            img,
+            cmap=magic.random_colour(),
+            extent=extent,
+        )
+        ax.figure.colorbar(aximg)
         ax.show()
 
 
@@ -188,9 +192,9 @@ if __name__ == '__main__':
     shines = np.array([math.sinh(x/100) ** 2 for x in range(1,1000)])
 
     weights = integrate.cumulative_trapezoid(shines, initial=0)
-    plt(weights)
-    plt.show()
-    0/1
+    #plt(weights)
+    #plt.show()
+    #0/1
 
     wm = False
     curio.run(run(), with_monitor=wm)

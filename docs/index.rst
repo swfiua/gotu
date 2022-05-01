@@ -85,7 +85,14 @@ Latest News
 .. toctree::
 
    news
-   
+
+
+Talk
+====
+
+.. toctree::
+
+   talk
 
 Indices and tables
 ==================
