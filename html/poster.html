@@ -1,0 +1,52 @@
+<html>
+  <head>
+      <!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" /> -->
+      <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+
+
+      <!-- 
+To use a local version of a package build a wheel:
+
+    python3 setup.py bdist_wheel
+
+Then include the path to the wheel.
+
+And run:
+
+    python -m http.server 8080
+
+To serve this file and the wheels too.
+This works pretty well if the html is part of the local package.
+-->
+      <py-env>
+        - matplotlib
+        - scipy
+        - ./blume-0.2.3-py3-none-any.whl
+        - ./gotu-0.o1-py3-none-any.whl
+        - paths:
+          - ./poster.py
+      </py-env>
+    </head>
+
+  <body>
+    <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button>
+    <py-script src='./poster.py' output='stdout'>
+
+    </py-script>
+
+    <h1>Log</h1>
+    <div id='log'></div>
+    <br><hr>
+    <h3>Help</h3>
+    <div id='help'></div>
+    <br><hr>
+    <div id="fig" pys-onKeyDown='show_key'></div>
+    <br><hr>
+    <h3>Stdout</h3>
+    <div id="stdout"></div>
+    
+    <!-- <div id="repl"> -->
+    <!--   <py-repl></py-repl> -->
+    <!-- </div> -->
+  </body>
+</html>

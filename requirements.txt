@@ -1,7 +1,5 @@
 blume
-curio
 matplotlib
 astropy
-networkx
-healpy
+
 

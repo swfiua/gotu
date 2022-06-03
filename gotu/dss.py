@@ -144,7 +144,7 @@ class Dss(magic.Ball):
  
             #print(img[row-1])
 
-            await curio.sleep(0)
+            await magic.sleep(0)
 
         ax = await self.get()
 
@@ -195,4 +195,4 @@ if __name__ == '__main__':
     #0/1
 
     wm = False
-    curio.run(run(), with_monitor=wm)
+    magic.run(run(), with_monitor=wm)
