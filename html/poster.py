@@ -1,18 +1,19 @@
 import numpy as np
+from blume import farm as land
 
-async def main():
+def main():
 
     from blume.examples import legendary
-    #from gotu import dss
+    from gotu import dss
 
     log = Element('log')
     fig = Element('fig')
-    aid = Element('help')
+    hhh = Element('help')
 
     words = [x.strip() for x in legendary.legend.__doc__.split()]
     words = np.array(words)
 
-    log.write(str(words))
+    #log.write(str(words))
 
     cols = 5
     words = words[:cols * cols].reshape(cols, cols)
@@ -21,17 +22,20 @@ async def main():
 
     log.write(str(words), append=True)
 
-    from blume import farm as land
     farm = land.Farm()
 
     log.write('got farm', append=True)
     farm.add(leg)
-    #ds = dss.Dss()
-    #farm.add(ds)
-    farm.carpet.output = fig
-    farm.shep.path.append(leg)
+
+    ds = dss.Dss()
     
-    await farm.start()
+    farm.add(ds)
+    farm.carpet.output = fig
+    farm.shep.path.append(ds)
+
+    from gotu.spiral import Spiral
+    farm.add(Spiral())
+    
     global keypress
     def keys(event):
         log.write(f'kkk {event.key}')
@@ -41,12 +45,25 @@ async def main():
             log.write(f'exception {e}')
     keypress = keys
 
-    aid.write('xxxstarting up farm for dss no leg')
-    await farm.run()
+    return farm
 
+def show_key(event):
+
+    global keypress
+    pyscript.write('log', f'key pressed {event}', append=True)
+    #pyscript.write('log', dir(event), append=True)
+    pyscript.write('log', f'key value {event.key}', append=True)
+    #pyscript.write('log', f'{type(keypress)}', append=True)
+    keypress(event)
+    pyscript.write('log', f'{farm.carpet}', append=True)
+    
       
 # close the global PyScript pyscript_loader
 pyscript_loader.close()
 print('about to run farm')
-pyscript.run_until_complete(main())
+farm = main()
+for key in farm.nodes.keys():
+    print(key)
+    print(type(key))
+pyscript.run_until_complete(land.start_and_run(farm))
 

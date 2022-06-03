@@ -205,8 +205,6 @@ import math
 
 from collections import deque
 
-import curio
-
 import astropy.units as u
 import astropy.constants as constants
 import astropy.coordinates as coord
@@ -785,7 +783,7 @@ def main(args=None):
 
     args = parser.parse_args(args)
 
-    curio.run(run(**args.__dict__), with_monitor=True)
+    magic.run(run(**args.__dict__), with_monitor=True)
 
 
 
