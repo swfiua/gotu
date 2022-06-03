@@ -37,8 +37,6 @@ from matplotlib import pyplot as plt
 from scipy import integrate
 from traceback import print_exc
 
-import curio
-
 from blume import magic
 from blume import magic
 from blume import farm as fm
