@@ -35,6 +35,10 @@ def main():
 
     from gotu.spiral import Spiral
     farm.add(Spiral())
+    from gotu.wits import SolarSystem, get_args
+    ssargs = get_args()
+    ssargs.planets = True
+    farm.add(SolarSystem(ssargs))
     
     global keypress
     def keys(event):

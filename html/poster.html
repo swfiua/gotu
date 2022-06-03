@@ -30,7 +30,7 @@ This works pretty well if the html is part of the local package.
     </head>
 
   <body>
-    <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button>
+    <!-- <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button> -->
     <py-script src='./poster.py' output='stdout'>
 
     </py-script>
@@ -45,7 +45,7 @@ This works pretty well if the html is part of the local package.
     <div id='help'></div>
     <br><hr>
     <h3>Figure</h3>
-    <div id="fig" pys-onKeyDown='show_key'></div>
+    <div id="fig" pys-onKeyDown='show_key' tabindex="0"></div>
     
     <!-- <div id="repl"> -->
     <!--   <py-repl></py-repl> -->
