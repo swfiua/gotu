@@ -27,7 +27,7 @@ setup(
     classifiers = [
       'Development Status :: 4 - Beta',
       'Intended Audience :: Science/Research',
-      'Programming Language :: Python :: 3.6+',
+      'Programming Language :: Python :: 3.6',
     ],
     keywords='astropy cosmology',
     packages=find_packages(exclude=['doc', 'tests*']),
