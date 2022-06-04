@@ -94,6 +94,11 @@ Talk
 
    talk
 
+Interactive Examples thanks to pyscript
+=======================================
+
+Poster `poster magic <_static/poster.html>`_ for lots of fun.
+
 Indices and tables
 ==================
 
