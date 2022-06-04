@@ -36,16 +36,41 @@ This works pretty well if the html is part of the local package.
     </py-script>
 
     <br><hr>
-    <h3>Stdout</h3>
-    <div id="stdout"></div>
-    <h3>Log</h3>
-    <div id='log'></div>
+    <div id='buttons'>
+    <button id='Run'
+            pys-onClick="run_current2">Run</button>
+
+    <button id='More'
+            pys-onClick="more_axes">More</button>
+    <button id='Less'
+            pys-onClick="less_axes">Less</button>
+    <button id='Next'
+            pys-onClick="next_ball">next</button>
+    <button id='Up'
+            pys-onClick="up_tree">up</button>
+    <button id='HelpB'
+            pys-onClick="help_cb">Help</button>
+    
+    
+    </div>
+    <h3>Figure</h3>
+    <div id="fig" pys-onKeyDown='show_key' tabindex="0"></div>
+    <br><hr>
+    <h3>Interact</h3>
+    <div id='interact'></div>
     <br><hr>
     <h3>Help</h3>
     <div id='help'></div>
     <br><hr>
-    <h3>Figure</h3>
-    <div id="fig" pys-onKeyDown='show_key' tabindex="0"></div>
+    <h3>Log</h3>
+    <div id='log'></div>
+    <br><hr>
+    <h3>Status</h3>
+    <div id='status'></div>
+    <br><hr>
+    <h3>Stdout</h3>
+    <div id="stdout"></div>
+
     
     <!-- <div id="repl"> -->
     <!--   <py-repl></py-repl> -->
