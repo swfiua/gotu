@@ -2,19 +2,20 @@ import numpy as np
 from blume import farm as land
 from blume import magic
 
+from functools import partial
+import inspect
+import traceback
+
 class Helper(magic.Ball):
 
     def __init__(self, element, channel=None):
 
         super().__init__()
 
-        channel = channel or element.id
+        channel = channel or element
 
         self.channel = channel
         self.element = element
-        #id(self.radii)
-        self.element.write(f'hello from {self.channel} helper')
-        self.element.write(f'roundabout id {id(magic.TheMagicRoundAbout)}')
 
     async def run(self):
 
@@ -23,21 +24,99 @@ class Helper(magic.Ball):
         while True:
             msg = await self.get(self.channel)
             print(f'channel {self.channel} got message')
-            self.element.clear()
+            element = Element(self.element)
+            element.clear()
             for line in msg.split('\n'):
-                self.element.write(line, append=True)
+                element.write(line, append=True)
 
-def main():
+async def relay(channel, callback):
+
+    print(f'listening for messages from {channel}')
+    while True:
+        print(f'RELAY WAITING FOR MESSAGE FROM {channel}')
+        msg = await magic.TheMagicRoundAbout.get(channel)
+        print(f'message from {channel}: {msg}')
+        try:
+            result = callback()
+            print(f'{callback} RETURNED SUCCESSFULLY')
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f'{channel} relay exception for {callback}')
+            
+        if inspect.iscoroutine(result):
+            try:
+                print(f'awaiting {result}')
+                await result
+            except:
+                print(f'{channel} relay exception awaiting {result}')
+        
+                
+tmra = magic.TheMagicRoundAbout
+
+async def send_key(event):
+
+    await tmra.put(event.key, 'keys')
+    
+
+
+channels = ['interact', 'status', 'help']
+
+
+def show_key(event, key=None):
+
+    tmra.put_nowait(key, 'keys')
+    
+    print('show_key', key)
+    tmra.put_nowait('help', f'show_key{key}')
+
+def set_up_buttons(shepherd):
+    print('SETTING UP BUTTONS')
+    button_box = Element('buttons')
+    help_button = Element('help_button')
+
+    background = '#00ff00'
+    bbe = button_box.element
+    print(f'Number of CHILDREN before removal {len(bbe.children)}')
+    for child in list(bbe.children):
+        #bbe.removeChild(child)
+        child.remove()
+    print(f'Number of CHILDREN after removal {len(bbe.children)}')
+
+    help_button.element.onclick = partial(show_key, key='h')
+
+    lastsheep = None
+    for sheep, key, callback in shepherd.generate_key_bindings():
+        if sheep != lastsheep:
+            print(f'processing bindings for {sheep} {key}')
+            #bb = button_box.element.append(Element('div').element)
+            
+        lastsheep = sheep
+
+            
+        button = document.createElement('Button')
+
+        print(f'bbbbbbbbbbbbbbbbbbbbbbbb {button}')
+        button.innerHTML = key
+        button.style.background = background
+        if key == ' ':
+            button.innerHTML = 'Space'
+        else:
+            button.innerHTML = key
+        button.id = key
+        button.onclick = partial(show_key, key=key)
+        button_box.element.appendChild(button)
+
+
+
+async def run():
 
     from blume.examples import legendary
 
     log = Element('log')
+    status = Element('status')
     fig = Element('fig')
-    hhh = Element('help')
 
-    helpers = {}
-    for channel in channels:
-        helpers[channel] = Helper(Element(channel))
 
     words = [x.strip() for x in legendary.legend.__doc__.split()]
     words = np.array(words)
@@ -49,16 +128,21 @@ def main():
 
     leg = legendary.Legend(words)
 
-    log.write(str(words), append=True)
+    #log.write(str(words), append=True)
 
     farm = land.Farm()
 
     #farm.add(Helper(), background=True)
 
-    log.write('got farm', append=True)
-    farm.add(leg)
+    status.write('got farm', append=True)
 
-    farm.helpers = helpers
+    for channel in channels:
+        status.write(f'adding helper for {channel}', append=True)
+        helper = Helper(channel)
+        farm.add_node(helper, background=True)
+
+    status.write('adding legendary legend to farm', append=True)
+    farm.add(leg)
 
     gotu = True
     if gotu:
@@ -68,7 +152,6 @@ def main():
 
         ds = dss.Dss()
         farm.add(ds)
-        farm.shep.path.append(ds)
 
         farm.add(Spiral())
         ssargs = get_args()
@@ -76,96 +159,36 @@ def main():
         farm.add(SolarSystem(ssargs))
 
     farm.carpet.output = fig
-    farm.shep.hhh = hhh
-    
-    global keypress
-    def keys(event):
-        log.write(f'kkk {event.key}')
-        try:
-            farm.carpet.keypress(event)
-        except Exception as e:
-            log.write(f'exception {e}')
-    keypress = keys
 
-    return farm
-
-tmra = magic.TheMagicRoundAbout
-
-async def send_key(event):
-
-    await tmra.put(event.key, 'keys')
-    
-
-def show_key(event):
-
-    global keypress
-    pyscript.write('log', f'key pressed {event}', append=True)
-    #pyscript.write('log', dir(event), append=True)
-    pyscript.write('log', f'key value {event.key}', append=True)
-    #pyscript.write('log', f'{type(keypress)}', append=True)
-    keypress(event)
-    pyscript.write('log', f'{farm.carpet}', append=True)
-
-channels = ['help', 'interact', 'status']
-
-
-def key_presser(key, event=None):
-
-    tmra.put_nowait(f'keypress {key}', 'help')
-    tmra.put_nowait(key, 'keys')
-
-
-from functools import partial    
-run_current2 = partial(key_presser, 'r')
-more_axes = partial(key_presser, '+')
-less_axes = partial(key_presser, '-')
-interact = partial(key_presser, 'i')
-nexti = partial(key_presser, ',')
-next_ball = partial(key_presser, 'n')
-up_tree = partial(key_presser, 'u')
-help_cb = partial(key_presser, 'h')
-
-                    
-
-async def run(farm):
-
-    helpers = {}
-    for channel, helper in farm.helpers.items():
-        print(channel)
-        print(dir(helper))
-        try:
-            helper.element.write(f'xxx roundabout id {id(magic.TheMagicRoundAbout)}')
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-
-        task = magic.spawn(helper.run())
-        print(dir(task))
-        print(task.get_name())
-        print('task done:')
-        print(task.done())
-
-    #await helpers['help'].put('status', 'time to launch farm')
-    #await asyncio.sleep(3)
-    #await helpers['help'].put('status', 'launch time...')
-    #await asyncio.sleep(3)
+        
+    button_relay = magic.spawn(relay(
+        'oldgrey',
+        partial(set_up_buttons, shepherd=farm.shep)))
+    #set_up_buttons(shepherd=farm.shep)
+    print('launching the farm')
     await land.start_and_run(farm)
 
       
 # close the global PyScript pyscript_loader
 pyscript_loader.close()
 print('about to run farm')
-farm = main()
-print(farm.helpers.keys())
-print('finished main')
-for key in farm.nodes.keys():
-    print(repr(key))
-    print(type(key))
+
+# connect temporary butts that actually work
+from functools import partial    
+run_current2 = partial(show_key, key='r')
+more_axes = partial(show_key, key='+')
+less_axes = partial(show_key, key='-')
+interact = partial(show_key, key='i')
+nexti = partial(show_key, key=',')
+next_ball = partial(show_key, key='n')
+up_tree = partial(show_key, key='u')
+help_cb = partial(show_key, key='h')
 
 
 print('launching async farm')
 try:
-    pyscript.run_until_complete(run(farm))
+    pyscript.run_until_complete(run())
 except:
+    traceback.print_exc()
     print('farm bailed out')
 

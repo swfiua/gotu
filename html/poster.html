@@ -17,15 +17,15 @@ And run:
 
 To serve this file and the wheels too.
 This works pretty well if the html is part of the local package.
-        - ./blume-0.2.4-py3-none-any.whl
         - ./gotu-0.1.1-py3-none-any.whl
+        - blume==0.2.4
         - gotu>=0.1.1
 -->
       <py-env>
         - matplotlib
         - scipy
         - astropy
-        - blume==0.2.4
+        - ./blume-0.2.4-py3-none-any.whl
         - gotu==0.1.1
         - paths:
           - ./poster.py
@@ -39,7 +39,8 @@ This works pretty well if the html is part of the local package.
     </py-script>
 
     <br><hr>
-    <div id='buttons'>
+    <div id='butts'>
+      
     <button id='Run'
             pys-onClick="run_current2">Run</button>
 
@@ -54,25 +55,31 @@ This works pretty well if the html is part of the local package.
     <button id='HelpB'
             pys-onClick="help_cb">Help</button>
     
+  
     
     </div>
-    <h3>Figure</h3>
+    <div id=='hb'><button id='help_button'>Help</button></div>
+
+    <div id='buttons'>
+    </div>
+    
     <div id="fig" pys-onKeyDown='show_key' tabindex="0"></div>
     <br><hr>
+    <div id='status'></div>
+    <br><hr>
+    <py-repl></py-repl>
     <h3>Interact</h3>
     <div id='interact'></div>
-    <br><hr>
-    <h3>Help</h3>
-    <div id='help'></div>
     <br><hr>
     <h3>Log</h3>
     <div id='log'></div>
     <br><hr>
-    <h3>Status</h3>
-    <div id='status'></div>
+    <h3>Help</h3>
+    <div id='help'></div>
     <br><hr>
     <h3>Stdout</h3>
     <div id="stdout"></div>
+    <br><hr>
 
     
     <!-- <div id="repl"> -->
