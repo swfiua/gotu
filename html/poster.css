@@ -1,0 +1,19 @@
+.xevenly {
+    display: flex;
+    justify-content:space-between;
+    border:solid;
+}
+
+.evenly {
+    display: block;
+    border: solid;
+    width: 100%;
+    background-color: #04aa6d;
+    font-size: 32px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.cb {
+    font-size: 32px;
+}

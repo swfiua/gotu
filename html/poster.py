@@ -89,23 +89,26 @@ def set_up_buttons(shepherd):
     for sheep, key, callback in shepherd.generate_key_bindings():
         if sheep != lastsheep:
             print(f'processing bindings for {sheep} {key}')
-            #bb = button_box.element.append(Element('div').element)
+            div = document.createElement('div')
+            div.className = 'evenly'
+
+            button_box.element.appendChild(div)
             
         lastsheep = sheep
 
             
         button = document.createElement('Button')
 
-        print(f'bbbbbbbbbbbbbbbbbbbbbbbb {button}')
         button.innerHTML = key
         button.style.background = background
         if key == ' ':
             button.innerHTML = 'Space'
         else:
-            button.innerHTML = key
+            button.innerHTML = key * 4
         button.id = key
+        button.className = 'cb'
         button.onclick = partial(show_key, key=key)
-        button_box.element.appendChild(button)
+        div.appendChild(button)
 
 
 

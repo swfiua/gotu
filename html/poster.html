@@ -1,6 +1,7 @@
 <html>
   <head>
-      <!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" /> -->
+      <link rel="stylesheet"
+                 href="./poster.css" /> 
       <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
 
 
@@ -30,7 +31,8 @@ This works pretty well if the html is part of the local package.
         - paths:
           - ./poster.py
       </py-env>
-    </head>
+  </head>
+  
 
   <body>
     <!-- <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button> -->
@@ -39,7 +41,7 @@ This works pretty well if the html is part of the local package.
     </py-script>
 
     <br><hr>
-    <div id='butts'>
+    <div id='butts' class='evenly'>
       
     <button id='Run'
             pys-onClick="run_current2">Run</button>
@@ -52,7 +54,7 @@ This works pretty well if the html is part of the local package.
             pys-onClick="next_ball">next</button>
     <button id='Up'
             pys-onClick="up_tree">up</button>
-    <button id='HelpB'
+    <button id='HelpB' class='evenly'
             pys-onClick="help_cb">Help</button>
     
   
