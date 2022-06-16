@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use("module://matplotlib.backends.html5_canvas_backend")
+
 import numpy as np
 from blume import farm as land
 from blume import magic
@@ -135,6 +138,10 @@ async def run():
 
     farm = land.Farm()
 
+    print(f'CANVAS ID {farm.carpet.image.canvas._id}')
+    div = Element(farm.carpet.image.canvas._id)
+    
+    #status.element.appendChild(div)
     #farm.add(Helper(), background=True)
 
     status.write('got farm', append=True)
