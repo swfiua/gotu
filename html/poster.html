@@ -26,7 +26,7 @@ This works pretty well if the html is part of the local package.
         - matplotlib
         - scipy
         - astropy
-        - ./blume-0.2.4-py3-none-any.whl
+        - ./blume-0.2.4.1-py3-none-any.whl
         - gotu==0.1.1
         - paths:
           - ./poster.py
@@ -36,56 +36,9 @@ This works pretty well if the html is part of the local package.
 
   <body>
     <!-- <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button> -->
-    <py-script src='./poster.py' output='stdout'>
-
-    </py-script>
-
-    <br><hr>
-    <div id='butts' class='evenly'>
-      
-    <button id='Run'
-            pys-onClick="run_current2">Run</button>
-
-    <button id='More'
-            pys-onClick="more_axes">More</button>
-    <button id='Less'
-            pys-onClick="less_axes">Less</button>
-    <button id='Next'
-            pys-onClick="next_ball">next</button>
-    <button id='Up'
-            pys-onClick="up_tree">up</button>
-    <button id='HelpB' class='evenly'
-            pys-onClick="help_cb">Help</button>
-    
-  
-    
-    </div>
-    <div id=='hb'><button id='help_button'>Help</button></div>
-
-    <div id='buttons'>
-    </div>
-    
-    <div id="fig" pys-onKeyDown='show_key' tabindex="0"></div>
-    <br><hr>
-    <div id='status'></div>
-    <br><hr>
+    <div id='buttons'> </div>
+    <div id='stdout'></div>
+    <py-script src='./poster.py' output='stdout'></py-script>
     <py-repl></py-repl>
-    <h3>Interact</h3>
-    <div id='interact'></div>
-    <br><hr>
-    <h3>Log</h3>
-    <div id='log'></div>
-    <br><hr>
-    <h3>Help</h3>
-    <div id='help'></div>
-    <br><hr>
-    <h3>Stdout</h3>
-    <div id="stdout"></div>
-    <br><hr>
-
-    
-    <!-- <div id="repl"> -->
-    <!--   <py-repl></py-repl> -->
-    <!-- </div> -->
   </body>
 </html>

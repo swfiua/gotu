@@ -76,8 +76,10 @@ def show_key(event, key=None):
 def set_up_buttons(shepherd):
     print('SETTING UP BUTTONS')
     button_box = Element('buttons')
-    help_button = Element('help_button')
 
+    stdout = Element('stdout')
+    stdout.clear()
+    
     background = '#00ff00'
     bbe = button_box.element
     print(f'Number of CHILDREN before removal {len(bbe.children)}')
@@ -85,8 +87,6 @@ def set_up_buttons(shepherd):
         #bbe.removeChild(child)
         child.remove()
     print(f'Number of CHILDREN after removal {len(bbe.children)}')
-
-    help_button.element.onclick = partial(show_key, key='h')
 
     lastsheep = None
     for sheep, key, callback in shepherd.generate_key_bindings():
@@ -121,7 +121,6 @@ async def run():
 
     log = Element('log')
     status = Element('status')
-    fig = Element('fig')
 
 
     words = [x.strip() for x in legendary.legend.__doc__.split()]
@@ -137,12 +136,6 @@ async def run():
     #log.write(str(words), append=True)
 
     farm = land.Farm()
-
-    print(f'CANVAS ID {farm.carpet.image.canvas._id}')
-    div = Element(farm.carpet.image.canvas._id)
-    
-    #status.element.appendChild(div)
-    #farm.add(Helper(), background=True)
 
     status.write('got farm', append=True)
 
@@ -167,8 +160,6 @@ async def run():
         ssargs = get_args()
         ssargs.planets = True
         farm.add(SolarSystem(ssargs))
-
-    farm.carpet.output = fig
 
         
     button_relay = magic.spawn(relay(
