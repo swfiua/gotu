@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use("module://matplotlib.backends.html5_canvas_backend")
+#matplotlib.use("module://matplotlib.backends.html5_canvas_backend")
 
 import numpy as np
 from blume import farm as land
