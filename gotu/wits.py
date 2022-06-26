@@ -80,7 +80,7 @@ from astropy import coordinates, constants, time
 
 from datetime import datetime, timedelta
 
-from matplotlib import pyplot
+from matplotlib import pyplot, legend
 
 import argparse
 
@@ -202,10 +202,14 @@ class SolarSystem(magic.Ball):
 
         ax.grid(True)
         ax.set_title(self.now)
-        ax.legend(loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
+        lax = await self.get()
+        h, l = legend._get_legend_handles_labels([ax])
+        lax.legend(handles=h, labels=l,
+            loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
 
         # draw the axes
         ax.show()
+        lax.show()
         #await self.put()
         
         self.tick()

@@ -21,14 +21,13 @@ This works pretty well if the html is part of the local package.
         - ./gotu-0.1.1-py3-none-any.whl
         - blume==0.2.4
         - gotu>=0.1.1
-        - ./blume-0.2.4.1-py3-none-any.whl
         - gotu==0.1.1
 -->
       <py-env>
         - matplotlib
         - scipy
         - astropy
-        - blume
+        - ./blume-0.2.4.2-py3-none-any.whl
         - gotu
         - paths:
           - ./poster.py
@@ -38,9 +37,9 @@ This works pretty well if the html is part of the local package.
 
   <body>
     <!-- <button id='keys' width=100 pys-onKeyDown='show_key'>Keys</button> -->
-    <div id='buttons'> </div>
     <div id='stdout'></div>
     <py-script src='./poster.py' output='stdout'></py-script>
-    <py-repl></py-repl>
+    <!-- <py-repl></py-repl> -->
+    <div id='buttons'> </div>
   </body>
 </html>

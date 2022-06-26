@@ -783,7 +783,7 @@ def main(args=None):
 
     args = parser.parse_args(args)
 
-    magic.run(run(**args.__dict__), with_monitor=True)
+    magic.run(run(**args.__dict__))
 
 
 

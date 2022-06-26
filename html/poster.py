@@ -1,5 +1,5 @@
 import matplotlib
-#matplotlib.use("module://matplotlib.backends.html5_canvas_backend")
+matplotlib.use("module://matplotlib.backends.html5_canvas_backend")
 
 import numpy as np
 from blume import farm as land
@@ -9,72 +9,19 @@ from functools import partial
 import inspect
 import traceback
 
-class Helper(magic.Ball):
-
-    def __init__(self, element, channel=None):
-
-        super().__init__()
-
-        channel = channel or element
-
-        self.channel = channel
-        self.element = element
-
-    async def run(self):
-
-        await self.put('HELPER STARTING UP', 'help')
-
-        while True:
-            msg = await self.get(self.channel)
-            print(f'channel {self.channel} got message')
-            element = Element(self.element)
-            element.clear()
-            for line in msg.split('\n'):
-                element.write(line, append=True)
-
-async def relay(channel, callback):
-
-    print(f'listening for messages from {channel}')
-    while True:
-        print(f'RELAY WAITING FOR MESSAGE FROM {channel}')
-        msg = await magic.TheMagicRoundAbout.get(channel)
-        print(f'message from {channel}: {msg}')
-        try:
-            result = callback()
-            print(f'{callback} RETURNED SUCCESSFULLY')
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            print(f'{channel} relay exception for {callback}')
-            
-        if inspect.iscoroutine(result):
-            try:
-                print(f'awaiting {result}')
-                await result
-            except:
-                print(f'{channel} relay exception awaiting {result}')
-        
-                
 tmra = magic.TheMagicRoundAbout
-
-async def send_key(event):
-
-    await tmra.put(event.key, 'keys')
-    
-
-
-channels = ['interact', 'status', 'help']
-
+relay = magic.relay
 
 def show_key(event, key=None):
 
-    tmra.put_nowait(key, 'keys')
+    tmra.put_nowait(key, key)
     
     print('show_key', key)
-    tmra.put_nowait('help', f'show_key{key}')
+    tmra.put_nowait('help', f'show_key {key}')
 
 def set_up_buttons(shepherd):
     print('SETTING UP BUTTONS')
+
     button_box = Element('buttons')
 
     stdout = Element('stdout')
@@ -139,11 +86,6 @@ async def run():
 
     status.write('got farm', append=True)
 
-    for channel in channels:
-        status.write(f'adding helper for {channel}', append=True)
-        helper = Helper(channel)
-        farm.add_node(helper, background=True)
-
     status.write('adding legendary legend to farm', append=True)
     farm.add(leg)
 
@@ -173,17 +115,6 @@ async def run():
 # close the global PyScript pyscript_loader
 pyscript_loader.close()
 print('about to run farm')
-
-# connect temporary butts that actually work
-from functools import partial    
-run_current2 = partial(show_key, key='r')
-more_axes = partial(show_key, key='+')
-less_axes = partial(show_key, key='-')
-interact = partial(show_key, key='i')
-nexti = partial(show_key, key=',')
-next_ball = partial(show_key, key='n')
-up_tree = partial(show_key, key='u')
-help_cb = partial(show_key, key='h')
 
 
 print('launching async farm')
