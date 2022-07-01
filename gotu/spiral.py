@@ -246,6 +246,7 @@ class SkyMap(magic.Ball):
         super().__init__()
 
         print('clean galaxy data')
+        print(len(gals), type(gals[0]))
         print(gals[0])
 
         self.balls = gals
@@ -254,6 +255,8 @@ class SkyMap(magic.Ball):
         
 
     def decra2rad(self, dec, ra):
+
+        return math.radians(dec), math.radians(ra)
 
         ra = (ra - 12) * math.pi / 12.
 
@@ -283,80 +286,19 @@ class SkyMap(magic.Ball):
 
         locs = [self.decra2rad(ball['DEC'], ball['RA'])
                     for ball in self.balls]
-            
         self.offset = 0
-            
 
         ball_colours = [x['DISTANCE'] for x in self.balls]
-        
+
+        ax.set_facecolor('black')
         ax.scatter([self.spinra(xx[1]) for xx in locs],
                    [xx[0] for xx in locs],
                    c=ball_colours,
-                   s=[x['ABS_BMAG'] or 1 for x in self.balls])
+                   s=[x['BMAG'] or 1 for x in self.balls])
 
-        norm = colors.Normalize(min(ball_colours), max(ball_colours))
-        cm = magic.random_colour()
-        for ball, loc, colour in zip(self.balls, locs, ball_colours):
-            ma = ball['LINEAR_DIAMETER'] or 1
-            
-            #ngn = ball.get('neighbor_galaxy_name', '')
-            ngn = 'foo'
-            constellation = ''
-            #if (ma or 1) > 20:
-            if 'ilky' in ngn or 'ilky' in constellation:
-            #if 'ilky' in ball.name:
-
-                #print()
-                #print(constellation)
-                #print(ball)
-                
-                ax.text(
-                    self.spinra(loc[1]), loc[0],
-                    '\n'.join((ball.get('name'), constellation)),
-                    color='red',
-                    #color=cm(1.0-norm(colour)),
-                    fontsize=15 * math.log(max(ma, 10)) / 10)
-                                   
         ax.axis('off')
 
         ax.show()
-        #await self.put(magic.fig2data(plt))
-
-
-        ax = await self.get()
-        
-        rv = [xx['RADIAL_VELOCITY'] or 0. for xx in self.balls]
-        distance = [xx['DISTANCE'] or 0. for xx in self.balls]
-
-        rrv = []
-        dd = []
-        for vel, dist in zip(rv, distance):
-            if dist > 11:
-                continue
-            
-            if vel == 0.0:
-                # use Hubble relationship
-                vel = dist * 70.
-            rrv.append(vel)
-            dd.append(dist)
-
-        ax.scatter(dd, rrv)
-        ax.show()
-
-        #await curio.sleep(self.sleep)
-        #await self.outgoing.put(magic.fig2data(fig))
-        #await curio.sleep(self.sleep)
-
-        #await self.outgoing.put(magic.fig2data(fig))
-        ax = await self.get()
-        ax.plot(distance)
-        ax.show()
-        #await self.outgoing.put(magic.fig2data(fig))
-
-        ax = await self.get()
-        ax.plot([xx[1] for xx in locs])
-        ax.show()
-        #await self.outgoing.put(magic.fig2data(fig))
 
 
 class Spiral(magic.Ball):
@@ -764,7 +706,7 @@ async def run(**args):
 
     if args['galaxy']:
         gals = list(near_galaxies(open(args['galaxy'])))
-
+        print(len(gals))
         skymap = SkyMap(gals)
         farm.add(skymap)
     
