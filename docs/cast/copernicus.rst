@@ -23,4 +23,4 @@ very special time, one where we can just see the earliest moments of
 the following the Big Bang.  In 100 billion years, 
 
 
-.. image:: images/copernicus.png
+.. image:: ../images/copernicus.png
