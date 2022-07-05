@@ -24,9 +24,6 @@ phi corresponds to the minimum distance between the receiver and
 emitter, in other words, the emitter's closest point of approach.
 
 theta measures the angle of approach.
-
-
-
 """
 
 # we are going to need this
@@ -154,7 +151,10 @@ class Dss(magic.Ball):
             cmap=magic.random_colour(),
             extent=extent,
         )
-        ax.figure.colorbar(aximg)
+
+        #ax.figure._axstack.bubble(ax.delegate)
+        #ax.figure.colorbar(aximg)
+        ax.axis('off')
         ax.show()
 
 

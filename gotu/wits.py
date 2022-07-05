@@ -191,7 +191,8 @@ class SolarSystem(magic.Ball):
                ra = ra - (2 * math.pi)
 
             dra, ddec, dist = bod.ra.deg, bod.dec.deg, bod.distance.au
-            label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
+            #label = f'{name} {dra:.0f} {ddec:.0f} {dist:0.2f}'
+            label = f'{name}'
 
             if view == 'polar':
                 if self.log and dist:
@@ -202,14 +203,16 @@ class SolarSystem(magic.Ball):
 
         ax.grid(True)
         ax.set_title(self.now)
-        lax = await self.get()
-        h, l = legend._get_legend_handles_labels([ax])
-        lax.legend(handles=h, labels=l,
-            loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
+        ax.legend(loc=0, fontsize='xx-small', ncol=2, markerscale=0.2)
+        #ax.axis('off')
+        #lax = await self.get()
+        #h, l = legend._get_legend_handles_labels([ax])
+        #lax.legend(handles=h, labels=l,
+        #    loc=0, fontsize=self.fontsize, title=f'{mode} {view}')
 
         # draw the axes
         ax.show()
-        lax.show()
+        #lax.show()
         #await self.put()
         
         self.tick()

@@ -251,6 +251,7 @@ class SkyMap(magic.Ball):
 
         self.balls = gals
         self.sleep=1.0
+        self.offset = 0.
 
         
 
@@ -286,7 +287,6 @@ class SkyMap(magic.Ball):
 
         locs = [self.decra2rad(ball['DEC'], ball['RA'])
                     for ball in self.balls]
-        self.offset = 0
 
         ball_colours = [x['DISTANCE'] for x in self.balls]
 
@@ -557,6 +557,7 @@ class Spiral(magic.Ball):
         ax.projection('polar')
         ax.plot(thetaValues - (B * tvalues), rr)
         ax.plot(thetaValues - (B * tvalues) + math.pi, rr)
+        ax.axis('off')
         ax.show()
 
 
@@ -644,7 +645,7 @@ def cpr():
     return rdot, inert, v, values
 
 
-def near_galaxies(infile):
+def near_galaxies():
     """ parse galaxy.txt from 
 
     https://heasarc.gsfc.nasa.gov/w3browse/all/neargalcat.html
@@ -704,9 +705,8 @@ async def run(**args):
 
     farm = fm.Farm()
 
-    if args['galaxy']:
-        gals = list(near_galaxies(open(args['galaxy'])))
-        print(len(gals))
+    if args['skymap']:
+        gals = list(near_galaxies())
         skymap = SkyMap(gals)
         farm.add(skymap)
     
@@ -721,7 +721,7 @@ async def run(**args):
 def main(args=None):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--galaxy', help="file of local galaxy data")
+    parser.add_argument('--skymap', action='store_true')
 
     args = parser.parse_args(args)
 
