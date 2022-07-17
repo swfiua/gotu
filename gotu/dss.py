@@ -153,8 +153,8 @@ class Dss(magic.Ball):
         )
 
         #ax.figure._axstack.bubble(ax.delegate)
-        #ax.figure.colorbar(aximg)
-        ax.axis('off')
+        ax.figure.colorbar(aximg)
+        #ax.axis('off')
         ax.show()
 
 
@@ -195,4 +195,4 @@ if __name__ == '__main__':
     #0/1
 
     wm = False
-    magic.run(run(), with_monitor=wm)
+    magic.run(run())

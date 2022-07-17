@@ -232,6 +232,5 @@ if __name__ == '__main__':
     fm = farm.Farm()
 
     fm.add(ss)
-    fm.shep.path.append(ss)
     farm.run(fm)
 
