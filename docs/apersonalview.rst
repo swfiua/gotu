@@ -2,6 +2,42 @@
  A Personal View
 =================
 
+I have been on a journey, and found new perspectives.
+
+It has been a way to see how the world might have changed or not.
+
+Sharing ideas with others, finding out what people are doing and why.
+
+What is the perspective, why do they believe what they do.
+
+It has been a wonderful time in our exploration of the universe we
+find ourselves in.
+
+A space telescope at L2, observing the light in the infra red.
+
+I met Norm Newton, just the perfect name.  At a cafe in the Universe,
+close to home.
+
+My journey had been shrouded in doubt, was the world quite ready to
+know what they see?
+
+It's stunning, it's crisp, with a gravitational twist, all in the deep
+infra red.
+
+What's distance, what's frequency as we spin through time.
+
+A mathematician with a furious fascination with the details of
+topological space.  Proving beyond, the shadow of a doubt that all
+spheres behave in just the same manners.
+
+Yet the deltas exchange and in time build collective understanding.
+
+There's noise everywhere, with some glorious peaks.
+
+When one with such a grasp of how our observations are constrained,
+whilst explaing the rhythms in space time.
+
+
 ** Work in progress -- much rambling ahead, for now this is just
 random thoughts to be resorted **
 
@@ -125,19 +161,21 @@ The classical solutions to Einstein's equations make no assumptions
 about how mass is distributed within a rotating body.
 
 The assumption is that only the total mass affects the gravitational
-field and that mass can be assumed to be conceentrated at the centre
+field and that mass can be assumed to be concentrated at the centre
 of the body.
 
 Gravity
 =======
 
-A bodu's affect on the rest of the universe matches the rest of the
+A body's affect on the rest of the universe matches the rest of the
 universe's effect on the body.
 
 Think about the Earth and the Moon.
 
 Assume that there exists a field that defines an extremely high
 frequency oscillation.
+
+The bodies modulate the signal.
 
 Weak Sciama Principle
 ---------------------
