@@ -55,15 +55,55 @@ Right now, I happen to be interested in M74, also known as NGC 628.
 from astroquery.mast import Observations
 from astroquery.simbad import Simbad
 
+from astropy.table import Table
+
+from glob import glob
+
+import random
+
 from blume import magic, farm
 
 
 class Jwst(magic.Ball):
 
+    def __init__(self):
+
+        super().__init__()
+
+        self.location = messier(74)
+
+    async def start(self):
+        region = str(self.location[0]['RA']) + str(self.location[0]['DEC'])
+        print(region)
+        results = Observations.query_region(region)
+        print(len(results))
+        print(results.colnames)
+        products = {}
+        for x in results:
+
+            if 'JWST' in x['dataURL']:
+                plist = Observations.get_product_list(x)
+                print("JJJJJJJ", len(plist))
+                for product in plist:
+                    #print(product)
+                    #print(product.colnames)
+                    print(product['size'],
+                          product['dataURI'],
+                          product['productFilename'])
+
+                    products[product['dataURI']] = product
+        self.products = products
+
     async def run(self):
 
-        pass
+        product = random.choice(list(self.products.keys()))
 
+        print(self.products[product])
+
+        await self.put(str(self.products[product]), 'help')
+
+        
+                             
 
 def messier(n=74):
 
@@ -73,22 +113,9 @@ def messier(n=74):
 
 if __name__ == '__main__':
 
+    from blume import magic, farm
 
-    m74 = messier(74)
+    fm = farm.Farm()
+    fm.add(Jwst())
+    magic.run(farm.start_and_run(fm))
     
-    # query the mast database for observations in the region
-    #Observations.query_region('01 36 41.7451 +15 47 01.107')
-    region = str(m74[0]['RA']) + str(m74[0]['DEC'])
-    print(region)
-    results = Observations.query_region(region)
-    print(len(results))
-    print(results.colnames)
-    for x in results:
-
-        if 'JWST' in x['dataURL']:
-            products = Observations.get_product_list(x)
-            print("JJJJJJJ", len(products))
-            for product in products[:1]:
-                print(product)
-                # Next line does a download -- be ready for lots of data. 
-                #Observations.download_products(product[:1])
