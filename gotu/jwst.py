@@ -56,12 +56,15 @@ from astroquery.mast import Observations
 from astroquery.simbad import Simbad
 
 from astropy.table import Table
+from astropy.io import fits
 
 from glob import glob
 
 import random
+from collections import Counter, defaultdict
 
 from blume import magic, farm
+from matplotlib import image
 
 
 class Jwst(magic.Ball):
@@ -71,36 +74,66 @@ class Jwst(magic.Ball):
         super().__init__()
 
         self.location = messier(74)
+        self.locatin = Simbad.query_object('PGC 2248')
 
     async def start(self):
         region = str(self.location[0]['RA']) + str(self.location[0]['DEC'])
         print(region)
         results = Observations.query_region(region)
         print(len(results))
-        print(results.colnames)
+        names = list(results.colnames)
         products = {}
+        counters = defaultdict(Counter)
+
         for x in results:
 
             if 'JWST' in x['dataURL']:
+        
                 plist = Observations.get_product_list(x)
                 print("JJJJJJJ", len(plist))
                 for product in plist:
+                    for name in product.colnames:
+                        counters[name].update([str(product[name])])
                     #print(product)
                     #print(product.colnames)
-                    print(product['size'],
-                          product['dataURI'],
-                          product['productFilename'])
+                    #print(product['size'],
+                    #      product['dataURI'],
+                    #      product['productFilename'])
 
                     products[product['dataURI']] = product
+
+        for key, counts in counters.items():
+            print(key)
+            print(counts.most_common(3))
+            
         self.products = products
 
     async def run(self):
 
         product = random.choice(list(self.products.keys()))
 
-        print(self.products[product])
+        prod =self.products[product]
+        msg = []
+        for key in prod.colnames:
+            msg.append([key, prod[key]])
+        print(msg)
 
-        await self.put(str(self.products[product]), 'help')
+        await self.put(msg, 'help')
+
+        # download the product
+        result = Observations.download_file(prod['dataURI'])
+
+        filename = prod['productFilename']
+        if filename.endswith('fits'):
+            tab = fits.open(filename)
+
+            print(tab.info())
+        elif filename.endswith('jpg'):
+            ax = await self.get()
+            ax.imshow(image.imread(filename))
+            ax.show()
+        
+
 
         
                              
