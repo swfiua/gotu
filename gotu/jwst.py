@@ -57,15 +57,18 @@ from astroquery.simbad import Simbad
 
 from astropy.table import Table
 from astropy.io import fits
-
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 from glob import glob
 
 import random
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
+from pathlib import Path
 
-from blume import magic, farm
+from blume import magic, farm, taybell, modnar
 from matplotlib import image
-
+import numpy as np
+import json
 
 class Jwst(magic.Ball):
 
@@ -73,14 +76,53 @@ class Jwst(magic.Ball):
 
         super().__init__()
 
-        self.location = messier(74)
-        self.locatin = Simbad.query_object('PGC 2248')
+        self.locations = deque((
+            messier(74),
+            Simbad.query_object('NGC 3324'),
+            Simbad.query_object('PGC 2248')))
+        self.topn = 1
+        self.do_product_list = False
+        self.maxrows = 15
 
+    async def show_stats(self, table):
+
+        msg = self.table_count(table)
+        await self.put(msg, 'help')
+        
+    def table_count(self, table, maxrows=None):
+
+        msg = []
+        counters = defaultdict(Counter)
+        for ix, row in enumerate(table):
+            if self.maxrows and ix > self.maxrows:
+                break
+            
+            for key in row.colnames:
+                value = row[key]
+                if isinstance(value, np.ma.core.MaskedConstant):
+                    value = value.tolist()
+                counters[key].update([value])
+        for key in table.colnames:
+            for value, count in counters[key].most_common(self.topn):
+                value = taybell.shortify_line(str(value), 20)
+                
+                msg.append([key, value, count])
+
+        return msg
+            
     async def start(self):
-        region = str(self.location[0]['RA']) + str(self.location[0]['DEC'])
-        print(region)
-        results = Observations.query_region(region)
-        print(len(results))
+
+        self.locations.rotate()
+        location = self.locations[0][0]
+        ra, dec = location['RA'], location['DEC']
+        skypos = SkyCoord(ra, dec, unit=(u.hourangle, u.deg))
+        print(skypos)
+        
+        results = Observations.query_region(skypos)
+
+        await self.show_stats(results)
+        
+        print('Region size:', len(results))
         names = list(results.colnames)
         products = {}
         counters = defaultdict(Counter)
@@ -88,52 +130,79 @@ class Jwst(magic.Ball):
         for x in results:
 
             if 'JWST' in x['dataURL']:
-        
-                plist = Observations.get_product_list(x)
-                print("JJJJJJJ", len(plist))
-                for product in plist:
-                    for name in product.colnames:
-                        counters[name].update([str(product[name])])
-                    #print(product)
-                    #print(product.colnames)
-                    #print(product['size'],
-                    #      product['dataURI'],
-                    #      product['productFilename'])
+                print(x['dataURL'])
+                products[x['dataURL']] = x
+                         
+                if self.do_product_list:
+                    plist = Observations.get_product_list(x)
+                    print("JJJJJJJ", len(plist))
+                    for product in plist:
+                        
+                        for name in product.colnames:
+                            counters[name].update([str(product[name])])
+                         
 
                     products[product['dataURI']] = product
+                         
 
-        for key, counts in counters.items():
-            print(key)
-            print(counts.most_common(3))
+                for key, counts in counters.items():
+                    print(key)
+                    print(counts.most_common(3))
             
         self.products = products
 
     async def run(self):
+                         
 
         product = random.choice(list(self.products.keys()))
 
-        prod =self.products[product]
+        prod = self.products[product]
         msg = []
         for key in prod.colnames:
-            msg.append([key, prod[key]])
-        print(msg)
+            msg.append([key, taybell.shortify_line(str(prod[key]), 20)])
+        #print(msg)
 
-        await self.put(msg, 'help')
+        #await self.put(msg, 'help')
+
+        print(type(prod))
+        print('FFFFFFFFFFFFFFFFF', 'jpegURL' in prod)
 
         # download the product
-        result = Observations.download_file(prod['dataURI'])
+        #result = Observations.download_file(prod['dataURI'])
+        #for key in ('jpegURL', 'dataURL', 'dataURI'):
+        for key in ('jpegURL',):
+            
+            if key not in prod.colnames:
+                continue
 
-        filename = prod['productFilename']
-        if filename.endswith('fits'):
-            tab = fits.open(filename)
+            path = Path(prod[key])
+            filename = path.name
+            result = Observations.download_file(str(path))
 
-            print(tab.info())
-        elif filename.endswith('jpg'):
-            ax = await self.get()
-            ax.imshow(image.imread(filename))
-            ax.show()
-        
+            if not Path(filename).exists():
+                print('DOWNLOAD FAIL for ', filename)
+                continue
+            
+            if filename.endswith('fits'):
+                tab = fits.open(filename)
+                for item in tab:
+                    print(item.size)
+                if isinstance(item.size, int):
+                    print('Array size:', item.size)
+                elif item.size:
+                    await self.show_stats(item)
 
+                print(tab.info())
+
+            elif filename.endswith('jpg'):
+                ax = await self.get()
+                ax.imshow(image.imread(filename), cmap=modnar.random_colour())
+                ax.show()
+
+            elif filename.endswith('json'):
+                msg = json.load(open(filename))
+                msg = [(key, value) for item in msg.items()]
+                await self.put(msg, 'help')
 
         
                              
