@@ -75,11 +75,14 @@ class Jwst(magic.Ball):
     def __init__(self):
 
         super().__init__()
-
         self.locations = deque((
-            messier(74),
-            Simbad.query_object('NGC 3324'),
-            Simbad.query_object('PGC 2248')))
+            'NGC 3132',
+            'SMACS 0723',  #  deep field?
+            'NGC 7318B',   # Stephen's Quintet?
+            'M 74',       # NGC 628 Phantom Galaxy
+            'NGC 3324',   # Carina Nebula
+            'PGC 2248'))  # Cartwheel
+
         self.topn = 1
         self.do_product_list = False
         self.maxrows = 15
@@ -109,19 +112,42 @@ class Jwst(magic.Ball):
                 msg.append([key, value, count])
 
         return msg
+
+    def name_to_skycoord(self, name):
+
+        location = Simbad.query_object(name)[0]
+        ra, dec = location['RA'], location['DEC']
+        skypos = SkyCoord(ra, dec, unit=(u.hourangle, u.deg))
+        return skypos
+
+    async def get_observations(self, skypos):
+
+        filename = Path(f'skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
+        if filename.exists():
+            results = Table.read(filename)
+        else:
+            print('querying mast database')
+            results = Observations.query_region(skypos)
+            # find the JWST ones
+            mask = results['project'] == 'JWST'
+        
+            results = results[mask]
+
+            # save a copy of the results
+            results.write(filename)
+
+        await self.show_stats(results)
+
+        return results
             
     async def start(self):
 
-        self.locations.rotate()
-        location = self.locations[0][0]
-        ra, dec = location['RA'], location['DEC']
-        skypos = SkyCoord(ra, dec, unit=(u.hourangle, u.deg))
-        print(skypos)
-        
-        results = Observations.query_region(skypos)
+        skypos = self.name_to_skycoord(self.locations[0])
+        print(self.locations[0], skypos)
 
-        await self.show_stats(results)
-        
+        # get observations
+        results = await self.get_observations(skypos)
+
         print('Region size:', len(results))
         names = list(results.colnames)
         products = {}
@@ -150,6 +176,7 @@ class Jwst(magic.Ball):
                     print(counts.most_common(3))
             
         self.products = products
+        self.locations.rotate()
 
     async def run(self):
                          
@@ -164,8 +191,8 @@ class Jwst(magic.Ball):
 
         #await self.put(msg, 'help')
 
-        print(type(prod))
-        print('FFFFFFFFFFFFFFFFF', 'jpegURL' in prod)
+        #print(type(prod))
+        #print('FFFFFFFFFFFFFFFFF', 'jpegURL' in prod)
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
@@ -177,24 +204,30 @@ class Jwst(magic.Ball):
 
             path = Path(prod[key])
             filename = path.name
-            result = Observations.download_file(str(path))
 
+            if not path.stem.endswith('i2d'):
+                continue
+            
+            result = Observations.download_file(str(path))
+            
             if not Path(filename).exists():
                 print('DOWNLOAD FAIL for ', filename)
                 continue
             
             if filename.endswith('fits'):
+                continue
                 tab = fits.open(filename)
                 for item in tab:
                     print(item.size)
                 if isinstance(item.size, int):
                     print('Array size:', item.size)
                 elif item.size:
-                    await self.show_stats(item)
-
+                    #await self.show_stats(item)
+                    pass
+                
                 print(tab.info())
 
-            elif filename.endswith('jpg'):
+            elif filename.endswith('jpg') or filename.endswith('png'):
                 ax = await self.get()
                 ax.imshow(image.imread(filename), cmap=modnar.random_colour())
                 ax.show()
