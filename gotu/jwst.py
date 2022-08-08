@@ -78,7 +78,7 @@ class Jwst(magic.Ball):
 
         super().__init__()
         self.locations = deque((
-            'HD147980',
+            'HD 147980',
             'NGC 3132',
             'SMACS 0723',  #  deep field?
             'NGC 7318B',   # Stephen's Quintet?
@@ -138,6 +138,12 @@ class Jwst(magic.Ball):
 
             # save a copy of the results
             results.write(filename)
+
+        # Fileter some more -- need to make this optional
+        mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
+        results = results[mask]
+        mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
+        results = results[mask]
 
         await self.show_stats(results)
 
