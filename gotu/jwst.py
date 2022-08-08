@@ -143,7 +143,7 @@ class Jwst(magic.Ball):
             results.write(filename)
 
         # Fileter some more -- need to make this optional
-        mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
+        mask = [Path(str(x['dataURL'])).stem.endswith('i2d') for x in results]
         results = results[mask]
         mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
         results = results[mask]
