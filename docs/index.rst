@@ -108,7 +108,7 @@ Europython 2022 in dublin Poster.
 Gallery
 =======
 
-.. toctree
+.. toctree::
 
    gallery
 
