@@ -101,6 +101,10 @@ Interactive Examples thanks to pyscript
 
 Poster `poster magic <_static/poster.html>`_ for lots of fun.
 
+Europython 2022 in dublin Poster.
+
+image:: images/poster.png
+
 Indices and tables
 ==================
 
