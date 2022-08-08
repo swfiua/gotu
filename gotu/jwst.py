@@ -73,7 +73,7 @@ import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
 
 class Jwst(magic.Ball):
-
+    """ Explore JWST data """
     def __init__(self):
 
         super().__init__()
@@ -96,7 +96,10 @@ class Jwst(magic.Ball):
         await self.put(msg, 'help')
         
     def table_count(self, table, maxrows=None):
-
+        """ Do some counts on a table 
+        
+        pretty sure there is some sort of table.info.stats()
+        """
         msg = []
         counters = defaultdict(Counter)
         for ix, row in enumerate(table):

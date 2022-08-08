@@ -63,6 +63,8 @@ A module for each chapter
 
    observations
 
+   jwst
+
 Cast of Characters
 ==================
 
