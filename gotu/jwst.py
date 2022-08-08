@@ -69,6 +69,8 @@ from blume import magic, farm, taybell, modnar
 from matplotlib import image
 import numpy as np
 import json
+import PIL.Image
+PIL.Image.MAX_IMAGE_PIXELS = None
 
 class Jwst(magic.Ball):
 
@@ -76,6 +78,7 @@ class Jwst(magic.Ball):
 
         super().__init__()
         self.locations = deque((
+            'HD147980',
             'NGC 3132',
             'SMACS 0723',  #  deep field?
             'NGC 7318B',   # Stephen's Quintet?
@@ -204,8 +207,10 @@ class Jwst(magic.Ball):
 
             path = Path(prod[key])
             filename = path.name
-
+            print(path)
             if not path.stem.endswith('i2d'):
+                print('skipping', filename)
+                print()
                 continue
             
             result = Observations.download_file(str(path))
