@@ -86,6 +86,11 @@ def query_region(skypos):
                'params':{'ra':skypos.ra.deg,
                          'dec':skypos.dec.deg,
                          'radius':0.2},
+
+               'filters': [
+                   {"dataRights": 'PUBLIC',
+                    "project": 'JWST',
+                   }],
                'format':'json',
                'pagesize':2000,
                'removenullcolumns':True,
@@ -110,6 +115,10 @@ def open_file(uri):
     target = f'{MAST_DOWNLOAD}{uri}'
     result = requests.get(target)
 
+    if result.status_code != 200:
+        print('STATUS', result)
+        raise IOError()
+
     return io.BytesIO(result.content)
 
 def download_file(uri):
@@ -119,11 +128,15 @@ def download_file(uri):
     if filename.exists():
         print('Using cached file', filename)
         return
+
+    try:
+        data = open_file(uri)
+    except:
+        return False
     
-    data = open_file(uri)
     filename.write_bytes(data.read())
     
-
+    return True
 
 class Jwst(magic.Ball):
     """ Explore JWST data """
