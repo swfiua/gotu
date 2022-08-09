@@ -69,8 +69,61 @@ from blume import magic, farm, taybell, modnar
 from matplotlib import image
 import numpy as np
 import json
+import io
+import requests
+    
+
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
+
+MAST_URL = "https://mast.stsci.edu/api/v0/invoke?request="
+MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
+
+
+def query_region(skypos):
+
+    request = {'service':'Mast.Caom.Cone',
+               'params':{'ra':skypos.ra.deg,
+                         'dec':skypos.dec.deg,
+                         'radius':0.2},
+               'format':'json',
+               'pagesize':2000,
+               'removenullcolumns':True,
+               'timeout':30,
+               }
+
+    result = requests.get('%s%s' % (MAST_URL, json.dumps(request)))
+    content = json.loads(result.content)
+
+    fields = content['fields']
+    names = [x['name'] for x in fields]
+    dtype = [x['type'] for x in fields]
+
+    typemap = dict(string=str,
+                   boolean=bool)
+    dtype = [typemap.get(x, x) for x in dtype]
+    
+    return Table(content['data'], names=names, dtype=dtype)
+
+def open_file(uri):
+
+    target = f'{MAST_DOWNLOAD}{uri}'
+    result = requests.get(target)
+
+    return io.BytesIO(result.content)
+
+def download_file(uri):
+
+    filename = Path(Path(uri).name)
+
+    if filename.exists():
+        print('Using cached file', filename)
+        return
+    
+    data = open_file(uri)
+    filename.write_bytes(data.read())
+    
+
 
 class Jwst(magic.Ball):
     """ Explore JWST data """
@@ -133,12 +186,18 @@ class Jwst(magic.Ball):
             results = Table.read(filename)
         else:
             print('querying mast database')
-            results = Observations.query_region(skypos)
+            results = query_region(skypos)
+            #results = Observations.query_region(skypos)
             # find the JWST ones
             mask = results['project'] == 'JWST'
         
             results = results[mask]
 
+            await self.show_stats(results)
+            results.info()
+            results.info('stats')
+                  
+            
             # save a copy of the results
             results.write(filename)
 
@@ -222,7 +281,7 @@ class Jwst(magic.Ball):
                 print()
                 continue
             
-            result = Observations.download_file(str(path))
+            result = download_file(str(path))
             
             if not Path(filename).exists():
                 print('DOWNLOAD FAIL for ', filename)
