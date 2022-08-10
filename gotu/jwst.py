@@ -52,8 +52,8 @@ Right now, I happen to be interested in M74, also known as NGC 628.
 
 """
 
-from astroquery.mast import Observations
-from astroquery.simbad import Simbad
+#from astroquery.mast import Observations
+#from astroquery.simbad import Simbad
 
 from astropy.table import Table
 from astropy.io import fits
@@ -90,15 +90,21 @@ def query_region(skypos):
                'filters': [
                    {"dataRights": 'PUBLIC',
                     "project": 'JWST',
-                   }],
+                    }],
                'format':'json',
                'pagesize':2000,
                'removenullcolumns':True,
                'timeout':30,
                }
 
-    result = requests.get('%s%s' % (MAST_URL, json.dumps(request)))
-    content = json.loads(result.content)
+    response = mast_query(request)
+    
+    return response_to_table(response)
+
+def response_to_table(response):
+    
+    content = json.loads(response.content)
+    print(content)
 
     fields = content['fields']
     names = [x['name'] for x in fields]
@@ -109,6 +115,44 @@ def query_region(skypos):
     dtype = [typemap.get(x, x) for x in dtype]
     
     return Table(content['data'], names=names, dtype=dtype)
+
+def object_lookup(obj):
+    """ Return location give string such as M74 or NgC3132
+    
+    Returns an astropy.coordinates.SkyCoord
+    """
+    
+    request = {'service':'Mast.Name.Lookup',
+               'params':{'input':obj,
+                         'format':'json'},
+               }
+    print(f'looking up {obj} {request}')
+    response =  mast_query(request)
+
+    info = response_to_json(response)
+
+    print(info)
+    records = info['resolvedCoordinate']
+    location = records[0]
+    
+    ra, dec = location['ra'], location['decl']
+    skypos = SkyCoord(ra, dec, unit=(u.deg, u.deg))
+    return skypos
+
+def response_to_json(response):
+
+    return json.loads(response.content)
+
+def mast_query(request):
+    
+    result = requests.get('%s%s' % (MAST_URL, json.dumps(request)))
+    print(result.status_code)
+    if result.status_code != 200:
+        raise requests.HTTPError(result.status_code)
+
+    return result
+
+    
 
 def open_file(uri):
 
@@ -159,6 +203,8 @@ class Jwst(magic.Ball):
     async def show_stats(self, table):
 
         msg = self.table_count(table)
+        print(table.colnames)
+        print('TABLELEN', len(table))
         await self.put(msg, 'help')
         
     def table_count(self, table, maxrows=None):
@@ -187,10 +233,7 @@ class Jwst(magic.Ball):
 
     def name_to_skycoord(self, name):
 
-        location = Simbad.query_object(name)[0]
-        ra, dec = location['RA'], location['DEC']
-        skypos = SkyCoord(ra, dec, unit=(u.hourangle, u.deg))
-        return skypos
+        return object_lookup(name)
 
     async def get_observations(self, skypos):
 
@@ -326,11 +369,6 @@ class Jwst(magic.Ball):
         
                              
 
-def messier(n=74):
-
-    messy = f'M{n}'
-    
-    return Simbad.query_object(messy)
 
 if __name__ == '__main__':
 

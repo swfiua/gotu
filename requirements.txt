@@ -2,4 +2,4 @@ blume
 matplotlib
 astropy
 astroquery
-jwst
+#jwst
