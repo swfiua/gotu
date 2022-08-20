@@ -24,6 +24,112 @@ phi corresponds to the minimum distance between the receiver and
 emitter, in other words, the emitter's closest point of approach.
 
 theta measures the angle of approach.
+
+de Sitter Space and the Space Telescope
+=======================================
+
+Phillip James E. Peebles recently published a fascinating paper:
+
+Anomalies in Physical Cosmology
+https://arxiv.org/abs/2208.05018
+
+It describes the standard, lambda-Cold-Dark-Matter model for the
+universe and observations that suggest the model may need some new
+insight.
+
+The paper is timely, with our new view on the universe thanks to the JWST.
+
+de Sitter Space is mentioned briefly in the paper, remarking that it
+was not consistent with the observations.   
+
+I believe Peebles is talking about that sub-space of de Sitter Space,
+that which is restricted to bodies with a common origin if you go back
+the Hubble time.
+
+de Sitter Space appears to disappear from consideration as a model for
+the universe.   
+
+The issue is not de Sitter Space, rather it is the assumption all
+matter in the universe was co-located at a big bang some 13.7 billion
+years ago.
+
+So what is de Sitter Space?  Imagine a universe, of galaxies, as far
+as the eye can see, and far, far beyond.
+
+Moving in seemingly random directions, at around one thousandth the
+speed of light.
+
+To transform time at some distant galaxy, to time at our galaxy, we
+have to take account of special relativity, the mixing of space and
+time.
+
+The result when you measure distance in this way is de Sitter Space.
+
+It is the simplest possible model for a universe where special
+relativity holds, and it matches observations extraordinarily well.
+
+It also explains how redshift naturally occurs forwards through time
+in space-time as a result of special relativity.
+
+The space is highly symmetric, in time as well as space.
+
+Backwards in time, paths separate exponentially in time too.
+
+Each galaxy that passes through our visible universe, arrives in a
+burst of blue shifted light, comes as near as it gets and then
+separates exponentially from then, following a hyperbola.
+
+Just as there is a first time that the source is visible, there is a
+last time it will be visible, but the observer will have to wait until
+the end of time to see that.
+
+So at any time there is a large but finite set of galaxies in the
+visible universe.
+
+The modulation of a galaxy's arrival depends on the closest distance
+it approaches and the angle of approach.
+
+With this model for a universe there is an explanation for the
+redshift that we see, whilst there being no overall expansion of
+space-time, as the redshift is exactly balanced by the blue shift
+period of a new arrival.
+
+So when we observe through the JWST we may occassionally find
+galaxies, new arrivals that are not as redshift as they would be
+expected to be, given their distance.
+
+There is a further complication, with associating red-shift with
+distance.  If the light is coming from a place close to a
+super-massive black hole, it may be highly redshifted by the local
+gravity, following Einstein's general relativity.
+
+Some of the distant galaxies we are seeing may in fact be smaller
+quasars, closer to home.   That's a story for another module.
+
+JWST is also showing us how much dust is scattered across galaxies and
+the beautiful dust spirals that emerge.
+
+The observations we have of our universe, show a place that is very
+much in balance, it has had a long time to settle into its current
+state.
+
+Once we remove the time limit imposed, due to the big bang it is
+possible to imagine very different galactic timescales and evolution.
+
+We see, in the JWST pictures, baby quasars, spinning close to their
+parent galaxies.
+
+Galaxies grow from their surrounding dust, and their appears to be
+just a steady flow of the stuff, with wonderful harmonics.
+
+But the Cosmic Microwave Background, what's that? It's the heat from
+billions of billions of distant galaxies, the glowing dust of the
+cosmos.
+
+It's all modulated by the lense of de Sitter Space.
+
+Now let's see if we can simulate some of this.
+
 """
 
 # we are going to need this
@@ -157,6 +263,12 @@ class Dss(magic.Ball):
         #ax.axis('off')
         ax.show()
 
+
+class DeSitterSpace(magic.Ball):
+    """ Another go ad de Sitter Space.
+
+    """
+    pass
 
 async def run():
 

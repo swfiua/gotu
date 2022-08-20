@@ -103,7 +103,7 @@ def query_region(skypos):
 
 def response_to_table(response):
     
-    content = json.loads(response.content)
+    content = response_to_json(response)
     print(content)
 
     fields = content['fields']
@@ -131,7 +131,6 @@ def object_lookup(obj):
 
     info = response_to_json(response)
 
-    print(info)
     records = info['resolvedCoordinate']
     location = records[0]
     
@@ -141,12 +140,11 @@ def object_lookup(obj):
 
 def response_to_json(response):
 
-    return json.loads(response.content)
+    return json.loads(response.text)
 
 def mast_query(request):
     
     result = requests.get('%s%s' % (MAST_URL, json.dumps(request)))
-    print(result.status_code)
     if result.status_code != 200:
         raise requests.HTTPError(result.status_code)
 
@@ -157,7 +155,10 @@ def mast_query(request):
 def open_file(uri):
 
     target = f'{MAST_DOWNLOAD}{uri}'
-    result = requests.get(target)
+    headers = {}
+    headers['Access-Control-Allow-Origin'] = 'true'
+    
+    result = requests.get(target, headers=headers)
 
     if result.status_code != 200:
         print('STATUS', result)
