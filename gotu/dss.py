@@ -265,7 +265,13 @@ class Dss(magic.Ball):
 
 
 class DeSitterSpace(magic.Ball):
-    """ Another go ad de Sitter Space.
+    """Another go ad de Sitter Space.
+
+    Suppose that the universe is just an endless stream of galaxies,
+    like the billions
+
+    The idea is to consider a distant galaxy, as it arrives in our
+    visible universe
 
     """
     pass

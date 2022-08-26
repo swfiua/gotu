@@ -2,12 +2,82 @@
  A Personal View
 =================
 
+I have decided to just keep appending new versions at the top of this
+file.
+
+The pictures from the James Webb Space Telescope have been stunning.
+They have generated a lot of excitement amnongst astrophysicists.
+
+High redshift galaxies, is the big bang theory wrong?  The word on the
+street is that this is just great new data to refine models and find
+the missing key to the standard big bang model.
+
+My personal view, recently changed to a belief that the universe
+
+From Peebles,  Anomalies in Physical Cosmology:
+
+   Einstein’s cosmological principle, or assumption, is that the
+   universe is close homogeneous and isotropic in the large-scale
+   average.
+
+   To be more explicit about the role of this assumption in
+   the standard ΛCDM theory used in this paper I offer the following
+   definition.
+
+   The theory applies the standard physics of matter,
+   radiation, and Einstein’s general theory of relativity with its
+   cosmological constant to a cosmologically flat universe that is a
+   spatially stationary, isotropic, random process with a close to
+   scale-invariant power law power spectrum of Gaussian and
+   adiabatic departures from homogeneity.
+
+   This trimmed-down theory has eight free parameters (the density
+   parameters in ordinary matter, dark matter, the CMB, and
+   neutrinos with negligible rest masses; with Hubble’s constant, the
+   primeval Gaussian process amplitude and power law index, and the
+   optical depth for scattering of the CMB by intergalactic plasma).
+
+I ask the question, what would a universe with Einstein's cosmological
+principla look like?
+
+What if the universe is essentially static, vast and truly ancient.
+
+Suppose that galaxies gradually grow from smaller systems, until they
+reach a size that is naturally in balance with the surrounding
+universe.
+
+Stirring dust into stars and planets for a very long time indeed.
+
+Over time, quasars can form along the galaxies arms. They may
+eventually be ejected from the galaxy and appear as baby galaxies.
+
+These quasars complicate astronomy significantly as they often have
+redshift that is due to a large mass at their centre.  Einstein's
+general relativity explains how a central mass can slow time
+significantly.   This influence can extend out far enough to shift the
+light from the active region.
+
+To model a quasar we just need the central mass, and the density and
+temperature of the surrounding medium.  JWST can help greatly with the
+last two parameters.
+
+It is in general difficult to distinguish a small, nearby quasar from
+a more distant galaxy, where all the redshift is assumed to be
+cosmological.   The angular size of the objects can clearly help
+clarify matters.
+
+With JWST we have high resolution images of nearby galaxies, the
+density and temperature of the dust should be much clearer.
+
+
+Previously
+==========
+
 I have been on a journey, and found new perspectives.
 
 It has been a way to see how the world might have changed or not.
 
 Sharing ideas with others, finding out what people are doing and why.
-
 What is the perspective, why do they believe what they do.
 
 It has been a wonderful time in our exploration of the universe we
@@ -53,7 +123,7 @@ simplest possible universe, we first have to forget much that we
 assume is undoubtedly true.
 
 Light.  Is there anything else?
-  
+
 de Sitter Space is an extremely good approximation to what we see.
 
 It is a vacuum solution to Einstein's equations, with no matter.
@@ -75,13 +145,17 @@ There are harmonics in the CMB, these are unsurprising, given the
 potential age of the universe.  A model should however take these
 harmonics into account.
 
-An atom which absorbs a quantum of light, that is rotating with the
-body, will move some distance before the electron decays and emits the
-photon.
+An a particle of dust which absorbs a quantum of light, that is
+rotating with the body, will move some distance before the electron
+decays and emits the photon.
 
 It will thereby result in an oscillation in the surrounding space time
 with the same angular velocity as the body, proportional to its mass,
 and falling off linearly with distance.
+
+The drop off is inversely proportional to distance, because the
+radiation has a direction, determined by the plane of rotation of the
+dust.
 
 The gravitational fog, that blurs our vision around the de Sitter
 Radius, obscures the fact that some of the light which makes up the

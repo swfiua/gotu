@@ -76,6 +76,9 @@ import requests
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
 
+#CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
+CORS_PROXY = "http://localhost:8080/"
+
 MAST_URL = "https://mast.stsci.edu/api/v0/invoke?request="
 MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
 
@@ -154,11 +157,10 @@ def mast_query(request):
 
 def open_file(uri):
 
+    target = f'{CORS_PROXY}{MAST_DOWNLOAD}{uri}'
     target = f'{MAST_DOWNLOAD}{uri}'
-    headers = {}
-    headers['Access-Control-Allow-Origin'] = 'true'
-    
-    result = requests.get(target, headers=headers)
+    print(target)
+    result = requests.get(target)
 
     if result.status_code != 200:
         print('STATUS', result)
@@ -374,8 +376,23 @@ class Jwst(magic.Ball):
 if __name__ == '__main__':
 
     from blume import magic, farm
+    import argparse
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--location')
+    parser.add_argument('--corsproxy')
+
+    args = parser.parse_args()
 
     fm = farm.Farm()
-    fm.add(Jwst())
+
+    jwst = Jwst()
+    if args.location:
+        jwst.locations.appendleft(args.location)
+
+    if args.corsproxy:
+        CORS_PROXY = args.corsproxy
+        
+    fm.add(jwst)
     magic.run(farm.start_and_run(fm))
     
