@@ -2,6 +2,211 @@
  A Personal View
 =================
 
+I spent my early years in the same Yorkshire town as Fred Hoyle, the
+astrophysicist who coinded the term *Big Bang*.
+
+It was the time of moon landings and I recall in junior school excited
+discussions as these things called black holes, they might actually
+exist.  Black holes did not feature much at all in the cosmology of
+the day.
+
+Some years later I found myself at Warwick University, learning
+mathematics from a wonderful department put together by Professor
+Zeeman.  He had recently given the Royal Institution Christmas
+Lectures, which was in part, why ended up at Warwick.
+
+It was Christopher Zeeman who gave a 30 lecture course on the
+foundations of mathematics.
+
+It was a 30 hour tour through the history of mathematics, building the
+foundations on which all mathematics stands.
+
+The story was interwoven with the history of the subject.  A crisis
+that emerged as calculus itself was called into question.
+
+The solution was a system based on axiomatics.  15 rules that numbers
+should obey.
+
+It was shown that such a system did exist, complete with a plan for
+how to build such a system.
+
+Things were taken one step further and it was shown that any two
+systems which obeyed the axioms would be equivalent in the sense that
+it would be possible to map every number in one system to a number in
+the other, preserving all the mathematical structure.
+
+I feel very much, that some of this rigour is lacking in the
+astrophysics world.
+
+We have a theory, the Big Bang theory, which fits our observations
+remarkably well.
+
+* observed correlation of redshift with distance
+* Cosmic Microwave Background
+* the distribution of hydrogen, helium, lithium and other elements.
+
+In order to fit the observations, a number of additions have had to be
+made:
+
+* inflationary period
+* dark matter
+* dark energy
+* theories of galactic formation
+* Hubble constant tension
+
+Given the numerous issues, it is very much asking if there is an
+alternative theory, one that does not require these adjustments?
+
+It so happens that there is such a theory, for this we first need to
+go back to Fred Hoyle's static universe.
+
+Hoyle calculated how much matter would need to be spontaneously
+created to balance the observed expansion.  It was only around 1 atom
+per year for each sky-skraper sized volume of space.  He argued that
+spontaneous creation of such a modest amount of matter was less
+implausible than the big bang theory.
+
+It was the discovery of quasars, highly red-shifted objects, assumed
+to be extraordinarily distant and powerful, an earlier phase of the
+universe, if you like, that was taken as strong evidence for the Big
+Bang.   We do not see these powerful objects closer to us, so it is
+assumed they represent some earlier stage of evolution of the
+universe.
+
+Fast forward to 2017 when I discovered, Professor Colin Rourke had
+a book out, with the title *A new paradigm for the Universe*.
+
+He was my tutor back in the day at Warwick.  He taught calculus with
+an approach he had developed for the Open University.  He also
+lectured on curves and spaces, a subject that is essential to an
+understanding of the equations of space-time.
+
+It has taken me many years to fully appreciate the ideas in the book.
+In which time it has been updated and republished, as *The Geometry of
+the Universe*.
+
+It really does describe a paradigm shift, although much of the book is
+highly relevent to a Big Bang Universe too.
+
+The book introduces the main characters involved in building models
+for Einstein's General Relativity.
+
+One of the principles behind the book is Einstein’s cosmological
+principle, that the universe is close to homogeneous and isotropic in
+the large-scale, on average.
+
+Colin Rourke uses the strong cosmological principle to extend the
+argument to time as well as space, suggesting the universe is likely
+orders of magnitude older and larger than the big bang theory's 13.7
+billion year age.
+
+There is a lot of evidence that the universe is extremely old.   There
+are many observations that show that the whole system appears to be in
+a remarkable state of equilibrium.
+
+Many of the issues that arise in the big bang theory disappear, if
+there is simply more time for everything to evolve.
+
+A new theory of galaxy growth and formation is needed, one that is
+stable over long periods of time.
+
+And then there is *redshift*.
+
+Well it turns out this is just what we would expect to see.  Based on
+local observations, galaxies are typically in relative motion at about
+one thousandth the speed of light or so.
+
+The result is that we see a source increasingly red-shifted the
+further it recedes from us.  This emerges from the Lortentz
+transformations to map the source's time and distance to our space.
+
+If we go back in time, past the point of closest approach of the
+galaxy, there is a symmetry with the path in forwards time.
+
+The result is that we end up seeing a very large amount of the
+emitter's time in a very short space of time.
+
+Rourke suggests that this is what gamma-ray bursts are.
+
+It's long past time for me to get this working in the `dss`_ module.
+
+A galaxy, newly visible to us, bursting on the scene and showing it's
+history in a burst of light, before receding rapidly into the
+distance, redder and redder.
+
+What about quasars?
+-------------------
+
+These are generally much closer to home.  Due to the mass at their
+centre, light can be highly redshifted.   In short, not all red-shift
+is cosmological.
+
+It can be hard to distinguish the two, but James Webb will help
+enormously with this task.
+
+Quasars are baby galaxies, many are part of the galaxy structure,
+others ejected from a galaxy.
+
+The book provides a model, for which I believe all that is required is
+the density and temperature of the medium, and the mass of the central
+black hole.
+
+
+The Cosmic Microwave Background?
+--------------------------------
+
+Once the Big Bang is abandoned, much of what we observe in the
+universe is easier to explain.
+
+A good example are the harmonics in the Cosmic Microwave Background.
+With an older universe, there is now no constraint on how long
+different parts of the universe have had to communicate and develop
+harmonics. 
+
+
+No Dark Matter?
+---------------
+
+The Sciama Principle, that a non-linear motion of a body induces a
+non-linear motion of the surrounding space.
+
+It is a natural addition to Einstein's General Relativity, where the
+rotation of a body is assumed to have negligible effect on the
+surrounding space time.
+
+It is important to note that this was a pre-computer age, so there is
+a strong focus on a simple model.
+
+That model happened to be extraordinarily good, fitting observations
+such as the precession of Mercury.   It has continued to be confirmed
+in many scenarios.
+
+The theory runs into trouble with galactic rotation curves, where
+stars at the edge of galaxies have higher tangential velocities than
+you would expect for the standard model.
+
+The standard solution has been to infer dark matter's presence.
+
+Rourke says rotation does matter, but it is not normally noticeable
+unless the mass is very large, or you are close to the mass.
+
+To drive a full sized galaxy you need hundreds of millions of solar
+masses, which raises important questions about Sgr A*.
+
+I am not aware of the theories relating to how fast these humoungous
+black holes take to form post big bang.
+
+The standard model has stars clumping together, then starting to spin
+up, with a central bulge and maybe a bar forming.
+
+In a static universe there is plenty of time for a galaxy to grow, and
+in turn create new quasars, that may one day grow to be a full sized
+galaxy. 
+
+ 
+Personal views
+==============
+
 I have decided to just keep appending new versions at the top of this
 file.
 
