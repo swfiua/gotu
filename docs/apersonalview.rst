@@ -54,7 +54,7 @@ made:
 * theories of galactic formation
 * Hubble constant tension
 
-Given the numerous issues, it is very much asking if there is an
+Given the numerous issues, it is very much worth asking if there is an
 alternative theory, one that does not require these adjustments?
 
 It so happens that there is such a theory, for this we first need to
@@ -89,23 +89,29 @@ It really does describe a paradigm shift, although much of the book is
 highly relevent to a Big Bang Universe too.
 
 The book introduces the main characters involved in building models
-for Einstein's General Relativity.
+for Einstein's General Relativity.  There is a whole cast of
+characters.  There was much discusion of different models.
 
 One of the principles behind the book is Einstein’s cosmological
 principle, that the universe is close to homogeneous and isotropic in
-the large-scale, on average.
+the large-scale, on average.   Whaterver that means.
 
 Colin Rourke uses the strong cosmological principle to extend the
 argument to time as well as space, suggesting the universe is likely
 orders of magnitude older and larger than the big bang theory's 13.7
 billion year age.
 
+It is a natural consequence of Einstein's Special Relativity, that
+time and space become intertwined, so why not extend the cosmological
+principle to time as well?
+
 There is a lot of evidence that the universe is extremely old.   There
 are many observations that show that the whole system appears to be in
-a remarkable state of equilibrium.
+a remarkable state of equilibrium.   The sort of equilibrium that
+might take a very long time to establish, given the distances involved.
 
 Many of the issues that arise in the big bang theory disappear, if
-there is simply more time for everything to evolve.
+there is simply more time for everything to happen.
 
 A new theory of galaxy growth and formation is needed, one that is
 stable over long periods of time.
@@ -113,26 +119,70 @@ stable over long periods of time.
 And then there is *redshift*.
 
 Well it turns out this is just what we would expect to see.  Based on
-local observations, galaxies are typically in relative motion at about
-one thousandth the speed of light or so.
+local observations, nearby galaxies are typically in relative motion
+at about one thousandth the speed of light or so.
+
+This is sufficient that the Lorentz transform that takes the source's
+space-time coordinates and maps it to ours, shows the source's time
+dilating, relative to ours.  In other words, the redshift we observe
+is just a consequence of special relativity.
+
+Further note, that de Sitter Space produces exactly the right metrics
+to explore this model of the universe.
 
 The result is that we see a source increasingly red-shifted the
-further it recedes from us.  This emerges from the Lortentz
+further it recedes from us.  This emerges from the Lorentz
 transformations to map the source's time and distance to our space.
 
-If we go back in time, past the point of closest approach of the
-galaxy, there is a symmetry with the path in forwards time.
+If we go backwards in time, past the point of closest approach of the
+galaxy, there is a symmetry with the path in forwards time. 
 
-The result is that we end up seeing a very large amount of the
-emitter's time in a very short space of time.
+But here, we see a large part of the source's time in a small period
+of our time.
 
-Rourke suggests that this is what gamma-ray bursts are.
+Rourke suggests that this is what gamma-ray bursts are. 
 
 It's long past time for me to get this working in the `dss`_ module.
 
 A galaxy, newly visible to us, bursting on the scene and showing it's
 history in a burst of light, before receding rapidly into the
 distance, redder and redder.
+
+And now we are back to Fred Hoyle's continuous creation.  Except that
+it is not magic creation of matter, rather it is matter that has
+existed for a very long time, a galaxy arriving in our visible
+universe.
+
+In his book Fred Hoyle had this curious paragraph::
+
+  ... You will have noticed that I have used the concepts of space and
+  time as if they coud be treated separately.
+
+  According to the relativity theory this is a dangerous thing to do.
+
+  But it so happens that it can be done with impunity in our universe,
+  although it is easy to imagine other universes where it could not be
+  done.
+  
+  What I mean by this is that a division between space and time can be
+  made and this division can be used throughout the whole of our
+  universe.
+
+  This is a very important and special property of our Universe which
+  I think it is important to take into account in forming the
+  equations that decide the way in which matter is created.
+
+I am extremely curious how Hoyle came to this way of thinking.
+
+Whilst it is true that we as an oberserver can choose three
+dimenstions of space and one of time, and we can use it throughout the
+universe, the same division is not possible for other observers.
+
+
+
+It is curious, since it is precisely when you take account of special
+relativity.
+
 
 What about quasars?
 -------------------
