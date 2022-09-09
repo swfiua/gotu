@@ -181,7 +181,7 @@ universe, the same division is not possible for other observers.
 
 
 It is curious, since it is precisely when you take account of special
-relativity.
+relativity, that it is clear why we see redshift.
 
 
 What about quasars?
@@ -199,7 +199,7 @@ others ejected from a galaxy.
 
 The book provides a model, for which I believe all that is required is
 the density and temperature of the medium, and the mass of the central
-black hole.
+black hole. 
 
 
 The Cosmic Microwave Background?
@@ -212,6 +212,8 @@ A good example are the harmonics in the Cosmic Microwave Background.
 With an older universe, there is now no constraint on how long
 different parts of the universe have had to communicate and develop
 harmonics. 
+
+The universe isn't a vacuum, it is full of dust.  Suppose each particle of dust obeys the Sciama Principle? 
 
 
 No Dark Matter?
