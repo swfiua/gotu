@@ -57,6 +57,8 @@ made:
 Given the numerous issues, it is very much worth asking if there is an
 alternative theory, one that does not require these adjustments?
 
+Is the big bang theory the only possible explanation of what we see?
+
 It so happens that there is such a theory, for this we first need to
 go back to Fred Hoyle's static universe.
 
@@ -119,13 +121,21 @@ stable over long periods of time.
 And then there is *redshift*.
 
 Well it turns out this is just what we would expect to see.  Based on
-local observations, nearby galaxies are typically in relative motion
-at about one thousandth the speed of light or so.
+local observations, nearby galaxies are typically in relative motion,
+relative to the distant stars at about one thousandth the speed of
+light or so.
 
-This is sufficient that the Lorentz transform that takes the source's
-space-time coordinates and maps it to ours, shows the source's time
-dilating, relative to ours.  In other words, the redshift we observe
-is just a consequence of special relativity.
+The transform that takes a distant galaxies space time to our space
+time is a Lorentz transform.  
+
+We see the path of the galaxy, when viewed in just two dimensions,
+distance and time, as following a hyperbola, as distance and time
+intertwine. 
+
+Thus the Lorentz transform that takes a source's space-time
+coordinates and maps it to ours, shows the source's time dilating,
+relative to ours.  In other words, the redshift we observe is just a
+consequence of special relativity.
 
 Further note, that de Sitter Space produces exactly the right metrics
 to explore this model of the universe.
@@ -153,7 +163,8 @@ it is not magic creation of matter, rather it is matter that has
 existed for a very long time, a galaxy arriving in our visible
 universe.
 
-In his book Fred Hoyle had this curious paragraph::
+In his marvellous book, The Nature of the Universe, Fred Hoyle had
+this curious paragraph::
 
   ... You will have noticed that I have used the concepts of space and
   time as if they coud be treated separately.
@@ -178,10 +189,10 @@ Whilst it is true that we as an oberserver can choose three
 dimenstions of space and one of time, and we can use it throughout the
 universe, the same division is not possible for other observers.
 
-
-
 It is curious, since it is precisely when you take account of special
-relativity, that it is clear why we see redshift.
+relativity, that it is clear why we see redshift, as well as extreme
+blue shift.
+
 
 
 What about quasars?
