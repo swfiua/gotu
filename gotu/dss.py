@@ -136,7 +136,7 @@ Now let's see if we can simulate some of this.
 import random
 import math
 import numpy as np
-from matplotlib import pyplot as plt
+from astropy import constants, units
 from scipy import integrate
 from traceback import print_exc
 
@@ -274,7 +274,33 @@ class DeSitterSpace(magic.Ball):
     visible universe
 
     """
-    pass
+    def __init__(self):
+
+
+        super().__init__()
+        
+        self.x = 0.
+        self.dt = 0.01
+        self.t = 0.
+
+        self.v = 1 / random.randint(5, 10)
+
+        
+    async def run(self):
+        """ """
+        # increment t
+        self.x += self.v * self.dt
+        self.t += self.dt
+
+        # we see
+        gamma = 1/math.sqrt(1 - (self.v * self.v))
+        dr = gamma * self.v * self.dt  # ???
+        dt = self.dt / gamma
+
+        v = dr/dt
+
+        print(v, self.v)
+        self.v = v
 
 async def run():
 
@@ -284,14 +310,16 @@ async def run():
     dss.constraints()
 
     farm = fm.Farm()
-    
+
+    dss2 = DeSitterSpace()
     farm.add(dss)
+    farm.add(dss2)
     
     await farm.start()
 
     print(dss.deSitter())
 
-    farm.shep.path.append(dss)
+    farm.shep.path.append(dss2)
 
     await farm.run()
         

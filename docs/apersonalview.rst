@@ -193,6 +193,12 @@ It is curious, since it is precisely when you take account of special
 relativity, that it is clear why we see redshift, as well as extreme
 blue shift.
 
+With a big bang theory, a universal time is partially reinstated, yet
+due to relativity, two observers in relative motion, will still not
+agree on the time and place of events.
+
+Regardless, the key point is that the redshift we observe is exactly
+what we would expect to see in a static universe as described above.
 
 
 What about quasars?
@@ -202,15 +208,25 @@ These are generally much closer to home.  Due to the mass at their
 centre, light can be highly redshifted.   In short, not all red-shift
 is cosmological.
 
-It can be hard to distinguish the two, but James Webb will help
-enormously with this task.
+The idea is that there is a spectrum as a quasar grows into a galaxy.
+It's central black hole grows over time.
+
+The light from a quasar can be highly redshifted, due to general
+relativity and the presence of a super massive black hole at its
+centre. 
+
+It can be hard to distinguish the cosmological and gravitational
+redshift, but James Webb will help enormously with this task.
 
 Quasars are baby galaxies, many are part of the galaxy structure,
 others ejected from a galaxy.
 
 The book provides a model, for which I believe all that is required is
 the density and temperature of the medium, and the mass of the central
-black hole. 
+black hole.
+
+There is surely plenty of data from JWST that will allow fitting of
+models to observations of quasars associated with local galaxies.
 
 
 The Cosmic Microwave Background?
