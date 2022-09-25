@@ -185,9 +185,13 @@ this curious paragraph::
 
 I am extremely curious how Hoyle came to this way of thinking.
 
-Whilst it is true that we as an oberserver can choose three
-dimenstions of space and one of time, and we can use it throughout the
+Whilst it is true that we as an observer can choose three
+dimensions of space and one of time, and we can use it throughout the
 universe, the same division is not possible for other observers.
+
+They have there own local division, we have the same speed of light.
+
+There's a transformation between the spaces that preserves distance.
 
 It is curious, since it is precisely when you take account of special
 relativity, that it is clear why we see redshift, as well as extreme
@@ -282,6 +286,16 @@ In a static universe there is plenty of time for a galaxy to grow, and
 in turn create new quasars, that may one day grow to be a full sized
 galaxy. 
 
+Dust
+====
+
+One thing the space telescope has shown is the dust across the universe.
+
+From rings around Neptune and Jupiter, to the interstellar dust of galaxies.
+
+This dust may be playing a critical role in the propogation of gravitational waves.   
+
+The Kerr metric is typically used to model the rotation 
  
 Personal views
 ==============
