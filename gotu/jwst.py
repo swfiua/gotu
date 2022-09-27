@@ -71,7 +71,9 @@ import numpy as np
 import json
 import io
 import requests
-    
+
+# make things pretty 
+from pprint import pprint
 
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
@@ -83,7 +85,7 @@ MAST_URL = "https://mast.stsci.edu/api/v0/invoke?request="
 MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
 
 
-def query_region(skypos):
+def query_region(skypos, project='JWST'):
 
     request = {'service':'Mast.Caom.Cone',
                'params':{'ra':skypos.ra.deg,
@@ -92,7 +94,7 @@ def query_region(skypos):
 
                'filters': [
                    {"dataRights": 'PUBLIC',
-                    "project": 'JWST',
+                    "project": project,
                     }],
                'format':'json',
                'pagesize':2000,
@@ -100,6 +102,7 @@ def query_region(skypos):
                'timeout':30,
                }
 
+    pprint(request)
     response = mast_query(request)
     
     return response_to_table(response)
@@ -177,6 +180,7 @@ def download_file(uri):
         return
 
     try:
+        # make this async?
         data = open_file(uri)
     except:
         return False
@@ -198,6 +202,9 @@ class Jwst(magic.Ball):
             'M 74',       # NGC 628 Phantom Galaxy
             'NGC 3324',   # Carina Nebula
             'PGC 2248'))  # Cartwheel
+
+        self.project = 'JWST'
+        self.project = None
 
         self.topn = 1
         self.do_product_list = False
@@ -248,9 +255,10 @@ class Jwst(magic.Ball):
             results = query_region(skypos)
             #results = Observations.query_region(skypos)
             # find the JWST ones
-            mask = results['project'] == 'JWST'
+            if self.project:
+                mask = results['project'] == self.project
         
-            results = results[mask]
+                results = results[mask]
 
             await self.show_stats(results)
             results.info()
@@ -326,28 +334,35 @@ class Jwst(magic.Ball):
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
-        for key in ('jpegURL', 'dataURL', 'dataURI'):
-        # for key in ('jpegURL',):
+        filetypes = set(('.jpg', '.png'))
+        #for key in ('jpegURL', 'dataURL', 'dataURI'):
+        for key in ('jpegURL',):
             
             if key not in prod.colnames:
                 continue
 
-            path = Path(prod[key])
-            filename = path.name
-            print(path)
-            if not path.stem.endswith('i2d'):
+            filename = Path(prod[key])
+
+            print(filename)
+            if not filename.stem.endswith('i2d'):
                 print('skipping', filename)
                 print()
                 continue
             
-            result = download_file(str(path))
+            if filename.suffix not in filetypes:
+                print('filtered out by filetype ', filename.suffix, filename)
+                if product in self.products:
+                    del self.products[product]
+                continue
             
-            if not Path(filename).exists():
+            result = download_file(str(filename))
+
+            if not Path(filename.name).exists():
                 print('DOWNLOAD FAIL for ', filename)
                 continue
             
-            if filename.endswith('fits'):
-
+            if filename.suffix == '.fits':
+                
                 tab = fits.open(filename)
                 for item in tab:
                     print(item.size)
@@ -359,12 +374,13 @@ class Jwst(magic.Ball):
                 
                 print(tab.info())
 
-            elif filename.endswith('jpg') or filename.endswith('png'):
+            elif filename.suffix == '.jpg' or filename.suffix == '.png':
                 ax = await self.get()
-                ax.imshow(image.imread(filename), cmap=modnar.random_colour())
+                ax.imshow(image.imread(filename.name),
+                          cmap=modnar.random_colour())
                 ax.show()
 
-            elif filename.endswith('json'):
+            elif filename.suffix == '.json':
                 msg = json.load(open(filename))
                 msg = [(key, value) for item in msg.items()]
                 await self.put(msg, 'help')
@@ -380,6 +396,7 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--location')
+    parser.add_argument('--project', default=None)
     parser.add_argument('--corsproxy')
 
     args = parser.parse_args()
