@@ -273,7 +273,7 @@ The standard solution has been to infer dark matter's presence.
 Rourke says rotation does matter, but it is not normally noticeable
 unless the mass is very large, or you are close to the mass.
 
-To drive a full sized galaxy you need hundreds of millions of solar
+To drive a full sized galaxy you need hundreds of billions of solar
 masses, which raises important questions about Sgr A*.
 
 I am not aware of the theories relating to how fast these humoungous
