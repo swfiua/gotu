@@ -43,8 +43,8 @@ de Sitter Space is mentioned briefly in the paper, remarking that it
 was not consistent with the observations.   
 
 I believe Peebles is talking about that sub-space of de Sitter Space,
-that which is restricted to bodies with a common origin if you go back
-the Hubble time.
+restricted to bodies with a common origin if you go back the Hubble
+time.
 
 de Sitter Space appears to disappear from consideration as a model for
 the universe.   
@@ -95,7 +95,7 @@ space-time, as the redshift is exactly balanced by the blue shift
 period of a new arrival.
 
 So when we observe through the JWST we may occassionally find
-galaxies, new arrivals that are not as redshift as they would be
+galaxies, new arrivals that are not as redshifedt as they would be
 expected to be, given their distance.
 
 There is a further complication, with associating red-shift with
@@ -103,10 +103,21 @@ distance.  If the light is coming from a place close to a
 super-massive black hole, it may be highly redshifted by the local
 gravity, following Einstein's general relativity.
 
+The current assumption is that light producing regions are far enough
+from any central mass for the gravitational redshift to be
+significant.
+
+Part of this belief comes from the theory of acretion models and
+over-coming the angular-momentum obstruction to acretion.
+
+According to Rourke, once you take account of the frame dragging due
+to the rotation of the central mass, the angular momentum problem goes
+away.
+
 Some of the distant galaxies we are seeing may in fact be smaller
 quasars, closer to home.   That's a story for another module.
 
-JWST is also showing us how much dust is scattered across galaxies and
+JWST is also showing us how much dust is scattered across galaxies and,
 the beautiful dust spirals that emerge.
 
 The observations we have of our universe, show a place that is very
@@ -116,11 +127,25 @@ state.
 Once we remove the time limit imposed, due to the big bang it is
 possible to imagine very different galactic timescales and evolution.
 
+It also explains the many observations that indicate a system in high
+state of equilibrium, for example as shown by the Cosmic Microwave
+Background.
+
+Galaxies evolve over time, matter moves out along the spiral arms,
+that journey would take of the order of 15 billion years, with many
+super-novae along the way.
+
+It should also be noted, that the conditions close to a galaxy's
+central black hole are very similar to those shortly after the big
+bang, making the journey of matter along spiral arms an even better
+match to the big bang theory.   
+
 We see, in the JWST pictures, baby quasars, spinning close to their
 parent galaxies.
 
-Galaxies grow from their surrounding dust, and their appears to be
-just a steady flow of the stuff, with wonderful harmonics.
+Galaxies grow from their surrounding dust, and there appears to be
+just a steady flow of dust, with wonderful harmonics.  Matter moving
+out along spiral arms before falling back into the centre.
 
 But the Cosmic Microwave Background, what's that? It's the heat from
 billions of billions of distant galaxies, the glowing dust of the
@@ -128,7 +153,47 @@ cosmos.
 
 It's all modulated by the lense of de Sitter Space.
 
+One criticism of de Sitter Space is that it is a vaccuum solution to
+Einstein's equations.  There is no matter and no Mach's Principle.
+
+Now Rourke's proposal of intertail drag from rotation, dropping off as
+1/radius, is also problematic.
+
+The Kerr metric isthe unique solotion to Einstein's equations assuming
+space is not a vacuum.
+
+But space is clearly not a vacuum, it is full of dust.  Whenp you apply
+the Sciama Pricnciple to every celestial body, from the smallest grain
+of dust to the largest central mass in a galaxy, then I believe it
+will be clear why the Sciama Principle applies.
+
 Now let's see if we can simulate some of this.
+
+
+Hyperbolas
+==========
+
+I have been stuck at this part of the journey for a while, looking for
+a good way to explain how space time seems to work.
+
+At this point here, we suddenly run into a lot of mathematics.  
+
+Conic sections, manifolds, matrices, rotations.
+
+To keep things manageable, just consider how the distance of an object
+varies over time.
+
+The key observation is that when you plot a distant galacy's distance
+against time we get a rectangular hyperbola.
+
+These hyperbolae arise from the Lorentz transformations of special
+relativity.
+
+Most of the sources of light we see are galaxies that are now in the
+rapidly receding part of their hyperbola.
+
+Presumably, under current cosmology, the few exceptions are assumed to
+be smaller objects nearer to our galaxy?
 
 """
 
