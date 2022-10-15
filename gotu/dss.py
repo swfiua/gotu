@@ -180,9 +180,6 @@ At this point here, we suddenly run into a lot of mathematics.
 
 Conic sections, manifolds, matrices, rotations.
 
-To keep things manageable, just consider how the distance of an object
-varies over time.
-
 The key observation is that when you plot a distant galacy's distance
 against time we get a rectangular hyperbola.
 
@@ -193,7 +190,44 @@ Most of the sources of light we see are galaxies that are now in the
 rapidly receding part of their hyperbola.
 
 Presumably, under current cosmology, the few exceptions are assumed to
-be smaller objects nearer to our galaxy?
+be smaller objects nearer to our galaxy?   
+
+To set the scene, consider someone on a planet in a distant galaxy.
+
+It is possible to estimate the movement, relative to the distant fixed
+stars.  For example, our own galaxy is cruising through space at some
+2.1 million km/h.  With a little help rom `astropy`:
+
+>>> from astropy import units, constants
+>>> milky_way_speed = 2.1e6 * units.kilometer / units.hour
+>>> milky_way_speed / constants.c.to(milky_way_speed.unit)
+<Quantity 0.00194579>
+
+We see that this is an appreciable fraction of the speed of light.  It
+is also in line with the speeds for other galaxies in their locality
+in the universe.
+
+More generally, due to the Hubble expansion:
+
+>>> from astropy import cosmology
+>>> cosmology.WMAP9.H
+
+These velocities are large enough that Einstein's special relativity
+has to be taken into account when mapping the distant galaxy's space
+time to our space time.
+
+Just as we can naturally divide space time into 3 dimensions of space
+and one of time, so can the alien on a distant galaxy.
+
+We both measure the same speed of light locally.  
+
+However, to map their space time to ours, we need to know our relative velocity.
+
+For distant galaxies, the redshift allows us to calculate the relative
+velocity.
+
+>>> cosmology.WMAP9.H(0)
+<Quantity 69.32 km / (Mpc s)>
 
 """
 
