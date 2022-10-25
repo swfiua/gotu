@@ -210,24 +210,40 @@ in the universe.
 More generally, due to the Hubble expansion:
 
 >>> from astropy import cosmology
->>> cosmology.WMAP9.H
+>>> cosmology.WMAP9.H(0)
+<Quantity 69.32 km / (Mpc s)>
 
-These velocities are large enough that Einstein's special relativity
-has to be taken into account when mapping the distant galaxy's space
-time to our space time.
+So local velocities are large enough that Einstein's special
+relativity has to be taken into account when mapping the distant
+galaxy's space time to our space time.  [1]
+
+Further, when Hubble expansion is taken into account, these relative
+velocities go up by about one thousandth the speed of light every few
+mega-parsecs.
+
+But this is just what we would expect when we do an analysis of light
+paths taking into account special relativity.
 
 Just as we can naturally divide space time into 3 dimensions of space
 and one of time, so can the alien on a distant galaxy.
 
-We both measure the same speed of light locally.  
+We both measure the same speed of light locally.  This is an
+assumption of special relativity.
 
 However, to map their space time to ours, we need to know our relative velocity.
 
 For distant galaxies, the redshift allows us to calculate the relative
 velocity.
 
->>> cosmology.WMAP9.H(0)
-<Quantity 69.32 km / (Mpc s)>
+
+Now we want a transformation that preserves distances.
+
+...
+
+References and Footnotes
+
+[1]  The parameter to `WMAP9.H` allows the cosmology to have different
+Hubble constants at different redshifts.
 
 """
 

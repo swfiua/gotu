@@ -195,6 +195,7 @@ class Jwst(magic.Ball):
 
         super().__init__()
         self.locations = deque((
+            'M 16',  # pillars of creation, eagle nebula
             'HD 147980',
             'NGC 3132',
             'SMACS 0723',  #  deep field?
@@ -269,8 +270,6 @@ class Jwst(magic.Ball):
             results.write(filename)
 
         # Fileter some more -- need to make this optional
-        mask = [Path(str(x['dataURL'])).stem.endswith('i2d') for x in results]
-        results = results[mask]
         mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
         results = results[mask]
 
