@@ -412,6 +412,8 @@ class DeSitterSpace(magic.Ball):
 
 
         super().__init__()
+
+        self.k = 1.
         
         self.x = 0.
         self.dt = 0.01
@@ -423,26 +425,64 @@ class DeSitterSpace(magic.Ball):
     async def uvxt(self):
         """ """
 
-    async def zedten(self, z=10):
-        """ a galaxy at zed ten
+    async def zedten(self, z=10, theta=0, nearest=1):
+        """a galaxy at zed ten
         
         z: redshift, optional, default 10
+        theta: angle of approach
+        nearest: point of closest approach
 
         plots future and past of a galaxy at zed10
 
-        
+        if nearest is zero, then it is a big bang universe.
+
+        but what if nearest is one or more? Where one is the Hubble distance.
+
+        The answer is a hyperbolic rotation, but how to get there?
+
+        Focus on the intersection of our timeline with the future
+        light cone of `Zed10`.
+
         """
         ax = await self.get()
 
+        ax.set_ylabel('x')
+        ax.set_xlabel('t')
+
         # light lines in our co-ordinates 
         for c in range(10):
-            t = np.arange(10)
+            t = np.arange(-5, 5)
                         
             # x = t + c, positive distance
             ax.plot(t + c, t, c='blue') 
 
             # negative distance x = -t + c
             ax.plot(-t + c, t, c='b') 
+
+        #ax.show()
+
+        
+        #ax = await self.get()
+        # now think about transformations that preserve `distance`
+
+        # distance_squared = (x1 - x2)**2 - (t1-t2)**2
+        # on light lines, dx**2 = dt**2
+
+        # u * v = k, u = x - t, v = x + t
+        k = self.k
+
+        for ix in range(20):
+            
+            x = np.arange(k**-2, 10, 0.1)
+
+            # x**2 - t**2 = k
+            #t**2 = x**2 - k
+
+            t = ((x**2) - k)**0.5
+
+            ax.plot(x, t)
+
+            k *= 1.5
 
         ax.show()
         
