@@ -1,0 +1,43 @@
+<html>
+    <head>
+      <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+      <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+      <py-env>
+        - matplotlib
+        - blume
+        - paths:
+          - /wits.py
+      </py-env>
+    </head>
+
+  <body>
+    <div id="fig"></div>
+    <py-script output=fig>
+#import gotu
+from matplotlib import pyplot as plt
+import blume
+
+fig = plt.figure()
+ax = fig.subplots()
+
+ax.plot(range(10))
+
+print(blume.__file__)
+from wits import run
+
+run()
+
+fig
+
+
+      
+
+      
+      
+    </py-script>
+
+    <div id="repl">
+      <!-- <py-repl></py-repl> -->
+    </div>
+  </body>
+</html>

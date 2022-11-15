@@ -1,0 +1,39 @@
+<html>
+  <head>
+      <!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" /> -->
+      <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+
+
+      <!-- 
+To use a local version of a package build a wheel:
+
+    python3 setup.py bdist_wheel
+
+Then include the path to the wheel.
+
+And run:
+
+    python -m http.server 8080
+
+To serve this file and the wheels too.
+This works pretty well if the html is part of the local package.
+-->
+      <py-env>
+        - matplotlib
+        - paths:
+          - ./tt1.py
+      </py-env>
+    </head>
+
+  <body>
+    <py-script src='./tt1.py' output='stdout'>
+
+    </py-script>
+
+    <div id='fig'></div>
+
+    <div id="repl">
+      <py-repl></py-repl>
+    </div>
+  </body>
+</html>

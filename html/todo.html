@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Todo App</title>
+
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+    - matplotlib
+    - astropy  
+    - scipy
+    - blume
+    - gotu
+    - paths:
+      - ./utils.py
+    </py-env>
+  </head>
+
+  <body class="container">
+    <!-- <py-repl id="my-repl" auto-generate="true"> </py-repl> -->
+    <py-script src="./todo.py">  </py-script>
+    <div id="buttons">
+      <button id='help_button'>Help</button>
+    </div>
+
+    <py-repl></py-repl>
+</body>
+</html>

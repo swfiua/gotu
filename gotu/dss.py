@@ -235,8 +235,8 @@ However, to map their space time to ours, we need to know our relative velocity.
 For distant galaxies, the redshift allows us to calculate the relative
 velocity.
 
-
-Now we want a transformation that preserves distances.
+Now we want a transformation that preserves distances, and takes the
+distant galaxies space time to ours.
 
 ...
 
@@ -380,7 +380,7 @@ class Dss(magic.Ball):
 
 
 class DeSitterSpace(magic.Ball):
-    """Another go ad de Sitter Space.
+    """Another go at de Sitter Space.
 
     Suppose that the universe is just an endless stream of galaxies,
     like the billions
