@@ -232,11 +232,29 @@ assumption of special relativity.
 
 However, to map their space time to ours, we need to know our relative velocity.
 
-For distant galaxies, the redshift allows us to calculate the relative
-velocity.
+For distant galaxies, the redshift allows us to calculate a starting
+point for this velocity.
 
-Now we want a transformation that preserves distances, and takes the
-distant galaxies space time to ours.
+Distant galaxies have high red shift, so let's suppose this galaxy is
+called Zedten.
+
+Now we want a transformation that preserves distances, and takes
+Zedten space time to ours.
+
+What does the path of the Zedten look like through our space-time?
+
+First, let's answer a simpler question.
+
+What does the distance of Zedten look like through our time?  
+
+Reduce the three dimensions of space to one dimension, the distance.
+
+So we need to be able to map a clock and a standard ruler to our clock
+and standard ruler.
+
+Light lines give the paths of light through space time.  Both
+ourselves and the people of Zed10, the Zeeten, agree that on these
+lines, time stands still.
 
 ...
 
@@ -387,7 +405,8 @@ class DeSitterSpace(magic.Ball):
 
     The idea is to consider a distant galaxy, as it arrives in our
     visible universe
-
+    
+    
     """
     def __init__(self):
 
@@ -400,9 +419,43 @@ class DeSitterSpace(magic.Ball):
 
         self.v = 1 / random.randint(5, 10)
 
+
+    async def uvxt(self):
+        """ """
+
+    async def zedten(self, z=10):
+        """ a galaxy at zed ten
+        
+        z: redshift, optional, default 10
+
+        plots future and past of a galaxy at zed10
+
+        
+        """
+        ax = await self.get()
+
+        # light lines in our co-ordinates 
+        for c in range(10):
+            t = np.arange(10)
+                        
+            # x = t + c, positive distance
+            ax.plot(t + c, t, c='blue') 
+
+            # negative distance x = -t + c
+            ax.plot(-t + c, t, c='b') 
+
+        ax.show()
         
     async def run(self):
         """ """
+
+        
+        await self.zedten()
+        return
+
+    async def lorentz(self):
+        """ FIXME """
+        
         # increment t
         self.x += self.v * self.dt
         self.t += self.dt
