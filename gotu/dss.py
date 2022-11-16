@@ -465,8 +465,8 @@ class DeSitterSpace(magic.Ball):
         #ax = await self.get()
         # now think about transformations that preserve `distance`
 
-        # distance_squared = (x1 - x2)**2 - (t1-t2)**2
-        # on light lines, dx**2 = dt**2
+        # distance_squared = (x1-x2)**2 - (t1-t2)**2
+        # on light lines, dx = dt
 
         # u * v = k, u = x - t, v = x + t
         k = self.k
@@ -481,8 +481,16 @@ class DeSitterSpace(magic.Ball):
             t = ((x**2) - k)**0.5
 
             ax.plot(x, t)
+            ax.plot(x, -t)
 
             k *= 1.5
+
+        k = self.k
+        for trial in range(3):
+            u = random.random() * random.randint(1, 5)
+            v = random.random() * random.randint(1,5)
+        
+            ax.plot([u+v, (u/k + k/v)], [u-v, u/k - (v * k)], 'o')
 
         ax.show()
         
