@@ -153,19 +153,19 @@ cosmos.
 
 It's all modulated by the lense of de Sitter Space.
 
-One criticism of de Sitter Space is that it is a vaccuum solution to
+One criticism of de Sitter Space is that it is a vacuum solution to
 Einstein's equations.  There is no matter and no Mach's Principle.
 
-Now Rourke's proposal of intertail drag from rotation, dropping off as
+Now Rourke's proposal of intertial drag from rotation, dropping off as
 1/radius, is also problematic.
 
-The Kerr metric isthe unique solotion to Einstein's equations assuming
+The Kerr metric is the unique solution to Einstein's equations assuming
 space is not a vacuum.
 
-But space is clearly not a vacuum, it is full of dust.  Whenp you apply
-the Sciama Pricnciple to every celestial body, from the smallest grain
-of dust to the largest central mass in a galaxy, then I believe it
-will be clear why the Sciama Principle applies.
+But space is clearly not a vacuum, it is full of dust and microwaves.
+When you apply the Sciama Pricnciple to every celestial body, from the
+smallest grain of dust to the largest central mass in a galaxy, then I
+believe it will be clear why the Sciama Principle applies.
 
 Now let's see if we can simulate some of this.
 
@@ -178,16 +178,19 @@ a good way to explain how space time seems to work.
 
 At this point here, we suddenly run into a lot of mathematics.  
 
-Conic sections, manifolds, matrices, rotations.
+Conic sections, manifolds, matrices, rotations.  Four dimensional
+hyperbolic space.
 
-The key observation is that when you plot a distant galacy's distance
+The key observation is that when you plot a distant galaxy's distance
 against time we get a rectangular hyperbola.
 
 These hyperbolae arise from the Lorentz transformations of special
 relativity.
 
 Most of the sources of light we see are galaxies that are now in the
-rapidly receding part of their hyperbola.
+rapidly receding part of their hyperbola, since that is where each
+source spends all but a small finite time of the infinite time it is
+visible.
 
 Presumably, under current cosmology, the few exceptions are assumed to
 be smaller objects nearer to our galaxy?   
@@ -443,6 +446,10 @@ class DeSitterSpace(magic.Ball):
         Focus on the intersection of our timeline with the future
         light cone of `Zed10`.
 
+        The plots below are an attempt to follow the arguments on page
+        163 of `gotu`.
+
+        
         """
         ax = await self.get()
 
@@ -485,12 +492,16 @@ class DeSitterSpace(magic.Ball):
 
             k *= 1.5
 
-        k = self.k
-        for trial in range(3):
-            u = random.random() * random.randint(1, 5)
-            v = random.random() * random.randint(1,5)
+        k = self.k * 2
+
+        for trial in range(5):
+            u = random.random() + random.randint(1, 5)
+            v = random.random() + random.randint(1,5)
         
-            ax.plot([u+v, (u/k + k/v)], [u-v, u/k - (v * k)], 'o')
+            print([(u+v)/2, (u/k + k*v)/2])
+            print([(v-u)/2, ((v * k) - u/k)/2])
+            ax.plot((u+v)/2, (v-u)/2, 'ro')
+            ax.plot((u/k + k*v)/2, ((v * k) - u/k)/2, 'bo')
 
         ax.show()
         
