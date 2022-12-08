@@ -99,16 +99,21 @@ import numpy as np
 import json
 import io
 import requests
-    
+
+# make things pretty 
+from pprint import pprint
 
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
+
+#CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
+CORS_PROXY = "http://localhost:8080/"
 
 MAST_URL = "https://mast.stsci.edu/api/v0/invoke?request="
 MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
 
 
-def query_region(skypos):
+def query_region(skypos, project='JWST'):
 
     request = {'service':'Mast.Caom.Cone',
                'params':{'ra':skypos.ra.deg,
@@ -117,7 +122,7 @@ def query_region(skypos):
 
                'filters': [
                    {"dataRights": 'PUBLIC',
-                    "project": 'JWST',
+                    "project": project,
                     }],
                'format':'json',
                'pagesize':2000,
@@ -125,13 +130,14 @@ def query_region(skypos):
                'timeout':30,
                }
 
+    pprint(request)
     response = mast_query(request)
     
     return response_to_table(response)
 
 def response_to_table(response):
     
-    content = json.loads(response.content)
+    content = response_to_json(response)
     print(content)
 
     fields = content['fields']
@@ -159,7 +165,6 @@ def object_lookup(obj):
 
     info = response_to_json(response)
 
-    print(info)
     records = info['resolvedCoordinate']
     location = records[0]
     
@@ -169,12 +174,11 @@ def object_lookup(obj):
 
 def response_to_json(response):
 
-    return json.loads(response.content)
+    return json.loads(response.text)
 
 def mast_query(request):
     
     result = requests.get('%s%s' % (MAST_URL, json.dumps(request)))
-    print(result.status_code)
     if result.status_code != 200:
         raise requests.HTTPError(result.status_code)
 
@@ -184,7 +188,9 @@ def mast_query(request):
 
 def open_file(uri):
 
+    target = f'{CORS_PROXY}{MAST_DOWNLOAD}{uri}'
     target = f'{MAST_DOWNLOAD}{uri}'
+    print(target)
     result = requests.get(target)
 
     if result.status_code != 200:
@@ -202,6 +208,7 @@ def download_file(uri):
         return
 
     try:
+        # make this async?
         data = open_file(uri)
     except:
         return False
@@ -216,6 +223,7 @@ class Jwst(magic.Ball):
 
         super().__init__()
         self.locations = deque((
+            'M 16',  # pillars of creation, eagle nebula
             'HD 147980',
             'NGC 3132',
             'SMACS 0723',  #  deep field?
@@ -223,6 +231,9 @@ class Jwst(magic.Ball):
             'M 74',       # NGC 628 Phantom Galaxy
             'NGC 3324',   # Carina Nebula
             'PGC 2248'))  # Cartwheel
+
+        self.project = 'JWST'
+        self.project = None
 
         self.topn = 1
         self.do_product_list = False
@@ -273,9 +284,10 @@ class Jwst(magic.Ball):
             results = query_region(skypos)
             #results = Observations.query_region(skypos)
             # find the JWST ones
-            mask = results['project'] == 'JWST'
+            if self.project:
+                mask = results['project'] == self.project
         
-            results = results[mask]
+                results = results[mask]
 
             await self.show_stats(results)
             results.info()
@@ -286,8 +298,6 @@ class Jwst(magic.Ball):
             results.write(filename)
 
         # Fileter some more -- need to make this optional
-        mask = [Path(str(x['dataURL'])).stem.endswith('i2d') for x in results]
-        results = results[mask]
         mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
         results = results[mask]
 
@@ -351,28 +361,35 @@ class Jwst(magic.Ball):
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
+        filetypes = set(('.jpg', '.png'))
         #for key in ('jpegURL', 'dataURL', 'dataURI'):
         for key in ('jpegURL',):
             
             if key not in prod.colnames:
                 continue
 
-            path = Path(prod[key])
-            filename = path.name
-            print(path)
-            if not path.stem.endswith('i2d'):
+            filename = Path(prod[key])
+
+            print(filename)
+            if not filename.stem.endswith('i2d'):
                 print('skipping', filename)
                 print()
                 continue
             
-            result = download_file(str(path))
+            if filename.suffix not in filetypes:
+                print('filtered out by filetype ', filename.suffix, filename)
+                if product in self.products:
+                    del self.products[product]
+                continue
             
-            if not Path(filename).exists():
+            result = download_file(str(filename))
+
+            if not Path(filename.name).exists():
                 print('DOWNLOAD FAIL for ', filename)
                 continue
             
-            if filename.endswith('fits'):
-                continue
+            if filename.suffix == '.fits':
+                
                 tab = fits.open(filename)
                 for item in tab:
                     print(item.size)
@@ -384,12 +401,13 @@ class Jwst(magic.Ball):
                 
                 print(tab.info())
 
-            elif filename.endswith('jpg') or filename.endswith('png'):
+            elif filename.suffix == '.jpg' or filename.suffix == '.png':
                 ax = await self.get()
-                ax.imshow(image.imread(filename), cmap=modnar.random_colour())
+                ax.imshow(image.imread(filename.name),
+                          cmap=modnar.random_colour())
                 ax.show()
 
-            elif filename.endswith('json'):
+            elif filename.suffix == '.json':
                 msg = json.load(open(filename))
                 msg = [(key, value) for item in msg.items()]
                 await self.put(msg, 'help')
@@ -401,8 +419,24 @@ class Jwst(magic.Ball):
 if __name__ == '__main__':
 
     from blume import magic, farm
+    import argparse
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--location')
+    parser.add_argument('--project', default=None)
+    parser.add_argument('--corsproxy')
+
+    args = parser.parse_args()
 
     fm = farm.Farm()
-    fm.add(Jwst())
+
+    jwst = Jwst()
+    if args.location:
+        jwst.locations.appendleft(args.location)
+
+    if args.corsproxy:
+        CORS_PROXY = args.corsproxy
+        
+    fm.add(jwst)
     magic.run(farm.start_and_run(fm))
     

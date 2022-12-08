@@ -25,7 +25,247 @@ emitter, in other words, the emitter's closest point of approach.
 
 theta measures the angle of approach.
 
+de Sitter Space and the Space Telescope
+=======================================
 
+Phillip James E. Peebles recently published a fascinating paper:
+
+Anomalies in Physical Cosmology
+https://arxiv.org/abs/2208.05018
+
+It describes the standard, lambda-Cold-Dark-Matter model for the
+universe and observations that suggest the model may need some new
+insight.
+
+The paper is timely, with our new view on the universe thanks to the JWST.
+
+de Sitter Space is mentioned briefly in the paper, remarking that it
+was not consistent with the observations.   
+
+I believe Peebles is talking about that sub-space of de Sitter Space,
+restricted to bodies with a common origin if you go back the Hubble
+time.
+
+de Sitter Space appears to disappear from consideration as a model for
+the universe.   
+
+The issue is not de Sitter Space, rather it is the assumption all
+matter in the universe was co-located at a big bang some 13.7 billion
+years ago.
+
+So what is de Sitter Space?  Imagine a universe, of galaxies, as far
+as the eye can see, and far, far beyond.
+
+Moving in seemingly random directions, at around one thousandth the
+speed of light.
+
+To transform time at some distant galaxy, to time at our galaxy, we
+have to take account of special relativity, the mixing of space and
+time.
+
+The result when you measure distance in this way is de Sitter Space.
+
+It is the simplest possible model for a universe where special
+relativity holds, and it matches observations extraordinarily well.
+
+It also explains how redshift naturally occurs forwards through time
+in space-time as a result of special relativity.
+
+The space is highly symmetric, in time as well as space.
+
+Backwards in time, paths separate exponentially in time too.
+
+Each galaxy that passes through our visible universe, arrives in a
+burst of blue shifted light, comes as near as it gets and then
+separates exponentially from then, following a hyperbola.
+
+Just as there is a first time that the source is visible, there is a
+last time it will be visible, but the observer will have to wait until
+the end of time to see that.
+
+So at any time there is a large but finite set of galaxies in the
+visible universe.
+
+The modulation of a galaxy's arrival depends on the closest distance
+it approaches and the angle of approach.
+
+With this model for a universe there is an explanation for the
+redshift that we see, whilst there being no overall expansion of
+space-time, as the redshift is exactly balanced by the blue shift
+period of a new arrival.
+
+So when we observe through the JWST we may occassionally find
+galaxies, new arrivals that are not as redshifedt as they would be
+expected to be, given their distance.
+
+There is a further complication, with associating red-shift with
+distance.  If the light is coming from a place close to a
+super-massive black hole, it may be highly redshifted by the local
+gravity, following Einstein's general relativity.
+
+The current assumption is that light producing regions are far enough
+from any central mass for the gravitational redshift to be
+significant.
+
+Part of this belief comes from the theory of acretion models and
+over-coming the angular-momentum obstruction to acretion.
+
+According to Rourke, once you take account of the frame dragging due
+to the rotation of the central mass, the angular momentum problem goes
+away.
+
+Some of the distant galaxies we are seeing may in fact be smaller
+quasars, closer to home.   That's a story for another module.
+
+JWST is also showing us how much dust is scattered across galaxies and,
+the beautiful dust spirals that emerge.
+
+The observations we have of our universe, show a place that is very
+much in balance, it has had a long time to settle into its current
+state.
+
+Once we remove the time limit imposed, due to the big bang it is
+possible to imagine very different galactic timescales and evolution.
+
+It also explains the many observations that indicate a system in high
+state of equilibrium, for example as shown by the Cosmic Microwave
+Background.
+
+Galaxies evolve over time, matter moves out along the spiral arms,
+that journey would take of the order of 15 billion years, with many
+super-novae along the way.
+
+It should also be noted, that the conditions close to a galaxy's
+central black hole are very similar to those shortly after the big
+bang, making the journey of matter along spiral arms an even better
+match to the big bang theory.   
+
+We see, in the JWST pictures, baby quasars, spinning close to their
+parent galaxies.
+
+Galaxies grow from their surrounding dust, and there appears to be
+just a steady flow of dust, with wonderful harmonics.  Matter moving
+out along spiral arms before falling back into the centre.
+
+But the Cosmic Microwave Background, what's that? It's the heat from
+billions of billions of distant galaxies, the glowing dust of the
+cosmos.
+
+It's all modulated by the lense of de Sitter Space.
+
+One criticism of de Sitter Space is that it is a vacuum solution to
+Einstein's equations.  There is no matter and no Mach's Principle.
+
+Now Rourke's proposal of intertial drag from rotation, dropping off as
+1/radius, is also problematic.
+
+The Kerr metric is the unique solution to Einstein's equations assuming
+space is not a vacuum.
+
+But space is clearly not a vacuum, it is full of dust and microwaves.
+When you apply the Sciama Pricnciple to every celestial body, from the
+smallest grain of dust to the largest central mass in a galaxy, then I
+believe it will be clear why the Sciama Principle applies.
+
+Now let's see if we can simulate some of this.
+
+
+Hyperbolas
+==========
+
+I have been stuck at this part of the journey for a while, looking for
+a good way to explain how space time seems to work.
+
+At this point here, we suddenly run into a lot of mathematics.  
+
+Conic sections, manifolds, matrices, rotations.  Four dimensional
+hyperbolic space.
+
+The key observation is that when you plot a distant galaxy's distance
+against time we get a rectangular hyperbola.
+
+These hyperbolae arise from the Lorentz transformations of special
+relativity.
+
+Most of the sources of light we see are galaxies that are now in the
+rapidly receding part of their hyperbola, since that is where each
+source spends all but a small finite time of the infinite time it is
+visible.
+
+Presumably, under current cosmology, the few exceptions are assumed to
+be smaller objects nearer to our galaxy?   
+
+To set the scene, consider someone on a planet in a distant galaxy.
+
+It is possible to estimate the movement, relative to the distant fixed
+stars.  For example, our own galaxy is cruising through space at some
+2.1 million km/h.  With a little help rom `astropy`:
+
+>>> from astropy import units, constants
+>>> milky_way_speed = 2.1e6 * units.kilometer / units.hour
+>>> milky_way_speed / constants.c.to(milky_way_speed.unit)
+<Quantity 0.00194579>
+
+We see that this is an appreciable fraction of the speed of light.  It
+is also in line with the speeds for other galaxies in their locality
+in the universe.
+
+More generally, due to the Hubble expansion:
+
+>>> from astropy import cosmology
+>>> cosmology.WMAP9.H(0)
+<Quantity 69.32 km / (Mpc s)>
+
+So local velocities are large enough that Einstein's special
+relativity has to be taken into account when mapping the distant
+galaxy's space time to our space time.  [1]
+
+Further, when Hubble expansion is taken into account, these relative
+velocities go up by about one thousandth the speed of light every few
+mega-parsecs.
+
+But this is just what we would expect when we do an analysis of light
+paths taking into account special relativity.
+
+Just as we can naturally divide space time into 3 dimensions of space
+and one of time, so can the alien on a distant galaxy.
+
+We both measure the same speed of light locally.  This is an
+assumption of special relativity.
+
+However, to map their space time to ours, we need to know our relative velocity.
+
+For distant galaxies, the redshift allows us to calculate a starting
+point for this velocity.
+
+Distant galaxies have high red shift, so let's suppose this galaxy is
+called Zedten.
+
+Now we want a transformation that preserves distances, and takes
+Zedten space time to ours.
+
+What does the path of the Zedten look like through our space-time?
+
+First, let's answer a simpler question.
+
+What does the distance of Zedten look like through our time?  
+
+Reduce the three dimensions of space to one dimension, the distance.
+
+So we need to be able to map a clock and a standard ruler to our clock
+and standard ruler.
+
+Light lines give the paths of light through space time.  Both
+ourselves and the people of Zed10, the Zeeten, agree that on these
+lines, time stands still.
+
+...
+
+References and Footnotes
+
+[1]  The parameter to `WMAP9.H` allows the cosmology to have different
+Hubble constants at different redshifts.
+>>>>>>> 34b35a1aeac7ade2c0edeaf423f6c29c727dcc67
 
 """
 
@@ -33,7 +273,7 @@ theta measures the angle of approach.
 import random
 import math
 import numpy as np
-from matplotlib import pyplot as plt
+from astropy import constants, units
 from scipy import integrate
 from traceback import print_exc
 
@@ -161,6 +401,135 @@ class Dss(magic.Ball):
         ax.show()
 
 
+class DeSitterSpace(magic.Ball):
+    """Another go at de Sitter Space.
+
+    Suppose that the universe is just an endless stream of galaxies,
+    like the billions
+
+    The idea is to consider a distant galaxy, as it arrives in our
+    visible universe
+    
+    
+    """
+    def __init__(self):
+
+
+        super().__init__()
+
+        self.k = 1.
+        
+        self.x = 0.
+        self.dt = 0.01
+        self.t = 0.
+
+        self.v = 1 / random.randint(5, 10)
+
+
+    async def uvxt(self):
+        """ """
+
+    async def zedten(self, z=10, theta=0, nearest=1):
+        """a galaxy at zed ten
+        
+        z: redshift, optional, default 10
+        theta: angle of approach
+        nearest: point of closest approach
+
+        plots future and past of a galaxy at zed10
+
+        if nearest is zero, then it is a big bang universe.
+
+        but what if nearest is one or more? Where one is the Hubble distance.
+
+        The answer is a hyperbolic rotation, but how to get there?
+
+        Focus on the intersection of our timeline with the future
+        light cone of `Zed10`.
+
+        The plots below are an attempt to follow the arguments on page
+        163 of `gotu`.
+
+        
+        """
+        ax = await self.get()
+
+        ax.set_ylabel('x')
+        ax.set_xlabel('t')
+
+        # light lines in our co-ordinates 
+        for c in range(10):
+            t = np.arange(-5, 5)
+                        
+            # x = t + c, positive distance
+            ax.plot(t + c, t, c='blue') 
+
+            # negative distance x = -t + c
+            ax.plot(-t + c, t, c='b') 
+
+        #ax.show()
+
+        
+        #ax = await self.get()
+        # now think about transformations that preserve `distance`
+
+        # distance_squared = (x1-x2)**2 - (t1-t2)**2
+        # on light lines, dx = dt
+
+        # u * v = k, u = x - t, v = x + t
+        k = self.k
+
+        for ix in range(20):
+            
+            x = np.arange(k**-2, 10, 0.1)
+
+            # x**2 - t**2 = k
+            #t**2 = x**2 - k
+
+            t = ((x**2) - k)**0.5
+
+            ax.plot(x, t)
+            ax.plot(x, -t)
+
+            k *= 1.5
+
+        k = self.k * 2
+
+        for trial in range(5):
+            u = random.random() + random.randint(1, 5)
+            v = random.random() + random.randint(1,5)
+        
+            print([(u+v)/2, (u/k + k*v)/2])
+            print([(v-u)/2, ((v * k) - u/k)/2])
+            ax.plot((u+v)/2, (v-u)/2, 'ro')
+            ax.plot((u/k + k*v)/2, ((v * k) - u/k)/2, 'bo')
+
+        ax.show()
+        
+    async def run(self):
+        """ """
+
+        
+        await self.zedten()
+        return
+
+    async def lorentz(self):
+        """ FIXME """
+        
+        # increment t
+        self.x += self.v * self.dt
+        self.t += self.dt
+
+        # we see
+        gamma = 1/math.sqrt(1 - (self.v * self.v))
+        dr = gamma * self.v * self.dt  # ???
+        dt = self.dt / gamma
+
+        v = dr/dt
+
+        print(v, self.v)
+        self.v = v
+
 async def run():
 
     dss = Dss()
@@ -169,14 +538,16 @@ async def run():
     dss.constraints()
 
     farm = fm.Farm()
-    
+
+    dss2 = DeSitterSpace()
     farm.add(dss)
+    farm.add(dss2)
     
     await farm.start()
 
     print(dss.deSitter())
 
-    farm.shep.path.append(dss)
+    farm.shep.path.append(dss2)
 
     await farm.run()
         
