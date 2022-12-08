@@ -12,7 +12,7 @@ The paper describes the relationships between pairs of geodesics in de
 Sitter Space.
 
 One geodesic corresponds to the path of a distant galaxy and the other
-a receiver geodesic.
+a receiver geodesic, such as our own galaxy.
 
 Each emitter arrives in our visible universe highly blue shifted, then
 becomes increasingly red-shifted as time goes by.
@@ -24,6 +24,9 @@ phi corresponds to the minimum distance between the receiver and
 emitter, in other words, the emitter's closest point of approach.
 
 theta measures the angle of approach.
+
+
+
 """
 
 # we are going to need this

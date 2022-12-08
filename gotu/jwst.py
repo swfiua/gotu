@@ -50,6 +50,34 @@ that you can query to get the location if you know it's name.
 
 Right now, I happen to be interested in M74, also known as NGC 628.  
 
+Update 2022/8/20
+================
+
+The code here has been on a bit of an adventure, because I wanted to
+get this running under pyodide in the browser.
+
+There is no access to sockets, so querying databases is more complex.
+
+There is no requests module on pyodide but there is pyodide-requests
+that implements a minimal requests using javascript apis.
+
+Everything is working except for the download of the file, which the
+browser blocks due to it being a *cross origin request sharing* issue.
+
+The code has got a little more complicated, but no longer requires
+*astroquery*, which is also unavailable on pyodide.  
+
+But what is JWST seeing?
+------------------------
+
+There has been a lot of excitement about galaxies of high redshift.
+The key number is *z* and is the ratio of the wavelenth we observe to
+what it was at the origin.
+
+There are many reports of many z>=10 in the first images.  There has
+also been some recalibration of the instrument that has generally
+reduced the red shifts observed.
+
 """
 
 #from astroquery.mast import Observations
