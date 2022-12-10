@@ -12,7 +12,7 @@ The paper describes the relationships between pairs of geodesics in de
 Sitter Space.
 
 One geodesic corresponds to the path of a distant galaxy and the other
-a receiver geodesic.
+a receiver geodesic, such as our own galaxy.
 
 Each emitter arrives in our visible universe highly blue shifted, then
 becomes increasingly red-shifted as time goes by.
@@ -265,6 +265,7 @@ References and Footnotes
 
 [1]  The parameter to `WMAP9.H` allows the cosmology to have different
 Hubble constants at different redshifts.
+>>>>>>> 34b35a1aeac7ade2c0edeaf423f6c29c727dcc67
 
 """
 
