@@ -29,8 +29,6 @@ view JWST data and images.
 You can pass it the name of your favourite target using the --location
 option::
 
-::
-
   python -m gotu.jwst --location  ngc1566
 
 The module queries the MAST database to convert the name into sky
