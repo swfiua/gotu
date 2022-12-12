@@ -61,6 +61,10 @@ transport of vectors around curves in two dimensional slices.
 How to visualise it all?  How to show what a curved universe looks
 like?
 
+I feel it is the key to showing that there are other universes than a
+big bang universe, that fit the observations, as any argument for a
+static universe needs to address red-shift.
+
 
   
 2021/12/3
