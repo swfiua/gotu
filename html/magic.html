@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      .terminal {
+        --size: 1.5;
+        --color: rgba(255, 255, 255, 0.8);
+      }
+      .noblink {
+        --animation: terminal-none;
+      }
+      body {
+        background-color: black;
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+  </head>
+  <body>
+    <script>
+      "use strict";
+        const echo = (msg, ...opts) =>
+          term.echo(
+            msg
+              .replaceAll("]]", "&rsqb;&rsqb;")
+              .replaceAll("[[", "&lsqb;&lsqb;"),
+            ...opts
+          );
+
+      function prompty(text) {
+          
+          return "help"
+      }
+
+      
+      async function main() {
+          let term;
+          globalThis.pyodide = await loadPyodide({
+              // stdout: () => {
+              // },
+              
+          });
+
+          let namespace = pyodide.globals.get("dict")();
+
+          await pyodide.loadPackage("micropip")
+          const micropip = await pyodide.pyimport("micropip")
+
+          await pyodide.loadPackage("matplotlib")
+
+          // await micropip.install("blume")
+          //await micropip.install("blume")
+          await micropip.install("gotu")
+          await micropip.install("./blume-0.2.5.1-py3-none-any.whl")
+
+          await micropip.install("matplotlib_pyodide")
+          
+          pyodide.runPythonAsync(
+          `
+
+            import matplotlib
+            matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
+
+            from blume import farm, magic
+            from gotu import wits
+
+            ss = wits.SolarSystem()
+            land = farm.Farm()
+            land.add(ss)
+
+            tmra = magic.TheMagicRoundAbout
+
+            await farm.start_and_run(land)
+          `,
+          { globals: namespace }
+          );          
+          let land = namespace.get("land")  
+          let farm = namespace.get("farm")
+          let tmra = namespace.get("tmra")
+      }
+      main();
+    </script>
+
+    <div id=terminal>
+      <!-- <input id=input></input>
+      <output id=output></output> -->
+    </div>
+    <div id="loading"></div>
+    <div id="canvas"></div>
+    <div id="term"></div>
+    <input
+
+  </body>
+</html>
