@@ -10,28 +10,21 @@
         --animation: terminal-none;
       }
       body {
-        background-color: black;
+          background-color: black;
+          color: white;
       }
 
     </style>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
   </head>
   <body>
+    <div id=terminal>
+      <div id="canvas"></div>
+      <input id="input"></input>
+      <div id="output"></div>
+    </div>
+    <div id="matplotlib">
     <script>
-      "use strict";
-        const echo = (msg, ...opts) =>
-          term.echo(
-            msg
-              .replaceAll("]]", "&rsqb;&rsqb;")
-              .replaceAll("[[", "&lsqb;&lsqb;"),
-            ...opts
-          );
-
-      function prompty(text) {
-          
-          return "help"
-      }
-
       
       async function main() {
           let term;
@@ -43,6 +36,7 @@
 
           let namespace = pyodide.globals.get("dict")();
 
+
           await pyodide.loadPackage("micropip")
           const micropip = await pyodide.pyimport("micropip")
 
@@ -51,12 +45,35 @@
           // await micropip.install("blume")
           //await micropip.install("blume")
           await micropip.install("gotu")
-          //await micropip.install("./blume-0.2.5.1-py3-none-any.whl")
+          await micropip.install("./blume-0.2.5.1-py3-none-any.whl")
 
           await micropip.install("matplotlib_pyodide")
           
           pyodide.runPythonAsync(
+              `
+          import micropip
+          await micropip.install("blume")
+          from blume import farm, magic
+          tmra = magic.TheMagicRoundAbout
+              `
+          );
+
+          console.log(pyodide.globals)
+
+          //let tmra = await pyodide.globals.get("tmra").toJs();
+
+          //console.log(tmra)
+
+          // var input = document.getElementById("input")
+          // input.addEventListener("keydown", function (e) {
+          //     tmra.put_nowait(e.target.value, 'stdin')
+          // })
+          
+          pyodide.runPythonAsync(
           `
+
+            from js import document
+            from pyodide import create_proxy
 
             import matplotlib
             matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
@@ -70,25 +87,36 @@
 
             tmra = magic.TheMagicRoundAbout
 
+            stdin = document.getElementById("input")
+
+            def enter(event, *args):
+
+                if event.key == 'Enter':
+                    print(stdin.value)
+                    tmra.put_nowait(stdin.value, 'stdin')
+                    stdin.value = ''
+
+            import html            
+            def stdout(text):
+                print('FOOO bar stdout')
+                print(text)
+                print(type(text))
+                output = document.getElementById('output')
+                output.innerHTML = html.escape(str(text))
+
+            magic.spawn(magic.relay('stdout', stdout, with_message=True))
+
+
+            stdin.addEventListener("keydown", create_proxy(enter))
+
             await farm.start_and_run(land)
-          `,
-          { globals: namespace }
+          `
           );          
-          let land = namespace.get("land")  
-          let farm = namespace.get("farm")
-          let tmra = namespace.get("tmra")
       }
+
+          
       main();
     </script>
-
-    <div id=terminal>
-      <!-- <input id=input></input>
-      <output id=output></output> -->
     </div>
-    <div id="loading"></div>
-    <div id="canvas"></div>
-    <div id="term"></div>
-    <input
-
   </body>
 </html>
