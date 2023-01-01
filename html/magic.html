@@ -23,14 +23,25 @@
       <input id="input"></input>
       <div id="output"></div>
     </div>
-    <div id="matplotlib">
     <script>
-      
+
+      function escape(htmlStr) {
+          return htmlStr.replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#39;");        
+      }
+
+
       async function main() {
           let term;
+
           globalThis.pyodide = await loadPyodide({
-              // stdout: () => {
-              // },
+              stdout: (s) => {
+                  out = document.getElementById("output");
+                  out.innerHTML = escape(s) + '<br>' + out.innerHTML;
+              },
               
           });
 
@@ -96,18 +107,19 @@
                     tmra.put_nowait(stdin.value, 'stdin')
                     stdin.value = ''
 
-            import html            
-            def stdout(text):
-                print('FOOO bar stdout')
-                print(text)
-                print(type(text))
-                output = document.getElementById('output')
-                output.innerHTML = html.escape(str(text))
-
-            magic.spawn(magic.relay('stdout', stdout, with_message=True))
-
-
             stdin.addEventListener("keydown", create_proxy(enter))
+
+            #import html            
+            #def stdout(text):
+            #    print('FOOO bar stdout')
+            #    print(text)
+            #    print(type(text))
+            #    output = document.getElementById('output')
+            #    output.innerHTML = html.escape(str(text))
+
+            #magic.spawn(magic.relay('stdout', stdout, with_message=True))
+
+
 
             await farm.start_and_run(land)
           `
@@ -117,6 +129,5 @@
           
       main();
     </script>
-    </div>
   </body>
 </html>
