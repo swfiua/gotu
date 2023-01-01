@@ -71,14 +71,6 @@
 
           console.log(pyodide.globals)
 
-          //let tmra = await pyodide.globals.get("tmra").toJs();
-
-          //console.log(tmra)
-
-          // var input = document.getElementById("input")
-          // input.addEventListener("keydown", function (e) {
-          //     tmra.put_nowait(e.target.value, 'stdin')
-          // })
           
           pyodide.runPythonAsync(
           `
@@ -108,18 +100,6 @@
                     stdin.value = ''
 
             stdin.addEventListener("keydown", create_proxy(enter))
-
-            #import html            
-            #def stdout(text):
-            #    print('FOOO bar stdout')
-            #    print(text)
-            #    print(type(text))
-            #    output = document.getElementById('output')
-            #    output.innerHTML = html.escape(str(text))
-
-            #magic.spawn(magic.relay('stdout', stdout, with_message=True))
-
-
 
             await farm.start_and_run(land)
           `
