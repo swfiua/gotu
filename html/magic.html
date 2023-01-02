@@ -20,7 +20,7 @@
   <body>
     <div id=terminal>
       <div id="canvas"></div>
-      <input id="input"></input>
+      <input id="input" size=60></input>
       <div id="output"></div>
     </div>
     <script>
@@ -92,14 +92,24 @@
 
             stdin = document.getElementById("input")
 
-            def enter(event, *args):
+            def keydown(event, *args):
 
                 if event.key == 'Enter':
-                    print(stdin.value)
                     tmra.put_nowait(stdin.value, 'stdin')
                     stdin.value = ''
+                    return True
 
-            stdin.addEventListener("keydown", create_proxy(enter))
+                elif event.key == 'Tab':
+                    completion = land.shell.complete(stdin.value)
+                    if completion:
+                       stdin.value = completion
+                    event.preventDefault()
+                    return True
+
+                return False
+
+            stdin.addEventListener("keydown", create_proxy(keydown))
+
 
             await farm.start_and_run(land)
           `
