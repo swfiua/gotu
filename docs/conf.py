@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
+    'sphinxcontrib.collections',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,5 +59,28 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static', '../html']
+html_static_path = ['_static', '../html', '_collections']
 
+# Collections extension.
+# I am (mis)using this to expand a template a bunch of times so
+# I can generate a bunch of static html pages that use pyodide
+# to make all this come alive in the browser.
+collections = {
+    'magic': {
+        'driver': 'jinja',
+        'source': '_templates/magic.html',
+        'target': '{{module|lower}}_{{class|lower}}.html',
+        'multiple_files': True,
+        'final_clean': False,
+        'data': [
+            {
+               'module': 'wits',
+               'class': 'SolarSystem',
+            },
+            {
+               'module': 'spiral',
+               'class': 'Spiral',
+            },
+        ],
+    },
+}

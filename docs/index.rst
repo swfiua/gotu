@@ -99,6 +99,10 @@ Talk
 Interactive Examples thanks to pyscript
 =======================================
 
+Spiral galaxy `Spirals without dark matter  <_static/spiral_spiral.html>`_
+
+Where is the Sun? `Solar System  <_static/wits_solarsystem.html>`_
+
 Poster `poster magic <_static/poster.html>`_ for lots of fun.
 
 Europython 2022 in dublin Poster.
@@ -111,6 +115,7 @@ Gallery
 .. toctree::
 
    gallery
+
 
 Indices and tables
 ==================

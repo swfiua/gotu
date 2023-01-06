@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      .terminal {
+        --size: 1.5;
+        --color: rgba(255, 255, 255, 0.8);
+      }
+      .noblink {
+        --animation: terminal-none;
+      }
+      body {
+          background-color: black;
+          color: white;
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+  </head>
+  <body>
+    <div id=terminal>
+      <div id="canvas"></div>
+      <input id="input" size=60></input>
+      <div id="output"></div>
+    </div>
+    <script>
+
+      function escape(htmlStr) {
+          return htmlStr.replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#39;");        
+      }
+
+
+      async function main() {
+          let term;
+
+          globalThis.pyodide = await loadPyodide({
+              stdout: (s) => {
+                  out = document.getElementById("output");
+                  out.innerHTML = escape(s) + '<br>' + out.innerHTML;
+              },
+              
+          });
+
+          let namespace = pyodide.globals.get("dict")();
+
+
+          await pyodide.loadPackage("micropip")
+          const micropip = await pyodide.pyimport("micropip")
+
+          await pyodide.loadPackage("matplotlib")
+
+          // await micropip.install("blume")
+          //await micropip.install("blume")
+          await micropip.install("gotu")
+          //await micropip.install("./blume-0.2.5.1-py3-none-any.whl")
+
+          await micropip.install("matplotlib_pyodide")
+          
+          pyodide.runPythonAsync(
+              `
+          import micropip
+          await micropip.install("blume")
+          from blume import farm, magic
+          tmra = magic.TheMagicRoundAbout
+              `
+          );
+
+          console.log(pyodide.globals)
+
+          
+          pyodide.runPythonAsync(
+          `
+            from collections import deque
+            from js import document
+            from pyodide import create_proxy
+
+            import matplotlib
+            matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
+
+            from blume import farm, magic
+            from gotu import {{module}}
+
+            ss = {{module}}.{{class}}()
+            land = farm.Farm()
+            land.add(ss)
+            
+            history = deque()
+            
+            tmra = magic.TheMagicRoundAbout
+
+            stdin = document.getElementById("input")
+
+            def keydown(event, *args):
+
+                if event.key == 'Enter':
+                    tmra.put_nowait(stdin.value, 'stdin')
+                    history.appendleft(stdin.value)
+                    stdin.value = ''
+                    return True
+
+                elif event.key == 'Tab':
+                    completion = land.shell.complete(stdin.value)
+                    if completion:
+                       stdin.value = completion
+                    event.preventDefault()
+                    return True
+                elif event.key == "ArrowUp":
+                    # Up pressed
+                    stdin.value = history[0]
+
+                return False
+
+            stdin.addEventListener("keydown", create_proxy(keydown))
+
+
+            await farm.start_and_run(land)
+          `
+          );          
+      }
+
+          
+      main();
+    </script>
+  </body>
+</html>
