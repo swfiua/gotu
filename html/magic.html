@@ -56,67 +56,12 @@
           // await micropip.install("blume")
           //await micropip.install("blume")
           await micropip.install("gotu")
-          await micropip.install("./blume-0.2.5.1-py3-none-any.whl")
+          await micropip.install("./blume-0.2.5.2-py3-none-any.whl")
 
           await micropip.install("matplotlib_pyodide")
           
-          pyodide.runPythonAsync(
-              `
-          import micropip
-          await micropip.install("blume")
-          from blume import farm, magic
-          tmra = magic.TheMagicRoundAbout
-              `
-          );
-
-          console.log(pyodide.globals)
-
-          
-          pyodide.runPythonAsync(
-          `
-
-            from js import document
-            from pyodide import create_proxy
-
-            import matplotlib
-            matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
-
-            from blume import farm, magic
-            from gotu import wits
-
-            ss = wits.SolarSystem()
-            land = farm.Farm()
-            land.add(ss)
-
-            tmra = magic.TheMagicRoundAbout
-
-            stdin = document.getElementById("input")
-
-            def keydown(event, *args):
-
-                if event.key == 'Enter':
-                    tmra.put_nowait(stdin.value, 'stdin')
-                    stdin.value = ''
-                    return True
-
-                elif event.key == 'Tab':
-                    completion = land.shell.complete(stdin.value)
-                    if completion:
-                       stdin.value = completion
-                    event.preventDefault()
-                    return True
-
-                return False
-
-            stdin.addEventListener("keydown", create_proxy(keydown))
-
-
-            await farm.start_and_run(land)
-          `
-          );          
-      }
-
-          
+          pyodide.runPythonAsync(await (await fetch("./magic.py")).text());
+      }          
       main();
     </script>
   </body>
