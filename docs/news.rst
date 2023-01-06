@@ -87,9 +87,10 @@ how that is going.
 Plans
 -----
 
-There are three main pieces that need fleshing out at this point.
+There are several pieces that need fleshing out at this point.
 
 * :ref:`dss`, geodesics, gamma-ray-bursts and red-shift.
+* :ref:`quasar`, a quasar model.
 * :ref:`cmb`, a model with all the harmonics.
 * :ref:`spiral`
 

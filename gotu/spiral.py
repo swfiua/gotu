@@ -356,7 +356,7 @@ class Spiral(magic.Ball):
     def sun(self):
 
         print('SUN!' * 10)
-        solar_mass = 1 * units.solMass
+        solar_mass = 1 * u.solMass
         solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
         
         # Central mass.  Mass converted to Schwartzschild radius (in light years)
@@ -368,7 +368,7 @@ class Spiral(magic.Ball):
 
         # astronomical unit in light years
         # au = 1 / 63241.08  ### can't remember how I calculated this
-        au = units.au
+        au = u.au
         
         self.rmin = 0.1 * au
         self.rmax = 50 * au
@@ -383,7 +383,7 @@ class Spiral(magic.Ball):
         self.A = self.K * solar_angular_velocity
 
         # magic constant determined by overall energy in the orbit
-        self.EE = 0.0
+        self.EE = 0.1
 
 
         # constant, can be read from tangential velocity for small r
