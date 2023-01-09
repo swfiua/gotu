@@ -233,7 +233,6 @@ class Jwst(magic.Ball):
             'PGC 2248'))  # Cartwheel
 
         self.project = 'JWST'
-        self.project = None
 
         self.topn = 1
         self.do_product_list = False
@@ -276,7 +275,10 @@ class Jwst(magic.Ball):
 
     async def get_observations(self, skypos):
 
-        filename = Path(f'skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
+        if self.project:
+            filename = Path(f'{self.project}_skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
+        else:
+            filename = Path(f'skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
         if filename.exists():
             results = Table.read(filename)
         else:
@@ -297,9 +299,11 @@ class Jwst(magic.Ball):
             # save a copy of the results
             results.write(filename)
 
-        # Fileter some more -- need to make this optional
-        mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
-        results = results[mask]
+        # Filter some more -- need to make this optional
+        if self.project == 'JWST':
+            mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
+
+            results = results[mask]
 
         await self.show_stats(results)
 
@@ -320,7 +324,6 @@ class Jwst(magic.Ball):
 
         for x in results:
 
-            if 'JWST' in x['dataURL']:
                 print(x['dataURL'])
                 products[x['dataURL']] = x
                          
@@ -370,12 +373,6 @@ class Jwst(magic.Ball):
 
             filename = Path(prod[key])
 
-            print(filename)
-            if not filename.stem.endswith('i2d'):
-                print('skipping', filename)
-                print()
-                continue
-            
             if filename.suffix not in filetypes:
                 print('filtered out by filetype ', filename.suffix, filename)
                 if product in self.products:
@@ -433,6 +430,9 @@ if __name__ == '__main__':
     jwst = Jwst()
     if args.location:
         jwst.locations.appendleft(args.location)
+
+    if args.project:
+        jwst.project = args.project
 
     if args.corsproxy:
         CORS_PROXY = args.corsproxy
