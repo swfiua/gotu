@@ -5,6 +5,26 @@
 I will try to give updates from time to time as to what is happening
 here.
 
+2023/1/6
+========
+
+Quasars
+-------
+
+ARP's peculiar galaxies.
+
+
+Distant galaxies in deep fields
+-------------------------------
+
+CMB
+---
+
+wits
+----
+
+
+
 2022/12/9
 =========
 
