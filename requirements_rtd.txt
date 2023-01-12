@@ -1,0 +1,8 @@
+# requirements for readthedocs
+blume
+matplotlib
+astropy
+astroquery
+scipy
+healpy
+sphinx_collections
