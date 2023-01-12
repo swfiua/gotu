@@ -1,6 +1,6 @@
 from collections import deque
 from js import document
-from pyodide import create_proxy
+from pyodide.ffi import create_proxy
 
 import matplotlib
 matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
@@ -29,8 +29,6 @@ def keydown(event, *args):
     elif event.key == 'Tab':
         values = stdin.value.split()
         value = values[-1]
-        print(value)
-        print(values)
         completion = land.shell.complete(value)
         if completion:
            stdin.value = ' '.join(values[:-1] + [completion])

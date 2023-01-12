@@ -106,9 +106,6 @@ from pprint import pprint
 import PIL.Image
 PIL.Image.MAX_IMAGE_PIXELS = None
 
-#CORS_PROXY = "https://cors-anywhere.herokuapp.com/"
-CORS_PROXY = "http://localhost:8080/"
-
 MAST_URL = "https://mast.stsci.edu/api/v0/invoke?request="
 MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
 
@@ -138,7 +135,6 @@ def query_region(skypos, project='JWST'):
 def response_to_table(response):
     
     content = response_to_json(response)
-    print(content)
 
     fields = content['fields']
     names = [x['name'] for x in fields]
@@ -188,7 +184,6 @@ def mast_query(request):
 
 def open_file(uri):
 
-    target = f'{CORS_PROXY}{MAST_DOWNLOAD}{uri}'
     target = f'{MAST_DOWNLOAD}{uri}'
     print(target)
     result = requests.get(target)
@@ -233,6 +228,7 @@ class Jwst(magic.Ball):
             'PGC 2248'))  # Cartwheel
 
         self.project = 'JWST'
+        self.i2d = False
 
         self.topn = 1
         self.do_product_list = False
@@ -242,11 +238,10 @@ class Jwst(magic.Ball):
 
         msg = self.table_count(table)
         print(table.colnames)
-        print('TABLELEN', len(table))
         if len(table) != 0:
             await self.put(msg, 'help')
         else:
-            await self.put('no data', 'help')
+            await self.put([['no data'], ['for'], [self.locations[0]]], 'help')
         
     def table_count(self, table, maxrows=None):
         """ Do some counts on a table 
@@ -295,15 +290,16 @@ class Jwst(magic.Ball):
                 results = results[mask]
 
             await self.show_stats(results)
-            results.info()
-            results.info('stats')
+
+            #results.info()
+            #results.info('stats')
                   
             
             # save a copy of the results
             results.write(filename)
 
         # Filter some more -- need to make this optional
-        if self.project == 'JWST':
+        if self.i2d:
             mask = [Path(x['dataURL']).stem.endswith('i2d') for x in results]
 
             results = results[mask]
@@ -342,9 +338,9 @@ class Jwst(magic.Ball):
                     products[product['dataURI']] = product
                          
 
-                for key, counts in counters.items():
-                    print(key)
-                    print(counts.most_common(3))
+                #for key, counts in counters.items():
+                #    print(key)
+                #    print(counts.most_common(3))
             
         self.products = products
         self.locations.rotate()
@@ -399,7 +395,7 @@ class Jwst(magic.Ball):
                     #await self.show_stats(item)
                     pass
                 
-                print(tab.info())
+                #print(tab.info())
 
             elif filename.suffix == '.jpg' or filename.suffix == '.png':
                 ax = await self.get()
@@ -426,7 +422,7 @@ if __name__ == '__main__':
     parser.add_argument('--survey')
     parser.add_argument('--size', type=int)
     parser.add_argument('--project', default=None)
-    parser.add_argument('--corsproxy')
+    parser.add_argument('--i2d', action='store_true')
 
     args = parser.parse_args()
 
@@ -439,14 +435,14 @@ if __name__ == '__main__':
     if args.project:
         jwst.project = args.project
 
-    if args.corsproxy:
-        CORS_PROXY = args.corsproxy
-
     if args.survey:
         jwst.locations.clear()
         locations = [args.survey + str(int(x)) for x in range(1, args.size+1)]
+        random.shuffle(locations)
         for location in locations:
             jwst.locations.append(location)
+
+    jwst.i2d = args.i2d
         
     fm.add(jwst)
     magic.run(farm.start_and_run(fm))
