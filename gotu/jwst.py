@@ -243,7 +243,10 @@ class Jwst(magic.Ball):
         msg = self.table_count(table)
         print(table.colnames)
         print('TABLELEN', len(table))
-        await self.put(msg, 'help')
+        if len(table) != 0:
+            await self.put(msg, 'help')
+        else:
+            await self.put('no data', 'help')
         
     def table_count(self, table, maxrows=None):
         """ Do some counts on a table 
@@ -420,6 +423,8 @@ if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--location')
+    parser.add_argument('--survey')
+    parser.add_argument('--size', type=int)
     parser.add_argument('--project', default=None)
     parser.add_argument('--corsproxy')
 
@@ -436,6 +441,12 @@ if __name__ == '__main__':
 
     if args.corsproxy:
         CORS_PROXY = args.corsproxy
+
+    if args.survey:
+        jwst.locations.clear()
+        locations = [args.survey + str(int(x)) for x in range(1, args.size+1)]
+        for location in locations:
+            jwst.locations.append(location)
         
     fm.add(jwst)
     magic.run(farm.start_and_run(fm))
