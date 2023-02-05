@@ -78,11 +78,12 @@ There are many reports of many z>=10 in the first images.  There has
 also been some recalibration of the instrument that has generally
 reduced the red shifts observed.
 
+
 """
 
 #from astroquery.mast import Observations
 #from astroquery.simbad import Simbad
-
+import asyncio
 from astropy.table import Table
 from astropy.io import fits
 from astropy.coordinates import SkyCoord
@@ -271,17 +272,20 @@ class Jwst(magic.Ball):
 
         return object_lookup(name)
 
-    async def get_observations(self, skypos):
+    async def get_observations(self, skypos, name='unknown'):
 
         if self.project:
-            filename = Path(f'{self.project}_skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
+            filename = Path(f'skypos_{name}_{self.project}_{skypos.ra.deg}_{skypos.dec.deg}.fits')
         else:
-            filename = Path(f'skypos_{skypos.ra.deg}_{skypos.dec.deg}.fits')
+            filename = Path(f'skypos_{name}_{skypos.ra.deg}_{skypos.dec.deg}.fits')
         if filename.exists():
             results = Table.read(filename)
         else:
             print('querying mast database')
-            results = query_region(skypos)
+            #loop = asyncio.get_event_loop()
+            results = query_region(skypos, self.project)
+            #results = loop.run_in_executor(
+            #    query_region, (skypos, self.project))
             #results = Observations.query_region(skypos)
             # find the JWST ones
             if self.project:
@@ -310,11 +314,12 @@ class Jwst(magic.Ball):
             
     async def start(self):
 
-        skypos = self.name_to_skycoord(self.locations[0])
-        print(self.locations[0], skypos)
+        name = self.locations[0]
+        skypos = self.name_to_skycoord(name)
+        print(name, skypos)
 
         # get observations
-        results = await self.get_observations(skypos)
+        results = await self.get_observations(skypos, name=name)
 
         print('Region size:', len(results))
         names = list(results.colnames)
