@@ -142,7 +142,8 @@ to explore this model of the universe.
 
 The result is that we see a source increasingly red-shifted the
 further it recedes from us.  This emerges from the Lorentz
-transformations to map the source's time and distance to our space.
+transformations to map the source's time and distance to our space,
+and taking account of the curvature of space-time.
 
 If we go backwards in time, past the point of closest approach of the
 galaxy, there is a symmetry with the path in forwards time. 
