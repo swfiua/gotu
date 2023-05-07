@@ -21,6 +21,13 @@ some numerical madness, the geodesics aren't behaving quite how I might expect.
 
 Time to go down the rabbit hole of curvature.
 
+2023/05/07
+==========
+
+I am currently trying to reconcile the equations implicit in the
+geodesic function with the presentation in the geometry of the universe.
+
+Here, geodesics all converge to the origin eventually.
 """
 from blume import magic, farm
 
@@ -33,6 +40,7 @@ H = 1.0  # Hubble parameter
 c = 1.0  # speed of light
 G = 1.0  # gravitational constant
 L = c**2 / H  # de Sitter radius
+SIGN = -1
 
 # Define the geodesic equation
 def geodesic(t, y):
@@ -41,9 +49,13 @@ def geodesic(t, y):
     dxdt = u
     dydt = v
     dzdt = w
-    dudt = -G * L**2 * x / r**4
-    dvdt = -G * L**2 * y / r**4
-    dwdt = -G * L**2 * z / r**4
+
+    # Calculate the acceslerations
+    # Note how these are independent of t.
+    
+    dudt = SIGN * G * L**2 * x / r**4
+    dvdt = SIGN * G * L**2 * y / r**4
+    dwdt = SIGN * G * L**2 * z / r**4
     return [dxdt, dydt, dzdt, dudt, dvdt, dwdt]
 
 # Define the initial conditions and time range
@@ -52,6 +64,7 @@ class Dss(magic.Ball):
     def __init__(self):
 
         super().__init__()
+        self.sign = SIGN
         self.u, self.v, self.w = 0., 0.5, 0.
         self.x, self.y, self.z = 1.0, 0., 0.
 
@@ -63,6 +76,8 @@ class Dss(magic.Ball):
         # Solve the geodesic equation
         self.y0 = [self.x, self.y, self.z,
                    self.u, self.v, self.w]
+        global SIGN
+        SIGN = self.sign
 
         results = solve_ivp(geodesic, (self.t0, self.tfinal), self.y0)
 
