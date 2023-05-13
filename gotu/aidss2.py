@@ -22,6 +22,7 @@ py0 = 0.0
 # Define the differential equations for x, y, px, and py
 def f(t, X):
     x, y, px, py = X
+    
     r = np.sqrt(x**2 + y**2)
     f_x = px / (m * r)
     f_y = py / (m * r)
@@ -29,26 +30,35 @@ def f(t, X):
     f_py = -m * H**2 * y / r**3
     return np.array([f_x, f_y, f_px, f_py])
 
-# Solve the differential equations using the Runge-Kutta method
-t = 0.0
-X = np.array([x0, y0, px0, py0])
-xvals = [x0]
-yvals = [y0]
-while t < tmax:
-    k1 = dt * f(t, X)
-    k2 = dt * f(t + 0.5*dt, X + 0.5*k1)
-    k3 = dt * f(t + 0.5*dt, X + 0.5*k2)
-    k4 = dt * f(t + dt, X + k3)
-    X = X + (k1 + 2.0*k2 + 2.0*k3 + k4) / 6.0
-    xvals.append(X[0])
-    yvals.append(X[1])
-    t += dt
+def main():
+    # Solve the differential equations using the Runge-Kutta method
 
-# Plot the geodesic
-plt.plot(xvals, yvals)
-plt.xlim(-2*L, 2*L)
-plt.ylim(-2*L, 2*L)
-plt.gca().set_aspect('equal', adjustable='box')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.show()
+    t = 0.0
+    X = np.array([x0, y0, px0, py0])
+    xvals = [x0]
+    yvals = [y0]
+    tvals = [t]
+    while t < tmax:
+        k1 = dt * f(t, X)
+        k2 = dt * f(t + 0.5*dt, X + 0.5*k1)
+        k3 = dt * f(t + 0.5*dt, X + 0.5*k2)
+        k4 = dt * f(t + dt, X + k3)
+        X = X + (k1 + 2.0*k2 + 2.0*k3 + k4) / 6.0
+        xvals.append(X[0])
+        yvals.append(X[1])
+        tvals.append(t)
+        t += dt
+
+    # Plot the geodesic
+    #plt.plot(xvals, yvals)
+    plt.plot(tvals, yvals)
+    #plt.xlim(-2*L, 2*L)
+    #plt.ylim(-2*L, 2*L)
+    #plt.gca().set_aspect('equal', adjustable='box')
+    plt.xlabel('x t')
+    plt.ylabel('y')
+    plt.show()
+
+if __name__ == '__main__':
+
+    main()
