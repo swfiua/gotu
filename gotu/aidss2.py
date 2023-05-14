@@ -16,7 +16,7 @@ dt = tmax / N  # time step size
 # Define initial conditions
 x0 = 0.0
 y0 = L
-px0 = m * np.sqrt((H*L)**2 - 1.0)
+px0 = m * np.sqrt((H*L)**2 - 1.0)  # ho-hum this is zero.
 py0 = 0.0
 
 # Define the differential equations for x, y, px, and py
