@@ -29,8 +29,6 @@ geodesic function with the presentation in the geometry of the universe.
 
 Here, geodesics all converge to the origin eventually.
 """
-from blume import magic, farm
-
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
@@ -41,6 +39,14 @@ c = 1.0  # speed of light
 G = 1.0  # gravitational constant
 L = c**2 / H  # de Sitter radius
 SIGN = -1
+
+# Define the initial conditions and time range
+u, v, w = 0., 0.5, 0.
+x, y, z = 1.0, 0., 0.
+t0, tfinal = 0.0, 20
+axes = [True] * 4
+
+show_time = False
 
 # Define the geodesic equation
 def geodesic(t, y):
@@ -58,64 +64,55 @@ def geodesic(t, y):
     dwdt = SIGN * G * L**2 * z / r**4
     return [dxdt, dydt, dzdt, dudt, dvdt, dwdt]
 
-# Define the initial conditions and time range
 
-class Dss(magic.Ball):
-    def __init__(self):
+def main():
 
-        super().__init__()
-        self.sign = SIGN
-        self.u, self.v, self.w = 0., 0.5, 0.
-        self.x, self.y, self.z = 1.0, 0., 0.
+    y0 = [x, y, z, u, v, w]
 
-        self.t0, self.tfinal = 0.0, 20
-        self.show_time = False
+    results = solve_ivp(geodesic, (t0, tfinal), y0)
 
-    async def run(self):
+    sol = results['y']
+    t = results['t']
+    
+    # Plot the trajectory in 3D
+    ax = axes[0]
 
-        # Solve the geodesic equation
-        self.y0 = [self.x, self.y, self.z,
-                   self.u, self.v, self.w]
-        global SIGN
-        SIGN = self.sign
 
-        results = solve_ivp(geodesic, (self.t0, self.tfinal), self.y0)
+    ax.projection('3d')
 
-        self.sol = sol = results['y']
-        self.t = results['t']
-        
-        # Plot the trajectory in 3D
-        ax = await magic.TheMagicRoundAbout.get()
-        ax.projection('3d')
 
-        ax.plot(sol[0], sol[1], sol[2])
-        if self.show_time:
-            ax.plot(sol[0], sol[1], self.t)
-        ax.set_xlabel('x')
-        ax.set_ylabel('y')
-        ax.set_zlabel('z')
-        ax.show()
+    ax.plot(sol[0], sol[1], sol[2])
+    if show_time:
+        ax.plot(sol[0], sol[1], self.t)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    ax.show()
 
-        # Plot the trajectory in the x-y plane
-        ax2 = await magic.TheMagicRoundAbout.get()
-        ax2.plot(sol[0], sol[1])
+    # Plot the trajectory in the x-y plane
+    print('axe', type(ax))
+    ax = axes[1]
 
-        ax2.set_xlabel('x')
-        ax2.set_ylabel('y')
-        ax2.show()
+    ax.plot(sol[0], sol[1])
 
-        ax = await magic.TheMagicRoundAbout.get()
-        r = (sol[0]**2 + sol[1] ** 2) ** 0.5
-        ax.plot(self.t, r)
-        ax.set_xlabel('t')
-        ax.set_ylabel('r')
-        ax.show()
-        
-        ax = await magic.TheMagicRoundAbout.get()
-        ax.plot(sol[3], sol[4])
-        ax.set_xlabel('u')
-        ax.set_ylabel('v')
-        ax.show()
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.show()
+
+    ax = axes[2]
+
+    r = (sol[0]**2 + sol[1] ** 2) ** 0.5
+    ax.plot(t, r)
+    ax.set_xlabel('t')
+    ax.set_ylabel('r')
+    ax.show()
+
+    ax = axes[3]
+
+    ax.plot(sol[3], sol[4])
+    ax.set_xlabel('u')
+    ax.set_ylabel('v')
+    ax.show()
 
     
 if __name__ == '__main__':

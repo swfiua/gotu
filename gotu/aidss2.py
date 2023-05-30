@@ -2,6 +2,7 @@
 
 
 """
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,6 +19,9 @@ x0 = 0.0
 y0 = L
 px0 = m * np.sqrt((H*L)**2 - 1.0)  # ho-hum this is zero.
 py0 = 0.0
+
+# results
+results = None
 
 # Define the differential equations for x, y, px, and py
 def f(t, X):
@@ -38,6 +42,7 @@ def main():
     xvals = [x0]
     yvals = [y0]
     tvals = [t]
+    Xvals = [X]
     while t < tmax:
         k1 = dt * f(t, X)
         k2 = dt * f(t + 0.5*dt, X + 0.5*k1)
@@ -47,16 +52,24 @@ def main():
         xvals.append(X[0])
         yvals.append(X[1])
         tvals.append(t)
+        Xvals.append(X)
         t += dt
 
+    global results
+    results = Xvals
+    
     # Plot the geodesic
     #plt.plot(xvals, yvals)
-    plt.plot(tvals, yvals)
+    plt.plot(tvals, xvals, label='x')
+    plt.plot(tvals, yvals, label='y')
+    plt.plot(tvals, list(x[3] for x in Xvals), label='py')
+    plt.plot(tvals, list(x[2] for x in Xvals), label='px')
+    plt.plot(tvals, list(math.sqrt(x[0]**2 + x[1]**2) for x in Xvals), label='r')
     #plt.xlim(-2*L, 2*L)
     #plt.ylim(-2*L, 2*L)
     #plt.gca().set_aspect('equal', adjustable='box')
-    plt.xlabel('x t')
-    plt.ylabel('y')
+    plt.legend()
+    plt.xlabel('t')
     plt.show()
 
 if __name__ == '__main__':
