@@ -5,7 +5,7 @@
 
 Turning the tables on the universe
 
-Twelve Lightning talks.
+Eleven Lightning talks.
 
 Johnny Gill
 
@@ -16,6 +16,53 @@ https://blume.readthedocs.org
 https://gotu.readthedocs.org
 
 https://github.com/swfiua
+
+Personal Introduction
+=====================
+
+Projects
+========
+
+karmapi
+-------
+
+interactive framework for working with matplotlib.
+
+blume
+-----
+
+Initially a home for the `matplotlib.table.Table` class.  See
+`blume.table`.
+
+* tkinter to matplotlib
+* magic roundabout.
+* still need to unify process management.
+ 
+Code Life cycle
+===============
+
+
+* Getting something going
+* Learn things are more complicated than you thought
+* Realise that you've hit some common problem
+* Move on to something more interesting
+
+Interface emerges.
+
+
+karmapi, blume and gotu
+
+curio to asyncio.
+
+=======================
+
+karmapi: beginnings of ideas, things that once worked
+
+blume:
+
+* a new home for matplotlib tables
+* a personal framework for exploring data with matplotlib.
+
 
 Where's the *bluming* table?
 ============================
@@ -50,6 +97,9 @@ blume.train
 planetary harmonics
 ===================
 
+::
+   python3 -m gotu.planets
+   
 quasars
 =======
 
@@ -77,3 +127,9 @@ blume.gaia
 gotu.planets
 
 gotu.
+
+List of modules to Run
+======================
+
+blume.examples.table_demo
+blume.examples.chess_table
