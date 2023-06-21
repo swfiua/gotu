@@ -114,14 +114,19 @@ MAST_DOWNLOAD = "https://mast.stsci.edu/api/v0.1/Download/file?uri="
 def query_region(skypos, project='JWST'):
 
     request = {'service':'Mast.Caom.Cone',
-               'params':{'ra':skypos.ra.deg,
-                         'dec':skypos.dec.deg,
-                         'radius':0.2},
-
-               'filters': [
-                   {"dataRights": 'PUBLIC',
-                    "project": project,
-                    }],
+               'params': {'ra':skypos.ra.deg,
+                          'dec':skypos.dec.deg,
+                          'radius':0.2,
+                          
+                         
+                          'filters': [
+                              {"paramName": "dataRights",
+                               "values": ['public'],
+                               },
+                              {"paramName": "project",
+                               "values": [project],
+                               },
+                          ]},
                'format':'json',
                'pagesize':2000,
                'removenullcolumns':True,
@@ -240,6 +245,7 @@ class Jwst(magic.Ball):
         msg = self.table_count(table)
         print(table.colnames)
         if len(table) != 0:
+            print(msg)
             await self.put(msg, 'help')
         else:
             await self.put([['no data'], ['for'], [self.locations[0]]], 'help')
