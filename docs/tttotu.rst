@@ -11,14 +11,22 @@ Johnny Gill
 
 29/6/2023
 
-https://blume.readthedocs.org
+`blume <https://blume.readthedocs.org>`
 
-https://gotu.readthedocs.org
+`gotu  <https://gotu.readthedocs.org`
 
-https://github.com/swfiua
+`github<https://github.com/swfiua>`
 
-Personal Introduction
-=====================
+JOHN(ny) GIL(Ly)
+================
+
+PEP 684: A Per-Interpreter GIL
+
+Coming in python 3.12
+
+What was the first python you used?
+
+
 
 Projects
 ========
@@ -27,6 +35,9 @@ karmapi
 -------
 
 interactive framework for working with matplotlib.
+
+a miscellaneous bunch of short scripts to explore my interests of the
+day.
 
 blume
 -----
@@ -76,7 +87,6 @@ blume, the matplotlib table module.
 
    python3 -m blume.examples.legendary
 
-Confession time.
 
 git
 ===
@@ -128,8 +138,27 @@ gotu.planets
 
 gotu.
 
+Fred and Colin
+==============
+
+An email exchange.
+
+Demonstrate how relativity twists time and space.
+
+Show how a static universe appears to expand.
+
+Add random galaxies to the plot until it looks like our universe.
+
+
+Gamma-ray bursts
+================
+
+Black hole collisions
+=====================
+
 List of modules to Run
 ======================
 
 blume.examples.table_demo
 blume.examples.chess_table
+
