@@ -20,24 +20,31 @@ Johnny Gill
 JOHN(ny) GIL(Ly)
 ================
 
+
+What was the first python you used?
+
+GIL
+===
+
 PEP 684: A Per-Interpreter GIL
 
 Coming in python 3.12
 
-What was the first python you used?
 
-
-
-Projects
+Personal Projects
 ========
 
 karmapi
 -------
 
-interactive framework for working with matplotlib.
+Started as tools for working with csv data.
 
-a miscellaneous bunch of short scripts to explore my interests of the
+Evolved into an interactive framework for working with matplotlib.
+
+A miscellaneous bunch of short scripts to explore my interests of the
 day.
+
+
 
 blume
 -----
@@ -59,7 +66,6 @@ Code Life cycle
 * Move on to something more interesting
 
 Interface emerges.
-
 
 karmapi, blume and gotu
 
@@ -131,7 +137,6 @@ eggshow
 
 talking to the AI.
 
-
 blume.gaia
 
 gotu.planets
@@ -161,4 +166,13 @@ List of modules to Run
 
 blume.examples.table_demo
 blume.examples.chess_table
+
+Things to see
+=============
+
+gotu.event
+
+someone has already done it.
+
+astropy.coordinates
 

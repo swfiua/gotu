@@ -23,9 +23,9 @@ for name in names:
 
 # add the masses, if we know them
 bodies['earth'].mass = constants.M_earth
-bodies['jupiter'].mass = constants.M_jupiter
+bodies['jupiter'].mass = constants.M_jup
 bodies['sun'].mass = constants.M_sun
-bodies['moon'].mass = bodies['earth'] * MOON_IN_EARTH_MASSES
+bodies['moon'].mass = bodies['earth'].mass * MOON_IN_EARTH_MASSES
 
 print(bodies)    
 

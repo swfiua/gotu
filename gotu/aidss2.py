@@ -42,7 +42,7 @@ def main():
     xvals = [x0]
     yvals = [y0]
     tvals = [t]
-    Xvals = [X]
+    Xvals = [dict(t=t, x=x0, y=y0, px=px0, py=py0)]
     while t < tmax:
         k1 = dt * f(t, X)
         k2 = dt * f(t + 0.5*dt, X + 0.5*k1)
@@ -52,7 +52,8 @@ def main():
         xvals.append(X[0])
         yvals.append(X[1])
         tvals.append(t)
-        Xvals.append(X)
+        x, y, px, py = X
+        Xvals.append(dict(t=t, x=x, y=y, px=px, py=py))
         t += dt
 
     global results
@@ -62,9 +63,9 @@ def main():
     #plt.plot(xvals, yvals)
     plt.plot(tvals, xvals, label='x')
     plt.plot(tvals, yvals, label='y')
-    plt.plot(tvals, list(x[3] for x in Xvals), label='py')
-    plt.plot(tvals, list(x[2] for x in Xvals), label='px')
-    plt.plot(tvals, list(math.sqrt(x[0]**2 + x[1]**2) for x in Xvals), label='r')
+    plt.plot(tvals, list(x['py'] for x in Xvals), label='py')
+    plt.plot(tvals, list(x['px'] for x in Xvals), label='px')
+    plt.plot(tvals, list(math.sqrt(x['x']**2 + x['y']**2) for x in Xvals), label='r')
     #plt.xlim(-2*L, 2*L)
     #plt.ylim(-2*L, 2*L)
     #plt.gca().set_aspect('equal', adjustable='box')
