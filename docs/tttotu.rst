@@ -5,7 +5,7 @@
 
 Turning the tables on the universe
 
-Eleven Lightning talks.
+Eleven(+/-n) Lightning talks.
 
 Johnny Gill
 
@@ -20,6 +20,9 @@ Johnny Gill
 JOHN(ny) GIL(Ly)
 ================
 
+who am i.
+
+karmapi.gilliam
 
 What was the first python you used?
 
@@ -30,9 +33,22 @@ PEP 684: A Per-Interpreter GIL
 
 Coming in python 3.12
 
+Things I (re) discovered whilst preparing this talk.
+----------------------------------------------------
+
+it's all about the names
+
+karmapi/docs/nodice: riddles and rhymes
+
+karmapi.README
+
+modules can often be run, use `argparse`
+
+So -h may give help
+
 
 Personal Projects
-========
+=================
 
 karmapi
 -------
@@ -54,7 +70,8 @@ Initially a home for the `matplotlib.table.Table` class.  See
 
 * tkinter to matplotlib
 * magic roundabout.
-* still need to unify process management.
+
+Is there anything better than an editor and a console?
  
 Code Life cycle
 ===============
@@ -89,7 +106,7 @@ blume, the matplotlib table module.
 ::
    python3 -m blume.examples.table_demo
 
-   python3 =m blume.examples.chess_table
+   python3 -m blume.examples.chess_table
 
    python3 -m blume.examples.legendary
 
@@ -164,6 +181,8 @@ Black hole collisions
 List of modules to Run
 ======================
 
+karmapi.tankrain
+
 blume.examples.table_demo
 blume.examples.chess_table
 
@@ -175,4 +194,42 @@ gotu.event
 someone has already done it.
 
 astropy.coordinates
+
+Commits
+=======
+
+karmapi
+
+5ffd4ef1f3b778cfd746d59115211ef5e76f6734
+
+docs/computers.rst
+
+of all the things they say:
+
+710b63cf04198e01db45452c2b3b804487af2efd
+
+Running order
+=============
+
+blume.train
+
+karmapi.tankrain
+
+blume.examples.table_demo
+
+blume.examples.chess_table
+
+blume.examples.legendary
+
+blume.mb
+
+blume.gw
+
+blume.console
+
+blume.eggshow
+
+gotu.aidss2
+
+gotu.jwst
 

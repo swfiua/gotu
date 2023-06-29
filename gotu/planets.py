@@ -9,7 +9,7 @@ from astropy import constants, units, coordinates, table, time
 import datetime
 import math
 
-MOON_IN_EARTH_MASSES = 0.1
+MOON_IN_EARTH_MASSES = 0.01
 
 names = [
     'sun', 'mercury', 'venus', 'earth', 'moon', 'mars',
