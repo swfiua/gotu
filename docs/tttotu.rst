@@ -46,12 +46,11 @@ modules can often be run, use `argparse`
 
 So -h may give help
 
-
 Personal Projects
 =================
 
-karmapi
--------
+karmapi 2017-
+------------
 
 Started as tools for working with csv data.
 
@@ -62,8 +61,8 @@ day.
 
 
 
-blume
------
+blume 2019-
+----------
 
 Initially a home for the `matplotlib.table.Table` class.  See
 `blume.table`.
@@ -72,7 +71,21 @@ Initially a home for the `matplotlib.table.Table` class.  See
 * magic roundabout.
 
 Is there anything better than an editor and a console?
- 
+
+gotu 2021-
+----------
+
+gotu.jwst
+
+gotu.wits
+
+blume.gaia
+
+gotu.aidss2
+
+blume.console
+
+
 Code Life cycle
 ===============
 
@@ -213,17 +226,36 @@ Running order
 
 blume.train
 
-karmapi.tankrain
+* karmapi.tankrain
 
-blume.examples.table_demo
+Tables
+------
+  
+* blume.examples.table_demo
 
-blume.examples.chess_table
+* blume.examples.chess_table
 
-blume.examples.legendary
+* blume.examples.legendary
 
+Pretty
+======
+  
 blume.mb
 
+Start of an idea
+================
+
 blume.gw
+
+A view on the galaxy
+====================
+
+blume.gaia
+
+gotu.wits
+
+Internals to the edge of the universe
+=====================================
 
 blume.console
 
