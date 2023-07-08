@@ -235,123 +235,15 @@ M = 1e11
 # Suns mass as a distance in meters
 msun = 3000 * units.meter
 
+# radius of the visible universe
 R = 1.37e10 * units.lightyear
 
+# how big is the wave from all these masses
 amplitude = N * M * msun / R.to(units.meter)
 
 print('Amplitude:', amplitude)
 
+# was hoping for 10 meters, how bad is the guestimate?
 print('factor out;', 10 / amplitude)
 
-1/0
 
-hubble = 68 * units.kilometer / units.second / units.megaparsec
-
-N = 1e11  # total number of galaxies in our visible universe
-
-# proportion of mass emitting wavelengths of a few years
-# things are complicated by z,
-# I should really sum over a range of z's adjusting the mass at each z 
-# to keep the effective wavelength constant.
-# I also need better information on galaxy mass distributions.
-k = 5e-6   
-
-# mass of each galaxy, in years   1 = 3e12 solar masses
-Msun = (3 * units.kilometer).to(units.lightyear)
-
-# mean mass of galaxies emiting wavelength of interest
-# my guess is that this wave is coming from smaller objects
-M = 1 * units.lightyear
-
-# hubble  distance in light years
-R = 1.37e10 * units.lightyear
-z = 1000
-
-rmin = 1e9 * units.lightyear
-rmax = 13.5e9 * units.lightyear
-
-wavelength = 1.0 * units.lightyear
-
-results = None
-
-def main():
-
-
-    print("mass in lightyears:", M)
-    print("mass in suns:", M / Msun)
-    
-
-    print("redshift adjusted wave length:", z * M)
-
-    amplitude = k * N * M / R
-    amplitude *= units.lightyear
-
-    print(amplitude.to(units.meter) / z**2)
-
-    # loop over distance
-    r = rmin + 0
-    global results
-    results = []
-    c = constants.c
-    print('rRRRRRR', r, rmin, rmax, rmin<rmax, r<rmax)
-    print('r is rmin', r is rmin)
-    rr = np.linspace(rmin, rmax, 20)
-
-    for r in rr:
-        print('xxxxxxx', r, rmin, rmax, rmin<rmax, r<rmax)
-        v = (r * hubble).to(units.meter/units.second)
-        zz = v / c
-
-
-        # alternative zz calc based on v
-        zz2 = -1 + 1 / (math.sqrt((1-(v**2/c**2))))
-        print('zzzz', zz, zz2, zz/zz2)
-
-        # use z = (wobs - wemit)/wemit to calculate
-        # wemit necessary for given wobs.
-        # rearrange to ge wemit = wobs/(1+z)
-        # and note that wobs is M
-
-        # we want a wavelength equal to M
-        # but we're redshifted by z, so our wave will be
-        # m = M / (1+ z)
-        
-        m = M / (1 + zz)
-
-        print("distance:", r, zz)
-        print("mass in lightyears:", m)
-        print(f"mass in suns:  {m / Msun:e}")
-        print("redshift adjusted wave length:", m)
-
-        # need to modify N according to r
-        n = N * (r / R) ** 2 
-        
-        amplitude = k * n * m / r * units.lightyear
-        
-        print(r/R, v, zz, m, amplitude.to(units.meter))
-
-        results.append(
-            dict(r=r, z=zz, m=m, roverhubble=r/R, v=v,
-                 amp=amplitude.to(units.meter)))
-
-        
-        
-        print('rrrrrr', len(results), r, rmin)
-
-        r += 1e9 * units.lightyear
-
-    print(results)
-    fig, ax = plt.subplots()
-    from astropy.table import Table
-    tab = Table(results)
-    print(tab)
-    ax.plot(tab['r'],  tab['amp'])
-    #ax.show()
-    print()
-    print('rrrrrr', len(results))
-
-    plt.show()
-
-if __name__ == '__main__':
-
-    main()
