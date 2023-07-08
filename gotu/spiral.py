@@ -357,14 +357,14 @@ class Spiral(magic.Ball):
 
         print('SUN!' * 10)
         solar_mass = 1 * u.solMass
-        solar_angular_velocity = (365/27) * 2 * math.pi  # radians per year
+        solar_angular_velocity = 2 * math.pi / 25  # radians per year
         
         # Central mass.  Mass converted to Schwartzschild radius (in light years)
         # Mass of 1 is approximately 3e12 solar masses.
         self.Mcent = solar_mass
         self.Mball = 0.
         self.Mdisc = 0.
-        self.omega0 = solar_angular_velocity
+        self.omega0 = solar_angular_velocity / u.year
 
         # astronomical unit in light years
         # au = 1 / 63241.08  ### can't remember how I calculated this
@@ -380,6 +380,7 @@ class Spiral(magic.Ball):
         # ??
 
         # A = K * \omega_0.  K = M for Sciama principle
+        # want 2 * A to be 
         self.A = self.K * solar_angular_velocity
 
         # magic constant determined by overall energy in the orbit
@@ -411,6 +412,8 @@ class Spiral(magic.Ball):
 
         # constant, can be read from tangential velocity for small r
         A, K, r = self.A, self.K, self.rmin
+
+        print(r, K, r/K)
         
         tv = (2 * A) - (2 * A *K) * math.log((r/K) + 1)
 
