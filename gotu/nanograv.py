@@ -222,21 +222,34 @@ visible to us.
 
 """
 import math
+import argparse
+
 import numpy as np
 from astropy import units, constants, coordinates
 from matplotlib import pyplot as plt
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-n', default=1e11, type=float,
+                    help='number of galaxies in the universe')
+parser.add_argument('-m', default=5e12, type=float,
+                    help='mass of typical galaxy')
+parser.add_argument('-r', default=1.37e10,
+                    help='radius of the visible universe')
+
+
+args = parser.parse_args()
+
 # Number of galaxies in the universe
-N = 1e11
+N = args.n
 
 # mass we are interested in, in solar masses
-M = 1e11
+M = args.m
 
 # Suns mass as a distance in meters
 msun = 3000 * units.meter
 
 # radius of the visible universe
-R = 1.37e10 * units.lightyear
+R = args.r * units.lightyear
 
 # how big is the wave from all these masses
 amplitude = N * M * msun / R.to(units.meter)
@@ -244,6 +257,8 @@ amplitude = N * M * msun / R.to(units.meter)
 print('Amplitude:', amplitude)
 
 # was hoping for 10 meters, how bad is the guestimate?
-print('factor out;', 10 / amplitude)
+print('factor out:', 10 / amplitude)
 
+print('Schwartzchild radius in light years:',
+      (msun * M).to(units.lightyear))
 
