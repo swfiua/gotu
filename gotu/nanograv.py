@@ -254,6 +254,8 @@ R = args.r * units.lightyear
 # how big is the wave from all these masses
 amplitude = N * M * msun / R.to(units.meter)
 
+print(f'{N:e} galaxies of mass {M:e}')
+
 print('Amplitude:', amplitude)
 
 # was hoping for 10 meters, how bad is the guestimate?
@@ -262,3 +264,22 @@ print('factor out:', 10 / amplitude)
 print('Schwartzchild radius in light years:',
       (msun * M).to(units.lightyear))
 
+surface_area_of_universe = 4 * math.pi * R.to(units.meter)**2
+print('surface area of universe:', surface_area_of_universe)
+
+cmb_photon_density = 4e8 / (units.meter**3)
+
+print('photons emitted:', cmb_photon_density * surface_area_of_universe)
+
+# how about R * 1.33?
+V = 1.33
+print('surface_area_of_universe * V *V:', V)
+
+print('photons emitted at V',
+      cmb_photon_density * surface_area_of_universe * V * V)
+
+# it does not matter where you are, the cmb_photon_density is the same
+
+# the question is, why is it so hot?
+# there is about 45 times the microwave energy
+# than that which all the galaxies are emitting as energy

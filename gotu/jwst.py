@@ -374,9 +374,9 @@ class Jwst(magic.Ball):
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
-        filetypes = set(('.jpg', '.png'))
+        filetypes = set(('.jpg', '.png', '.fits'))
         #for key in ('jpegURL', 'dataURL', 'dataURI'):
-        for key in ('jpegURL',):
+        for key in ('jpegURL', 'dataURL'):
             
             if key not in prod.colnames:
                 continue
@@ -397,7 +397,7 @@ class Jwst(magic.Ball):
             
             if filename.suffix == '.fits':
                 
-                tab = fits.open(filename)
+                tab = fits.open(filename.name)
                 for item in tab:
                     print(item.size)
                 if isinstance(item.size, int):
