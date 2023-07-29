@@ -398,6 +398,7 @@ class Jwst(magic.Ball):
             if filename.suffix == '.fits':
                 
                 tab = fits.open(filename.name)
+                print(tab.info())
                 for item in tab:
                     print(item.size)
                 if isinstance(item.size, int):

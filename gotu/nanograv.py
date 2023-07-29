@@ -80,13 +80,15 @@ Kerr metric).
 
 Nonetheless, the waves are commensurate with the Schwartzchild radius
 of the black holes, with magnitude proportional to the mass and
-presumably dropping off with distance by a factor of 1/r.
+presumably dropping off with distance by a factor of 1/r. [1]
 
 For a radius in years, we need 10^11 solar masses.
 
 Note also that the effect is dominated by distant galaxies, as is the
 CMB, since the number of galaxies at a given distance goes up with
 r^2.
+
+[1] see Compton radius.
 
 What about the high frequency waves LIGO is detecting?
 ------------------------------------------------------
@@ -283,3 +285,98 @@ print('photons emitted at V',
 # the question is, why is it so hot?
 # there is about 45 times the microwave energy
 # than that which all the galaxies are emitting as energy
+
+T = 2.73 * units.K
+
+E = constants.k_B * T**4 
+
+print(f'Radiant heat per unit area at {T}: {E}')
+
+# planck's law  B_v(v, T) = (2hv^3/c^2) / (e(hv/kT) - 1)
+
+
+def planck_radiance_law(v, T=T):
+    """ Energy emitted in frequency v at temperature T """
+    h = constants.h
+    c = constants.c
+    e = math.exp
+
+    v = v / units.second
+    hv = h * v
+    kT = constants.k_B * T
+    lam = c / v
+
+    # in terms of frequency v
+    bv = (2*h*v**3/(c*c)) / (e(hv/kT) - 1)
+
+    return bv.value
+
+def planck_radiance_law_wavelength(wavelength, T=T):
+    """ Energy emitted in wavelength at temperature T """
+    h = constants.h
+    c = constants.c
+    e = math.exp
+    kT = constants.k_B * T
+    lam = wavelength * units.meter
+    #print(lam)
+    #print(h*c/lam*kT)
+    # in terms of frequency v
+    blam = (2*h*c**2/(lam**5)) / (e(h*c/(lam*kT)) - 1)
+
+    return blam.value
+
+
+def plots():
+
+    xx = np.logspace(7, 12., 100)
+
+    yy = [planck_radiance_law(x / units.second).value for x in xx]
+
+    fig, (ax1, ax2) = plt.subplots(1,2)
+    ax1.plot(xx, yy)
+
+    yy = [
+        planck_radiance_law_wavelength(
+            constants.c / (x / units.second)).value
+        for x in xx]
+
+    ax2.plot(xx, yy)
+    plt.show()
+
+
+def velocity_of_hydrogen_gas(T=2.73):
+
+    value = 3 *constants.k_B * T * units.K / (2 * constants.m_p)
+    print(value)
+    v_rms = math.sqrt(value.value)
+
+    return v_rms
+
+# how much matter is hydrogen gas?
+mass_of_galaxies = M * N * constants.M_sun
+
+dust_ratio = 1
+
+hydrogen_atoms = mass_of_galaxies / (constants.m_p * 2)
+
+# ratio of surface area of a galaxy to surface area if split into
+# hydrogen molecules
+ratio = M * constants.M_sun / (2 * constants.m_p)
+print(ratio) 
+
+sc_radius_of_galaxy = 3 * units.kilometer * M
+c = constants.c
+sc_radius_of_proton = 2 * constants.G * constants.m_p / (c*c)
+
+# surface area
+print(sc_radius_of_galaxy ** 3 /
+      ((sc_radius_of_proton ** 3) * ratio))
+
+h2 = (100./units.meter)**3
+
+# calculate mass of universe at this density
+mass = (2 * constants.m_p) * 4 * h2 * (R.to(units.meter)**3) / 3
+
+# in solar masses
+print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
+print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
