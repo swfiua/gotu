@@ -372,11 +372,40 @@ sc_radius_of_proton = 2 * constants.G * constants.m_p / (c*c)
 print(sc_radius_of_galaxy ** 3 /
       ((sc_radius_of_proton ** 3) * ratio))
 
-h2 = (100./units.meter)**3
+# hydrogen_atomes per m3
+def mass_of_universe_given_hpm(hpm = 10):
 
-# calculate mass of universe at this density
-mass = (2 * constants.m_p) * 4 * h2 * (R.to(units.meter)**3) / 3
+    h2 = (hpm/units.meter)**3
 
-# in solar masses
-print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
-print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
+    # calculate mass of universe at this density
+    total_h2 = 4 * math.pi * h2 * (R.to(units.meter))**3 / 3
+    mass = (2 * constants.m_p) * total_h2
+
+    # in solar masses
+    print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
+    print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
+    print(f"total_h2 {total_h2:e}")
+    # what is the surface area of a proton compared to galaxy mass M?
+    ratio = (M * 3 * units.kilometer) ** 2 / (
+        total_h2 * (2*constants.m_p/constants.M_sun))
+    ratio = (M * constants.M_sun / constants.m_p)
+    
+    
+    print(ratio, ratio / total_h2)
+    
+    protons_per_galaxy = M * constants.M_sun / constants.m_p
+    print(f'protons per galaxy: {protons_per_galaxy:e}')
+
+    # galaxy surface area
+    sa_of_galaxy = (protons_per_galaxy**(1/3))**2
+
+    print(f'surface area of galaxy in proton area {sa_of_galaxy:e}')
+
+    gas_area = protons_per_galaxy / sa_of_galaxy
+    print(f'one galaxy of protons has area of {gas_area:e}')
+
+# eg compare these
+mass_of_universe_given_hpm(1)
+mass_of_universe_given_hpm(10)
+mass_of_universe_given_hpm(100)
+
