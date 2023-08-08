@@ -52,8 +52,9 @@ indicate that both the waves and the CMB have the same source.
 This will be taken as confirmation of the big bang theory and a
 fantasy period of merging galaxies, that we do not see.
 
-What we are seeing is the sum of the rotations of all black holes in
-our visible universe.
+What we are seeing is the sum of the rotations of all matter in our
+visible universe.  Giant black holes at the heart of galaxies account
+for much of the matter.
 
 As Professor Rourke suggests, these black holes drag the surrounding
 spacetime by::
@@ -120,8 +121,8 @@ energy emitted by the inspiral.
 The Sciama Principle model presumably generates similar energy over a
 longer time scale?
 
-Ramling thoughts
-----------------
+Rambling thoughts
+-----------------
 
 We are now able to track the motion of some objects with incredible
 precision. There are lots of opportunities to test the Sciama
@@ -217,9 +218,13 @@ It's this that we are seeing, a weaker wave, it happens all the time.
 The models all agree that the wavelengths we are seeing are dominated
 by a period of supermassive black hole merging.
 
-By a happy coincidence, the chirp mass happens to closely match the
+By a happy coincidence(?), the chirp mass happens to closely match the
 amount of energy the galaxy gives off over half of the time it is
 visible to us.
+
+Update
+======
+
 
 
 """
@@ -382,6 +387,7 @@ def mass_of_universe_given_hpm(hpm = 10):
     mass = (2 * constants.m_p) * total_h2
 
     # in solar masses
+    print(f'With {hpm} hydrogen molecules per meter')
     print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
     print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
     print(f"total_h2 {total_h2:e}")
