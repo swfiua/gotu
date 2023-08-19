@@ -351,7 +351,7 @@ def plots():
 
 def velocity_of_hydrogen_gas(T=2.73):
 
-    value = 3 *constants.k_B * T * units.K / (2 * constants.m_p)
+    value = 3 * constants.k_B * T * units.K / constants.m_p
     print(value)
     v_rms = math.sqrt(value.value)
 
@@ -362,11 +362,11 @@ mass_of_galaxies = M * N * constants.M_sun
 
 dust_ratio = 1
 
-hydrogen_atoms = mass_of_galaxies / (constants.m_p * 2)
+hydrogen_atoms = mass_of_galaxies / constants.m_p
 
 # ratio of surface area of a galaxy to surface area if split into
-# hydrogen molecules
-ratio = M * constants.M_sun / (2 * constants.m_p)
+# hydrogen atoms
+ratio = M * constants.M_sun / constants.m_p
 print(ratio) 
 
 sc_radius_of_galaxy = 3 * units.kilometer * M
@@ -380,38 +380,63 @@ print(sc_radius_of_galaxy ** 3 /
 # hydrogen_atomes per m3
 def mass_of_universe_given_hpm(hpm = 10):
 
-    h2 = (hpm/units.meter)**3
+    h1 = (hpm/units.meter)**3
 
     # calculate mass of universe at this density
-    total_h2 = 4 * math.pi * h2 * (R.to(units.meter))**3 / 3
-    mass = (2 * constants.m_p) * total_h2
+    total_h1 = 4 * math.pi * h2 * (R.to(units.meter))**3 / 3
+    mass = constants.m_p * total_h2
 
     # in solar masses
-    print(f'With {hpm} hydrogen molecules per meter')
+    print(f'With {hpm} hydrogen atoms per meter')
     print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
     print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
-    print(f"total_h2 {total_h2:e}")
-    # what is the surface area of a proton compared to galaxy mass M?
-    ratio = (M * 3 * units.kilometer) ** 2 / (
-        total_h2 * (2*constants.m_p/constants.M_sun))
-    ratio = (M * constants.M_sun / constants.m_p)
-    
-    
-    print(ratio, ratio / total_h2)
-    
-    protons_per_galaxy = M * constants.M_sun / constants.m_p
-    print(f'protons per galaxy: {protons_per_galaxy:e}')
+    print(f"total_h1 {total_h1:e}")
 
-    # galaxy surface area
-    sa_of_galaxy = (protons_per_galaxy**(1/3))**2
-
-    print(f'surface area of galaxy in proton area {sa_of_galaxy:e}')
-
-    gas_area = protons_per_galaxy / sa_of_galaxy
-    print(f'one galaxy of protons has area of {gas_area:e}')
 
 # eg compare these
 mass_of_universe_given_hpm(1)
 mass_of_universe_given_hpm(10)
 mass_of_universe_given_hpm(100)
+
+
+earth_atmosphere = 1e25 # oxygen/nitrogen
+
+
+def mean_free_path(energy=None, density=None, cross_section=None):
+    """ Mean distance photons travel between interactions
+
+    energy: the energy of the photon
+    density: the number of particles per unit volue
+    cross_section of the particles for photon interaction at
+              this wavelength.
+
+    particles are assumed to be hydrogen atoms.
+
+    currently just prints out the energy, as the cross_section
+    varies according to the energy.
+
+    may need to track down some data and theory on this.
+    """
+    if energy is None:
+        energy = constants.h * constants.c / (1e-3 * units.meter)
+
+    if density is None:
+        density = 1e6 / (units.meter**3)
+
+    cross_section = 1e-31 * units.meter**2
+
+    # schwartzchild raidus of proton
+    scrp = 3e3 * units.meter * constants.m_p / constants.M_sun
+    
+    print(energy, density, cross_section, cross_section/scrp)
+
+    mean_free_path = 1 / (density * cross_section)
+    
+    return mean_free_path
+
+    
+#
+mfp = mean_free_path()
+print(mfp, mfp.to(units.lightyear)/1e9)
+print(mean_free_path(density=1e9/units.meter**3))
 
