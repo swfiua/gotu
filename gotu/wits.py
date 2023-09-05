@@ -97,7 +97,7 @@ def get_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--planets', action='store_true')
-    parser.add_argument('--fontsize', type=int, default=6)
+    parser.add_argument('--fontsize', type=int, default=12)
     parser.add_argument('--inc', type=float)
     parser.add_argument('--log', action='store_true')
     parser.add_argument('--rotate', action='store_true')
@@ -203,7 +203,9 @@ class SolarSystem(magic.Ball):
 
         ax.grid(True)
         ax.set_title(self.now)
-        ax.legend(loc=0, fontsize='xx-small', ncol=2, markerscale=0.2)
+
+        if self.fontsize:
+            ax.legend(loc=0,fontsize=self.fontsize, ncol=2)
         #ax.axis('off')
         #lax = await self.get()
         #h, l = legend._get_legend_handles_labels([ax])
