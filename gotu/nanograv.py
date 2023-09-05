@@ -383,12 +383,12 @@ def mass_of_universe_given_hpm(hpm = 10):
     h1 = (hpm/units.meter)**3
 
     # calculate mass of universe at this density
-    total_h1 = 4 * math.pi * h2 * (R.to(units.meter))**3 / 3
-    mass = constants.m_p * total_h2
+    total_h1 = 4 * math.pi * h1 * (R.to(units.meter))**3 / 3
+    mass = constants.m_p * total_h1
 
     # in solar masses
     print(f'With {hpm} hydrogen atoms per meter')
-    print(f"Mass of universe density {h2:e} {mass/constants.M_sun:e} solar masses")
+    print(f"Mass of universe density {h1:e} {mass/constants.M_sun:e} solar masses")
     print(f"Or {mass/(M*constants.M_sun):e} galaxies of {M:e} suns")
     print(f"total_h1 {total_h1:e}")
 
@@ -399,7 +399,7 @@ mass_of_universe_given_hpm(10)
 mass_of_universe_given_hpm(100)
 
 
-earth_atmosphere = 1e25 # oxygen/nitrogen
+earth_atmosphere = 1e25 / (units.meter ** 3) # oxygen/nitrogen
 
 
 def mean_free_path(energy=None, density=None, cross_section=None):
