@@ -19,6 +19,7 @@ from astropy import constants as c, units as u
 
 distance = 21.3 * u.megaparsec
 
+# at 21 Mega parsec 
 h1mass = 1.94e10 * c.M_sun
 
 h2mass = 1.3e9 * u.M_sun
@@ -28,6 +29,9 @@ mbh = 8.3e6
 h1_systematic_velocity = 1496 * u.km / u.s
 
 # central_bar = 32".5
+
+# inter galactic medium density
+igm_density = 5e-5 / (u.cm**3)
 
 # from reference... 
 h1_density = 3.7e20 / (u.cm**2)

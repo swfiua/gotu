@@ -398,8 +398,24 @@ mass_of_universe_given_hpm(1)
 mass_of_universe_given_hpm(10)
 mass_of_universe_given_hpm(100)
 
+# from spanish dancer paper
+u = units
+igm = 5e-5 / (u.cm**3)
+
+mass_of_universe_given_hpm(igm.to(1/u.m**3).value ** (1/3))
+
 
 earth_atmosphere = 1e25 / (units.meter ** 3) # oxygen/nitrogen
+
+# inter galactic distance
+igd = 5e6 * u.lightyear
+
+# calculate averate density of a sphere of radius igd and
+# total mass M
+c = constants
+rr = igd.to(u.m)
+migd = 4 * math.pi * rr**3 / (M * c.M_sun/c.m_p)
+print(f'Equivalent igm from mass {M:e} in volume {igd:e} is {migd:.2f}')
 
 
 def mean_free_path(energy=None, density=None, cross_section=None):
