@@ -232,8 +232,11 @@ import math
 import argparse
 
 import numpy as np
-from astropy import units, constants, coordinates
+from astropy import units, constants, coordinates, cosmology
+u = units
+c = constants
 from matplotlib import pyplot as plt
+from scipy import integrate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-n', default=1e11, type=float,
@@ -258,6 +261,8 @@ msun = 3000 * units.meter
 # radius of the visible universe
 R = args.r * units.lightyear
 
+vol = ((4/3) * math.pi * (R ** 3)).to(units.m**3)
+
 # how big is the wave from all these masses
 amplitude = N * M * msun / R.to(units.meter)
 
@@ -276,6 +281,8 @@ print('surface area of universe:', surface_area_of_universe)
 
 cmb_photon_density = 4e8 / (units.meter**3)
 
+cmb_energy_density = 4.17e-14 * u.J / (u.m**3)
+
 print('photons emitted:', cmb_photon_density * surface_area_of_universe)
 
 # how about R * 1.33?
@@ -291,7 +298,7 @@ print('photons emitted at V',
 # there is about 45 times the microwave energy
 # than that which all the galaxies are emitting as energy
 
-T = 2.73 * units.K
+T = cosmology.Planck18.Tcmb0
 
 E = constants.k_B * T**4 
 
@@ -300,7 +307,7 @@ print(f'Radiant heat per unit area at {T}: {E}')
 # planck's law  B_v(v, T) = (2hv^3/c^2) / (e(hv/kT) - 1)
 
 
-def planck_radiance_law(v, T=T):
+def uplanck_radiance_law(v, T=T):
     """ Energy emitted in frequency v at temperature T """
     h = constants.h
     c = constants.c
@@ -314,10 +321,21 @@ def planck_radiance_law(v, T=T):
     # in terms of frequency v
     bv = (2*h*v**3/(c*c)) / (e(hv/kT) - 1)
 
+    return bv
+
+def planck_radiance_law(v, T=T):
+    """ Energy emitted in frequency v at temperature T """
+    bv = uplanck_radiance_law(v, T)
     return bv.value
 
-def planck_radiance_law_wavelength(wavelength, T=T):
-    """ Energy emitted in wavelength at temperature T """
+def uplanck_radiance_law_wavelength(wavelength, T=T):
+    """ Energy emitted in wavelength at temperature T
+
+    wavelength: a float, wavelength in meters
+    T: temperature, a quantity with units K
+    
+    returns astropy Quantity object with units
+    """
     h = constants.h
     c = constants.c
     e = math.exp
@@ -328,26 +346,86 @@ def planck_radiance_law_wavelength(wavelength, T=T):
     # in terms of frequency v
     blam = (2*h*c**2/(lam**5)) / (e(h*c/(lam*kT)) - 1)
 
+    return blam
+
+def planck_radiance_law_wavelength(wavelength, T=T):
+    """ Energy emitted in wavelength at temperature T  """
+    blam = uplanck_radiance_law_wavelength(wavelength, T)
     return blam.value
 
 
 def plots():
 
-    xx = np.logspace(7, 12., 100)
+    xx = np.logspace(6, 12., 1000)
+    
+    yy = [planck_radiance_law(x) for x in xx]
 
-    yy = [planck_radiance_law(x / units.second).value for x in xx]
-
-    fig, (ax1, ax2) = plt.subplots(1,2)
+    fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+    ax1.set_title('frequency')
     ax1.plot(xx, yy)
 
-    yy = [
-        planck_radiance_law_wavelength(
-            constants.c / (x / units.second)).value
-        for x in xx]
+    ww = [(constants.c / x).value for x in xx]
+    yy = [planck_radiance_law_wavelength(x) for x in ww]
 
-    ax2.plot(xx, yy)
+    #xx = [(constants.c / (x / units.second)).value for x in xx]
+
+    chop = 200
+    ax2.plot(ww[:chop], yy[:chop])
+    ax2.set_title('wavelength')
+
+    ax3.plot(xx[:chop], ww[:chop])
+    ax3.set_title('freq v wavelength')
     plt.show()
 
+def uplanck_photon_rates_wavelength(wavelength, T=T):
+
+    value = planck_radiance_law_wavelength(wavelength, T)
+
+    # energy per photon
+    ee = c.h * c.c / wavelength
+
+    # return effective number of photons at this wavelength
+    return (value / ee)
+
+def planck_photon_rates_wavelength(wavelength, T=T):
+
+    return uplanck_photon_rates_wavelength(wavelength, T).value
+
+def uplanck_photon_rates(freq, T=T):
+
+    value = planck_radiance_law(freq, T)
+
+    # energy per photon of freq freq
+    ee = c.h * freq
+
+    # return effective number of photons at this freq
+    return (value / ee)
+
+def planck_photon_rates(freq, T=T):
+
+    return uplanck_photon_rates(freq, T).value
+
+def cmb_model():
+
+    c = constants
+    u = units
+    
+    # cmb_photon_density
+    a = 1e-4
+    b = 1e-2
+
+    xx = np.linspace(a, b, 1000)
+
+    yy  = [planck_photon_rates_wavelength(x) for x in xx]
+
+    area, error = integrate.quad(planck_photon_rates_wavelength,
+                                 a, b)
+    print(area)
+    #cmb_photon_density = 1
+    fig, (ax1, ax2) = plt.subplots(2)
+    ax1.plot(xx, yy)
+    ax2.plot(xx, np.array(yy) * cmb_photon_density / area)
+    plt.show()
 
 def velocity_of_hydrogen_gas(T=2.73):
 
@@ -456,3 +534,75 @@ mfp = mean_free_path()
 print(mfp, mfp.to(units.lightyear)/1e9)
 print(mean_free_path(density=1e9/units.meter**3))
 
+
+from blume import magic, farm
+
+from gotu.spiral import waves
+
+class CMB(magic.Ball):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.a = 1e-5 * u.m
+        self.b = 1e-2 * u.m
+        self.T = T
+        self.n = 1000
+        self.R = R.to(u.m).value
+        self.fudge = 45.
+        self.period = 1.
+
+    async def run(self):
+
+
+        wavelengths = np.linspace(self.a, self.b, self.n)
+
+        
+        energy = np.array([planck_radiance_law_wavelength(x.value)
+                           for x in wavelengths])
+
+        sc = np.array([
+            (2 * c.G * c.h / (x * c.c**3)).value for x in wavelengths])
+
+        R = self.R
+
+        ax = await self.get()
+
+        ax.set_title('planck radiance energy')
+        ax.plot(wavelengths, energy)
+        ax.show()
+        
+        ax = await self.get()
+        ax.plot(sc)
+        ax.show()
+        
+        energy *= sc * R * R * self.fudge
+        
+        ax = await self.get()
+        ax.plot(wavelengths, energy)
+        ax.set_title('Scaled energy')
+        ax.show()
+
+        points, wave = waves(
+            [x for x in energy],
+            [x.value for x in wavelengths],
+            period=self.period)
+
+        ax = await self.get()
+        ax.plot(points, wave)
+
+        ax.show()
+        
+        ax = await self.get()
+        ax.set_title('frequency v energy')
+        ax.plot([c.c.value/x for x in points], energy)
+
+        ax.show()
+
+if __name__ == '__main__':
+
+    farm.run(balls=[CMB()])
+    
+
+    

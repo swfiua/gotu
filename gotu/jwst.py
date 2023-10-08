@@ -375,6 +375,7 @@ class Jwst(magic.Ball):
         # download the product
         #result = Observations.download_file(prod['dataURI'])
         filetypes = set(('.jpg', '.png', '.fits'))
+        filetypes = set(('.jpg', '.png'))
         #for key in ('jpegURL', 'dataURL', 'dataURI'):
         for key in ('jpegURL', 'dataURL'):
             
