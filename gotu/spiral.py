@@ -227,9 +227,47 @@ def hubble_tension(cmb=cosmology.Planck18.H0, near=None):
     """ Explore hubbe tension """
 
     if near is None:
+        # I should calculate this based on the full model
         near = 73 * u.km / (u.Mpc * u.s)
 
     return near - cmb
+
+class Cosmo:
+    """ Mimic an astropy Cosmology object
+
+    """
+
+    def __init__(self, cosmo=None):
+
+        cosmo = cosmo or cosmology.default_cosmology.get()
+
+        for attr in dir(cosmo):
+            if attr.endswith('0'):
+                setattr(self, attr, getattr(cosmo, attr))
+
+    def __getattr__(self, attr):
+        """ Magic to save writing lots of f at z functions
+
+        Universe is essentially static so all these values are
+        the same regardless of z.
+        """
+        if hasattr(self, attr + '0'):
+
+            def f(z):
+
+                return getattr(self, attr + '0')
+
+            return f
+
+        raise AttributeError
+
+    def is_flat(self):
+        """ Not sure what the answer is to this.
+
+        Perhaps, asymptotically flat.
+        """
+
+        return None
 
 class SkyMap(magic.Ball):
     """ Yet another table viewer? 
@@ -265,13 +303,19 @@ class SkyMap(magic.Ball):
         self.balls = gals
         self.offset = 0.
 
-        # Conversion factor from stellar mass to black hole mass
-        self.m_bh = 1800.
+        # set defaults from Cosmo object
+        cosmo = Cosmo()
 
+        # Conversion factor from stellar mass to black hole mass
+        self.m_bh = cosmo.Odm0 / cosmo.Ob0
+
+        # the CMB is 45 times brighter than you would expect based
+        # on size of visible universe.  Hitchhikers should note
+        # that setting fudge to 42 produces a viable model.
         self.fudge = 45.
 
         # Conversion from Holmberg radius mass to full stellar mass
-        self.h_factor = 100.
+        self.h_factor = 10.
 
         self.minmass = 6.
 
@@ -307,7 +351,8 @@ class SkyMap(magic.Ball):
         print('mean mass', mean_mass)
         print('sample size', len(sample))
 
-        print('total mass given 1e11 galaxies', 1e11 * mean_mass)
+        print('total mass given 1e11 galaxies',
+              1e11 * 10**mean_mass * c.M_sun)
         
         critical_density = 5 / (u.m**3)
 
