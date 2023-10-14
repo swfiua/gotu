@@ -238,29 +238,41 @@ c = constants
 from matplotlib import pyplot as plt
 from scipy import integrate
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-n', default=1e11, type=float,
-                    help='number of galaxies in the universe')
-parser.add_argument('-m', default=5e12, type=float,
-                    help='mass of typical galaxy')
-parser.add_argument('-r', default=1.37e10,
-                    help='radius of the visible universe')
-
-
-args = parser.parse_args()
+# cosmology related parameters
+cosmo = cosmology.default_cosmology.get()
 
 # Number of galaxies in the universe
-N = args.n
+N = 1e11
 
 # mass we are interested in, in solar masses
-M = args.m
+M = 5e12
 
-# Suns mass as a distance in meters
-msun = 3000 * units.meter
+# Sun's mass as a distance in meters, the Sun's Schwartzchild radius
+msun = 2 * c.G * c.M_sun / (c.c * c.c)
 
 # radius of the visible universe
-R = args.r * units.lightyear
+R = cosmo.hubble_distance.to(units.lightyear)
 
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-n', default=N, type=float,
+                        help='number of galaxies in the universe')
+    parser.add_argument('-m', default=M, type=float,
+                        help='mass of typical galaxy')
+    parser.add_argument('-r', default=1.37e10,
+                        help='radius of the visible universe')
+
+
+    args = parser.parse_args()
+
+    N = args.n
+    M = args.m
+    R = args.r * u.lightyear
+
+
+# volume of universe in cubic meters.
 vol = ((4/3) * math.pi * (R ** 3)).to(units.m**3)
 
 # how big is the wave from all these masses
@@ -279,26 +291,8 @@ print('Schwartzchild radius in light years:',
 surface_area_of_universe = 4 * math.pi * R.to(units.meter)**2
 print('surface area of universe:', surface_area_of_universe)
 
-cmb_photon_density = 4e8 / (units.meter**3)
 
-cmb_energy_density = 4.17e-14 * u.J / (u.m**3)
-
-print('photons emitted:', cmb_photon_density * surface_area_of_universe)
-
-# how about R * 1.33?
-V = 1.33
-print('surface_area_of_universe * V *V:', V)
-
-print('photons emitted at V',
-      cmb_photon_density * surface_area_of_universe * V * V)
-
-# it does not matter where you are, the cmb_photon_density is the same
-
-# the question is, why is it so hot?
-# there is about 45 times the microwave energy
-# than that which all the galaxies are emitting as energy
-
-T = cosmology.Planck18.Tcmb0
+T = cosmo.Tcmb0
 
 E = constants.k_B * T**4 
 
@@ -600,6 +594,7 @@ class CMB(magic.Ball):
 
         ax.show()
 
+    
 if __name__ == '__main__':
 
     farm.run(balls=[CMB()])
