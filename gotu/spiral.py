@@ -236,7 +236,27 @@ def hubble_tension(cmb=cosmology.Planck18.H0, near=None):
     return near - cmb
 
 class Cosmo:
-    """ Mimic an astropy Cosmology object
+    """Mimic an astropy Cosmology object
+
+    It's a Sciama-DeSitter Universe.
+
+    Static, but doesn't look static.
+
+    Old and big in a state of equilibrium.
+
+    The O*0 attributes give the current estimates of the share of the
+    critical mass (also at z=0) in various buckets.
+
+    Ogamma for photons (primarial CMB)
+    Om for non-realtivistic matter
+    Ob for baryonic
+    Odm for dark matter.
+    Ode for dark energy.
+
+    Dark matter is not part of this cosmology.
+
+    Instead assume this turns up as black holes in
+    the centre of galaxies.
 
     """
 
@@ -267,7 +287,7 @@ class Cosmo:
     def is_flat(self):
         """ Not sure what the answer is to this.
 
-        Perhaps, asymptotically flat.
+        Perhaps, "asymptotically flat"?
         """
 
         return None
@@ -297,6 +317,7 @@ class SkyMap(magic.Ball):
         super().__init__()
 
         print('clean galaxy data')
+
         print(len(gals), type(gals[0]))
         print(gals[0])
 
@@ -504,6 +525,8 @@ class SkyMap(magic.Ball):
         ax.show()
 
         await self.cmbsim()
+        await self.cmb_gwb()
+
 
     async def cmbsim(self):
         """ Calculate some CMB related numbers """
@@ -542,8 +565,6 @@ class SkyMap(magic.Ball):
         print("CMB fraction of critical, Ogamma", cmbgamma)
               
         print("Ogamm0", self.cosmo.Ogamma0)
-
-        await self.cmb_gwb()
 
 
     async def cmb_gwb(self):
@@ -595,6 +616,35 @@ class SkyMap(magic.Ball):
         ax.plot([c.c.value/x for x in points], energy)
 
         ax.show()
+
+
+        # try and estimate the hubble tension
+        esquare = energy * energy
+
+
+        mean_energy = np.mean(esquare)
+        print('mean square energy', mean_energy)
+
+        # now assume this is the change of hubble constant in Hz
+        # This is actually change per wavelength, which is of order
+        # 1-3m, so per second this gives:
+        lams = np.linspace(self.cmb_min, self.cmb_max, 1000)
+        hubble_tension = ((mean_energy * c.c / lams) / self.cosmo.H0.to(1/u.s)).value
+
+        ax = await self.get()
+        ax.plot(lams, (1 + hubble_tension) * self.cosmo.H0.value)
+        ax.plot(lams, [self.cosmo.H0.value] * len(lams))
+        ax.set_title('Hubble tension')
+        ax.show()
+
+        cmb_peak = 1e-3
+        
+        ht = ((mean_energy * c.c / cmb_peak) / self.cosmo.H0.to(1/u.s)).value
+              
+        print(f"Hubble Tension based on {cmb_peak}m wave:",
+              self.cosmo.H0,
+              (1 + ht) * self.cosmo.H0)
+
 
 def waves(amplitudes, wavelengths, phases=None, period=1, n=1000):
 
