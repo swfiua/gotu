@@ -224,7 +224,30 @@ import numpy as np
 from scipy import integrate
 
 from gotu import sd
-from gotu import nanograv
+
+def planck_radiance_law_wavelength(wavelength, T=None):
+    """ Energy emitted in wavelength at temperature T
+
+    wavelength: a float, wavelength in meters
+    T: temperature, a quantity with units K
+    
+    returns astropy Quantity object with units
+    """
+    if T is None:
+        T = Cosmo().Tcmb0
+    
+    hh = c.h
+    cc = c.c
+    ee = math.exp
+    kT = c.k_B * T
+    lam = wavelength * u.meter
+    #print(lam)
+    #print(h*c/lam*kT)
+    # in terms of frequency v
+    blam = (2*hh*cc**2/(lam**5)) / (ee(hh*cc/(lam*kT)) - 1)
+
+    return blam.value
+
 
 def hubble_tension(cmb=cosmology.Planck18.H0, near=None):
     """ Explore hubbe tension """
@@ -264,26 +287,57 @@ class Cosmo:
 
         cosmo = cosmo or cosmology.default_cosmology.get()
 
+        # Our Cosmos is essentially static so all these
+        # Omega values are the same regardless of z
+        # Code below is magic to set up these functions
         for attr in dir(cosmo):
             if attr.endswith('0'):
+                def f(z, attr=attr):
+                    return getattr(self, attr)
+
                 setattr(self, attr, getattr(cosmo, attr))
+                setattr(self, attr[:-1], f)
 
-    def __getattr__(self, attr):
-        """ Magic to save writing lots of f at z functions
+    @property
+    def hubble_distance(self):
 
-        Universe is essentially static so all these values are
-        the same regardless of z.
+        htime = (1/self.H0).to(u.year)
+
+        distance = htime.value * u.lightyear
+
+        return distance
+
+    def check_critical_density(self):
+        """ Critical density formulae
+
+        The critical density only depends on the Hubble distance.
+
+        It is the mass per unit volume such that the total mass has
+        Schwartzchild radius equal to the Hubble distance.
+
+        As such, it is determined by the Hubble constant.
         """
-        if hasattr(self, attr + '0'):
+        pi = math.pi
+        hd = self.hubble_distance << u.m
+        cd = self.critical_density0 << u.kg / u.m**3
 
-            def f(z):
+        # mass of the universe [1]
+        M = cd * (4/3) * pi * hd * hd * hd
+        print(hd)
+        print(cd)
+        print(M)
+        
+        # Schwartzchild radius
+        print((c.G * 2 * M / (c.c * c.c)) << u.m)
+        # hd = 2 * M * c.G / (c.c * c.c)
+        # M = hd * c.c * c.c / (2 * c.G)
 
-                return getattr(self, attr + '0')
-
-            return f
-
-        raise AttributeError
-
+        sc = (c.G * 2 * (cd * (4/3) * pi * hd * hd * hd) / (c.c * c.c))
+        
+        # substitute from [1]
+        cd2 = (3/4) * c.c * c.c / (2 * c.G * hd * hd * pi)
+        print(cd, cd2, M)
+    
     def is_flat(self):
         """ Not sure what the answer is to this.
 
@@ -293,7 +347,7 @@ class Cosmo:
         return None
 
 class SkyMap(magic.Ball):
-    """ Yet another table viewer? 
+    """Yet another table viewer? 
 
     parsing csv and figuring out what it means.
 
@@ -308,7 +362,8 @@ class SkyMap(magic.Ball):
     
     See :mod:`gotu.wits` for more on this subject.
 
-    Maybe SkyMap allows systems to evolve over time, according to the paradigm.
+    Maybe SkyMap allows systems to evolve over time, according to the
+    paradigm.
 
     """
 
@@ -332,10 +387,9 @@ class SkyMap(magic.Ball):
         self.cosmo = cosmo
 
         # Conversion factor from stellar mass to black hole mass
-        self.m_bh = cosmo.Odm0 / cosmo.Ob0
-
-        # mass of the cmb - assume it is Ogamma
-        self.m_cmb = cosmo.Ogamma0 * cosmo.critical_density0
+        # Assume the dark matter and dark energy turn up as central
+        # galactic black holes.
+        self.m_bh = (cosmo.Ode0 + cosmo.Odm0) / cosmo.Ob0
 
 
         # the CMB is 45 times brighter than you would expect based
@@ -344,14 +398,45 @@ class SkyMap(magic.Ball):
         self.fudge = 45.
 
         # Conversion from Holmberg radius mass to full stellar mass
-        self.h_factor = 10.
+        self.minmass = 6.  # min mass to include, log10(solar_mass)
+        mean_sample_mass = self.sample_mass()
 
-        self.minmass = 6.
+        hd = cosmo.hubble_distance << u.m
+        volume_of_universe = (4/3) * math.pi * (hd**3)
+        critical_density = cosmo.critical_density0 << u.kg / u.m**3
+        mass_of_universe = critical_density * volume_of_universe
+        self.mass_of_universe = mass_of_universe
+        # we want to scale things up to cosmo.Ob0
+        stellar_mass = cosmo.Ob0 * mass_of_universe << u.solMass
+
+        # Given number of galaxies, we can get the factor needed to scale
+        # the sample mass up to stellar_mass
+        self.N = 1e11
+        
+        self.h_factor = (stellar_mass / self.N) / mean_sample_mass
+
 
         self.period = 30    # years
 
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
+
+    def sample_mass(self):
+        """ Return the sum of the masses of the sample
+
+        In solar masses.
+        """
+        mass = 0
+        total = 0
+        for gal in self.balls:
+            m26 = gal['LOG_MASS_26']
+            if m26 < self.minmass:
+                continue
+
+            total += 1
+            mass += 10**m26
+
+        return mass / total << u.solMass
 
     def waves(self):
         """ What waves would be generated by the catalog """
@@ -384,29 +469,16 @@ class SkyMap(magic.Ball):
         print('mean mass', mean_mass)
         print('sample size', len(sample))
 
-        print('total mass given 1e11 galaxies',
-              1e11 * 10**mean_mass * c.M_sun)
-        
-        critical_density = 5 / (u.m**3)
+        print(f'total mass given {self.N} galaxies',
+              self.N * 10**mean_mass * c.M_sun)
 
-        volume = 4*math.pi*((13.7e9*u.lightyear.to(u.m)) ** 3)/3 * (u.m**3)
-
-        
-        mbocd = volume * critical_density * c.m_p
-        print(volume)
-        print("mass based on critical_density", mbocd)
-
-        
+        mou = self.mass_of_universe
         print("number of galaxies based on mbocd",
-              f'{mbocd / (c.M_sun * total_mass/len(sample)):.2e}')
-
-        N = 1e11
-        M = 5e15
+              f'{mou / (c.M_sun * total_mass/len(sample)):.2e}')
 
         # weight for each galaxy
-        weight = N / 390
-
-        R = 13.7e9 * u.lightyear
+        weight = self.N / len(sample)
+        R = self.cosmo.hubble_distance << u.m
 
         for gal in sample:
             m26 = gal['LOG_MASS_26']
@@ -414,7 +486,7 @@ class SkyMap(magic.Ball):
             gal['bh'] = math.log10(bh)
             sc = 2 * bh * c.M_sun * c.G / (c.c*c.c)
             gal['sc'] = sc.to(u.lightyear)
-            gal['amplitude'] = (weight * sc)/R.to(u.m)
+            gal['amplitude'] = (weight * sc)/R
             # print('XXXX', gal['sc'], gal['amplitude'])
         return sample
 
@@ -533,9 +605,9 @@ class SkyMap(magic.Ball):
 
         # Mass per unit volume, based on critical density and Ogamma
         # Assumes CMB makes up the vast majority of photons.
-        cmb_mpuv = self.m_cmb.to(u.kg/u.m**3)
+        cosmo = self.cosmo
+        cmb_mpuv = cosmo.Ogamma0 * cosmo.critical_density0 << u.kg/u.m**3
         print("CMB equivalent mass per unit volume", cmb_mpuv)
-        
         
         # What is the energy 
         mwave = 1e-3 * u.m
@@ -545,7 +617,7 @@ class SkyMap(magic.Ball):
 
         # energy according to planck radiance
         energy, error = integrate.quad(
-            nanograv.planck_radiance_law_wavelength,
+            planck_radiance_law_wavelength,
             self.cmb_min, self.cmb_max)
         print(energy)
         
@@ -568,6 +640,8 @@ class SkyMap(magic.Ball):
 
 
     async def cmb_gwb(self):
+
+        cosmo = self.cosmo
         
         # Simulate the gravitational waves that the CMB generates
         a, b = self.cmb_min * u.m, self.cmb_max * u.m
@@ -576,14 +650,14 @@ class SkyMap(magic.Ball):
 
         
         energy = np.array(
-            [nanograv.planck_radiance_law_wavelength(x.value)
+            [planck_radiance_law_wavelength(x.value)
              for x in wavelengths])
 
         sc = np.array([
             (2 * c.G * c.h / (x * c.c**3)).value for x in wavelengths])
 
         # radius of visible universe in m
-        R = nanograv.R.to(u.m).value
+        R = cosmo.hubble_distance.to(u.m).value
 
         # energy
         energy *= sc * R * R * self.fudge
@@ -596,31 +670,11 @@ class SkyMap(magic.Ball):
 
         # now assume this is the change of hubble constant in Hz
         # This is actually change in frequency.
-        h0 = self.cosmo.H0.to(1/u.s).value
+        h0 = cosmo.H0.to(1/u.s).value
         hubble_tension = np.array([
             x.value/h0 for x in esquare * c.c.value / wavelengths])
 
 
-        def ht(lam):
-            
-            energy = nanograv.planck_radiance_law_wavelength(lam)
-            sc = (2 * c.G * c.h / (lam * c.c**3)).value
-
-            energy *= sc * R * R * self.fudge
-
-            esquare = energy * energy / 2.0
-
-            
-            H0 = self.cosmo.H0.to(1/u.s).value
-            tension = (esquare * c.c / lam) / H0
-
-            return tension.value
-
-        area, error = integrate.quad(ht, a.value, b.value)
-        xwidth = (b-a).value
-        print("area under CMB wave",
-              area, area / xwidth, self.cosmo.H0 * (1 + area/xwidth))
-        
         # lams short for wavelengths
         lams = wavelengths
         
