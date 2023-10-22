@@ -407,6 +407,7 @@ class SkyMap(magic.Ball):
         critical_density = cosmo.critical_density0 << u.kg / u.m**3
         mass_of_universe = critical_density * volume_of_universe
         self.mass_of_universe = mass_of_universe
+
         # we want to scale things up to cosmo.Ob0
         stellar_mass = cosmo.Ob0 * mass_of_universe << u.solMass
 
@@ -461,7 +462,8 @@ class SkyMap(magic.Ball):
                 print(f'm26 {m26:.2e} mh1 {mass_h1:.2e} m_star {m26 + m26_to_stellar:.2e} m_bh {m26 + m26_to_bh:.2e} {name} {clz}')
 
             bh = 10 ** (m26 + m26_to_bh)
-            total_mass += 10 ** (m26 + m26_to_bh)
+            stellar = 10 ** (m26 + m26_to_stellar)
+            total_mass += bh + stellar
 
 
         print('total mass',  math.log10(total_mass), total_mass * c.M_sun)
@@ -555,11 +557,13 @@ class SkyMap(magic.Ball):
                    [x['amplitude'].value for x in sample])
         ax.show()
 
-        await self.log10hist([x['amplitude'].value for x in sample],
-                             title='Amplitude(m)')
+        await self.log10hist(
+            [x['amplitude'].value * self.fudge for x in sample],
+            title='Amplitude(m)')
 
-        await self.log10hist([x['sc'].value for x in sample],
-                             title='Schwartzschild (lightyear)')
+        await self.log10hist(
+            [x['sc'].value for x in sample],
+            title='Schwartzschild (lightyear)')
         
         ax = await self.get()
         ax.hist([x['bh'] for x in sample])
@@ -574,25 +578,16 @@ class SkyMap(magic.Ball):
         ax.show()
 
         # try and simulate the wave
-        n = 100000
         period = self.period
-        #wave = np.zeros(n)
-        #for gal in sample:
-        #    wavelength = gal['sc'].value
-        #    amplitude = gal['amplitude'] * self.fudge
-        #    phase = random.random() * 2 * math.pi
-        #    points = np.linspace(0, period, n)
-        #    values = amplitude * np.sin((points/wavelength) + phase)
-        #    wave += values
 
         ax = await self.get()
         points, wave = waves(
             [x['amplitude'] * self.fudge for x in sample],
             [x['sc'].value for x in sample],
             period=self.period)
-            
         
         ax.plot(points, wave)
+        ax.set_title('Gravitational Wave Background')
         ax.show()
 
         await self.cmbsim()
@@ -702,7 +697,7 @@ class SkyMap(magic.Ball):
         
         ax = await self.get()
         ax.set_title("Schwartzschild Radius")
-        ax.plot(sc)
+        ax.plot(wavelengths, sc)
         ax.show()
         
         
