@@ -517,12 +517,10 @@ class SkyMap(magic.Ball):
     async def log10hist(self, values, n=10, title=None):
 
         ax = await self.get()
-        logbins = np.logspace(np.log10(min(values)),
-                              np.log10(max(values)), n+1)
-
-        #ax.hist(values, bins=logbins)
-
         ax.hist([math.log10(x) for x in values])
+
+        ticks = ax.get_xticks()
+        ax.set_xticklabels([10**x for x in ticks])
         ax.set_title(title)
         ax.show()
         
@@ -678,9 +676,10 @@ class SkyMap(magic.Ball):
 
         # Now take the ratio of this amplitude to the wavelength
         # and see how it compares to the Hubble constant in Hz.
-        # Why should there be a relation? Maybe if convert to
-        # wavelengths per second, but that means freq and is
-        # c.c / wavelength, which is a factor of 10^11 hmmmmm
+        # Why should there be a relation?  We are multiplying
+        # by the Hubble time, to get the size of the effect
+        # over the Hubble time - it appears commensurate
+        # with the Hubble tension.
         h0 = cosmo.H0.to(1/u.s).value
         hubble_tension = np.array([
             x.value/h0 for x in self.fudge * energy / wavelengths])
