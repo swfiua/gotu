@@ -678,7 +678,9 @@ class SkyMap(magic.Ball):
 
         # Now take the ratio of this amplitude to the wavelength
         # and see how it compares to the Hubble constant in Hz.
-        # Why should there be a relation?
+        # Why should there be a relation? Maybe if convert to
+        # wavelengths per second, but that means freq and is
+        # c.c / wavelength, which is a factor of 10^11 hmmmmm
         h0 = cosmo.H0.to(1/u.s).value
         hubble_tension = np.array([
             x.value/h0 for x in self.fudge * energy / wavelengths])
