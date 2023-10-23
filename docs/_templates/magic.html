@@ -71,12 +71,13 @@
 
           console.log(pyodide.globals)
 
+          document.pyodideMplTarget = document.getElementById('canvas')
           
           pyodide.runPythonAsync(
           `
             from collections import deque
             from js import document
-            from pyodide import create_proxy
+            from pyodide.ffi import create_proxy
 
             import matplotlib
             matplotlib.use("module://matplotlib_pyodide.html5_canvas_backend")
@@ -111,6 +112,9 @@
                 elif event.key == "ArrowUp":
                     # Up pressed
                     stdin.value = history[0]
+                elif event.key == "I":
+                    # I for idle, open some source code
+                    pass
 
                 return False
 
