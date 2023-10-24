@@ -81,6 +81,10 @@ collections = {
                'module': 'spiral',
                'class': 'Spiral',
             },
+            {
+               'module': 'spiral',
+               'class': 'SkyMap',
+            },
         ],
     },
 }
