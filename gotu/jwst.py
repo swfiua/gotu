@@ -358,8 +358,10 @@ class Jwst(magic.Ball):
 
     async def run(self):
                          
-
-        product = random.choice(list(self.products.keys()))
+        while True:
+            product = random.choice(list(self.products.keys()))
+            if self.products[product]:
+                break
 
         prod = self.products[product]
         msg = []
@@ -374,8 +376,8 @@ class Jwst(magic.Ball):
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
-        filetypes = set(('.jpg', '.png', '.fits'))
         filetypes = set(('.jpg', '.png'))
+        filetypes = set(('.jpg', '.png', '.fits'))
         #for key in ('jpegURL', 'dataURL', 'dataURI'):
         for key in ('jpegURL', 'dataURL'):
             

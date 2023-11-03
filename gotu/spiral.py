@@ -681,12 +681,12 @@ class SkyMap(magic.Ball):
         wavelengths = np.linspace(a, b , 1000)
 
         # Planck radiance energy, converted to J/m3
-        energy = np.array(
+        density = np.array(
             [planck_radiance_law_wavelength(x.value) / c.c.value
              for x in wavelengths])
 
-        # convert to total in universe
-        energy *= (self.volume_of_universe << u.m**3).value
+        # convert to total CMB energy in universe
+        energy = density * (self.volume_of_universe << u.m**3).value
 
         # Get Schwartzchild radiuses
         sc = np.array([
@@ -705,9 +705,14 @@ class SkyMap(magic.Ball):
         total_photons = energy / mass_per_photon
         # 4/3 pi R3 * energy -- rho 4 pi r2 
 
-        # The effect integrated over volume of the universe 3M / 2R 
+        # The effect integrated over volume of the universe 3M / 2R
+        # the wave decays with 1/r, and we have to divide energy
+        # by the volume
         energy = (sc * 3 * energy  / (2 * R))
 
+        # can also calculate energy from density
+        # energy2 = sc * 2 * math.pi * density * R * R
+        
         # Now take the ratio of this amplitude to the wavelength
         # and see how it compares to the Hubble constant in Hz.
         # Why should there be a relation?  We are multiplying
@@ -796,10 +801,11 @@ class Spiral(magic.Ball):
             ('galaxy', 'sun', 'sd'))
 
         # set up an initial mode
+        self.cosmo = Cosmo()
         self.T = 3000
-        self.n = 1e6  # density of the medium, protons per m^3
         self.mode = None
         self.mode_switch()
+        self.n = self.density()  # density of the medium, protons per m^3
         
         self.details = True
 
@@ -884,6 +890,7 @@ class Spiral(magic.Ball):
 
         self.print_parms()
         print()
+
 
     def sd(self):
         """ Spanish Dancer
@@ -1014,7 +1021,7 @@ class Spiral(magic.Ball):
         T = self.T or 3000.
         S = self.Mcent # mass in lightyears, we need mass in kg
 
-        M = S*u.lightyear.to(u.m) * u.m * c.c * c.c/ (2*c.G)
+        M = self.mass_in_kg()
 
         msuns = M / c.M_sun
         print("mass in suns:", msuns)
@@ -1023,7 +1030,65 @@ class Spiral(magic.Ball):
         print('Bondi:', bondi)
         self.bondi()
         print('Eddington:', 'TODO')
-        print('Schwartzchild:', self.Mcent)
+        print('Schwartzchild:', self.schwartzchild())
+
+    def density(self):
+        """ Return density of Mcent if it is a black hole """
+        S = self.schwartzchild() << u.m
+        M = S * c.c * c.c/ (2*c.G)
+        
+        M = M.to(u.kg, equivalencies=u.mass_energy())
+
+        print(S, M, math.log10(M/c.M_sun))
+
+        mpcm = (M / ((4/3) * math.pi * (S**3))) << u.kg / u.m**3
+
+        return mpcm
+
+    def amplitude(self, R=None):
+        """amplitude of the gravitational wave wave
+
+        Returns the amplitude of the wave if there was
+        just one such object in the sphere radius R.  Scale
+        by the actual density to get useful numbers.
+
+        Suppose rho is the number of such objects per unit volume,
+        the the full wave will be::
+
+           a = 4 * pi rho Sum M r^2 dr / r for 0 < r < R
+
+        Which simplifies to::
+
+           a = 4 * pi * rho * M Sum r dr for 0 < r < R
+
+        or:
+
+            a = 2 * pi * rho * S * R ** 2  [1]
+
+        Now::
+
+            N = rho * 4/3 * pi * R**3
+
+        So if N==1, rho = 4 * pi / (3* R**3), substituting in [1]
+
+            a = 3 S / 2 R
+        
+        Where S be the Schwartzchild radius of Mcent.
+
+        R is the radius out to which bodies can contribute to the sum.
+
+        To get the full wave, scale by the number of objects in
+        the region of radius R.
+
+        """
+        if R is None:
+            R = self.cosmo.hubble_distance
+
+        S = self.schwartzchild()
+        amp = 3 * S / (2 * R)
+
+        return amp
+        
 
     def bondi(self):
         """ The Bondi Sphere
@@ -1060,8 +1125,33 @@ class Spiral(magic.Ball):
         pass
 
     def schwartzchild(self):
-        pass
+        """ Schwartzchild radius in lightyears """
+
+        return self.Mcent * u.lightyear
+
+    def mass_in_kg(self):
+
+        # self.Mcent = 2 * M * c.G / (c.c * c.c)
+        mass = self.Mcent * u.lightyear * c.c * c.c / (2 * c.G)
+
+        return mass
         
+    def critical_radius(self):
+        """ Radius of Mcent based on critical density
+
+        Convert Mcent to the radius of the sphere it
+        would occupy based on critical density.
+        """
+        mass = self.mass_in_kg()
+
+        cd = self.cosmo.critical_density0 << u.kg/u.m**3
+
+        # M / ((4/3) pi r**3) = cd
+
+        r = (3 * mass / (4*math.pi*cd))**(1/3)
+
+        return r << u.lightyear
+
     async def run(self):
 
         # switch mode if it is time to do so
@@ -1234,6 +1324,20 @@ def near_galaxies():
     for item in table:
         yield item
 
+def schwartzchild(m):
+    """ Mass in kg to schwartzchild radius in lightyears """
+    return 2 * m * c.G / (c.c * c.c)
+
+        
+def from_neasarc(kwargs):
+    """ Create a Spiral from a Neasarc record """
+    galaxy = Spiral()
+
+    # set mass to M26 mass
+    m26 = 10 ** kwargs['LOG_MASS_26']
+
+    
+    galaxy.Mcent = schwartzchild(m26 * c.M_sun)
 
 
 def parse_radec(value):
