@@ -202,6 +202,7 @@ import argparse
 import random
 
 import math
+import statistics
 
 from collections import deque
 
@@ -224,6 +225,31 @@ import numpy as np
 from scipy import integrate
 
 from gotu import sd
+
+def mass_length():
+    """ Equivalence of mass and length based on Schwartzchild radius
+
+    This is for use with astropy constants.
+
+    for example:
+    >>> u.solMass.compose(mass_length())
+    
+    """
+    ee = [u.kg, u.m, lambda x: (2 * x * c.G / (c.c * c.c)).value, lambda x:(c.c * c.c * x / (2 * c.G)).value]
+
+    def kgtom(x):
+
+        return (2 * x * c.G / (c.c * c.c)).value
+    
+    def mtokg(x):
+
+        return (c.c * c.c * x / (2 * c.G)).value
+
+    return u.Equivalency([
+        [u.kg, u.m, kgtom, mtokg]], 'mass_length')
+
+
+    
 
 def planck_radiance_law_wavelength(wavelength, T=None):
     """ Energy emitted in wavelength at temperature T
@@ -372,8 +398,11 @@ class SkyMap(magic.Ball):
         super().__init__()
 
         if gals is None:
-            print('calling near_galaxies')
-            gals = [from_heasarc(x) for x in near_galaxies()]
+            try:
+                print('calling near_galaxies')
+                gals = [from_heasarc(x) for x in near_galaxies()]
+            except:
+                gals = list(sample_galaxies())
         
         self.balls = gals
         self.offset = 0.
@@ -393,6 +422,9 @@ class SkyMap(magic.Ball):
         # on size of visible universe.  Hitchhikers should note
         # that setting fudge to 42 produces a viable model.
         self.fudge = 45.
+
+        # wavelength factor relative to Schwartzchild radius
+        self.sfactor = 10
 
         # Conversion from Holmberg radius mass to full stellar mass
         self.minmass = 6.  # min mass to include, log10(solar_mass)
@@ -466,7 +498,7 @@ class SkyMap(magic.Ball):
             if distance > self.max_distance: continue
 
             stellar_mass = self.h_factor * gal.Mstellar
-            black_hole = gal.mass_in_kg()
+            black_hole = gal.lightyear_to_kg()
             
             sc = (2 * black_hole * c.G / (c.c*c.c)) << u.lightyear
 
@@ -497,7 +529,7 @@ class SkyMap(magic.Ball):
 
             sample.append(gal)
 
-            bh = gal.mass_in_kg() / c.M_sun
+            bh = gal.lightyear_to_kg() / c.M_sun
             
             total_mass += bh.value + stellar
 
@@ -522,7 +554,6 @@ class SkyMap(magic.Ball):
         for gal in sample:
             sc = gal.schwartzchild() << u.m
             gal.amplitude = 1.5 * (weight * sc)/R
-            print('XXXX', sc, gal.amplitude)
         return sample
 
     def decra2rad(self, dec, ra):
@@ -584,7 +615,7 @@ class SkyMap(magic.Ball):
         ax = await self.get()
 
         sample = self.waves()
-        print(len(sample))
+
         ax.set_title('Schwartzchild v amplitude')
         ax.scatter([x.schwartzchild().value for x in sample],
                    [x.amplitude.value for x in sample])
@@ -599,7 +630,7 @@ class SkyMap(magic.Ball):
             title='Schwartzschild (lightyear)')
         
         ax = await self.get()
-        ax.hist([math.log10(x.mass_in_kg() / c.M_sun) for x in sample])
+        ax.hist([math.log10(x.lightyear_to_kg() / c.M_sun) for x in sample])
         ax.set_title('Black hole mass (log10(suns))')
         ax.show()
         
@@ -616,7 +647,7 @@ class SkyMap(magic.Ball):
         ax = await self.get()
         points, wave = waves(
             [x.amplitude.value * self.fudge for x in sample],
-            [x.schwartzchild().value for x in sample],
+            [self.sfactor * x.schwartzchild().value for x in sample],
             period=self.period)
         
         ax.plot(points, wave)
@@ -719,15 +750,12 @@ class SkyMap(magic.Ball):
         hubble_tension = np.array([
             x.value/h0 for x in self.fudge * energy / wavelengths])
 
-        # lams short for wavelengths
-        lams = wavelengths
-        
         # Plot some stuff
 
         ax = await self.get()
         ax.set_title("Hubble Tension")
         ax.plot(wavelengths,  (1+hubble_tension) * self.cosmo.H0)
-        ax.plot(wavelengths, [self.cosmo.H0.value] * len(lams))
+        ax.plot(wavelengths, [self.cosmo.H0.value] * len(wavelengths))
         ax.show()
 
         ax = await self.get()
@@ -798,11 +826,16 @@ class Spiral(magic.Ball):
 
         # set up an initial mode
         self.cosmo = Cosmo()
+
+        # need a way to calculate the density of the medium
+        # and the temperature -- the two are linked.
+        # this is for z and Eddington sphere calculations.
+        self.n = 1e5  # density in protons / m**3 1e2 - 1e12
         self.T = 3000
+
         self.mode = None
         self.mode_switch()
-        self.n = self.density()  # density of the medium, protons per m^3
-        
+
         self.details = True
 
     def galaxy(self):
@@ -837,13 +870,12 @@ class Spiral(magic.Ball):
     def sun(self):
 
         print('SUN!' * 10)
-        solar_mass = 3 / c.c.to(u.km/u.s).value
         
         solar_angular_velocity = 2 * math.pi * 365 / 25  # radians per year
         
         # Central mass.  Mass converted to Schwartzschild radius (in light years)
         # Mass of 1 is approximately 3e12 solar masses.
-        self.Mcent = solar_mass
+        self.Mcent = (schwartzchild(c.M_sun) << u.lightyear).value
         self.Mball = 0.
         self.Mdisc = 0.
         self.omega0 = solar_angular_velocity # radians per year
@@ -1011,7 +1043,7 @@ class Spiral(magic.Ball):
         T = self.T or 3000.
         S = self.Mcent # mass in lightyears, we need mass in kg
 
-        M = self.mass_in_kg()
+        M = self.lightyear_to_kg()
 
         msuns = M / c.M_sun
         print("mass in suns:", msuns)
@@ -1114,20 +1146,41 @@ class Spiral(magic.Ball):
         print('Bondi Sphere:', B.decompose() << u.lightyear)
         return B.decompose()
 
-    def eddington(self):
-        pass
+    def eddington(self, z=None):
+        """ Eddington Sphere
+
+        Easiest to calculate if we know the redshift.
+        """
+        z = z or self.z_calc()
+        
+        return self.schwartzchild() / (1 - (1+z)**-2)
+        
 
     def schwartzchild(self):
         """ Schwartzchild radius in lightyears """
 
         return self.Mcent * u.lightyear
 
-    def mass_in_kg(self):
+    def lightyear_to_kg(self, m=None):
 
+        m = m or self.Mcent
         # self.Mcent = 2 * M * c.G / (c.c * c.c)
-        mass = self.Mcent * u.lightyear * c.c * c.c / (2 * c.G)
+        mass = m * u.lightyear * c.c * c.c / (2 * c.G)
 
         return mass.decompose()
+
+    def z_calc(self):
+        """ 1.27e7 theta / M
+
+        M mass in suns
+        """
+
+        m = self.lightyear_to_kg() / c.M_sun
+
+        theta =  (self.T**1.5)/ self.n
+
+        return 1.27e7 * theta / m
+    
         
     def critical_radius(self):
         """ Radius of Mcent based on critical density
@@ -1135,7 +1188,7 @@ class Spiral(magic.Ball):
         Convert Mcent to the radius of the sphere it
         would occupy based on critical density.
         """
-        mass = self.mass_in_kg()
+        mass = self.lightyear_to_kg()
 
         cd = self.cosmo.critical_density0 << u.kg/u.m**3
 
@@ -1330,6 +1383,7 @@ def from_heasarc(kwargs):
     m26 = 10 ** kwargs['LOG_MASS_26']
     mh1 = 10 ** kwargs['LOG_H1_MASS']
 
+    print(m26)
     galaxy.Mstellar = m26
     galaxy.Mh1 = mh1
     galaxy.distance = kwargs['DISTANCE'] * u.Mpc << u.lightyear
@@ -1340,6 +1394,30 @@ def from_heasarc(kwargs):
     return galaxy
 
 
+def sample_galaxies(n=1000):
+
+    # distribution of stellar mass based on heasarc catalog
+    cosmo = Cosmo()
+    hd = cosmo.hubble_distance
+    
+    stellar = statistics.NormalDist(
+        mu=8.459767827529022,
+        sigma=1.358427349161494)
+
+    #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
+
+    for mass in stellar.samples(n):
+        galaxy = Spiral()
+        
+        galaxy.Mstellar = 10**mass
+        galaxy.distance = random.random() * hd << u.lightyear
+        galaxy.dec = (random.random() * 180.0) - 90.0
+        galaxy.ra = random.random() * 360.0
+        galaxy.name = f'galaxy{n}'
+
+        yield galaxy
+
+    
 
 def parse_radec(value):
 
@@ -1383,7 +1461,14 @@ async def run(**args):
     farm.add(spiral)
 
     if args['skymap']:
-        skymap = SkyMap()
+
+        if args['heasarc']:
+            galaxies = list(from_heasarc(x) for x in near_galaxies())
+        else:
+            print('creating a galaxy sample')
+            galaxies = list(sample_galaxies(args['n']))
+        
+        skymap = SkyMap(galaxies)
         farm.add(skymap)
 
 
@@ -1396,6 +1481,8 @@ def main(args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--skymap', action='store_true')
+    parser.add_argument('--heasarc', action='store_true')
+    parser.add_argument('-n', type=int, default=1000)
 
     args = parser.parse_args(args)
 
