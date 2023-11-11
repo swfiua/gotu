@@ -14,17 +14,33 @@
           color: white;
       }
 
+      .buttons {
+          text-aign: center;
+      }
+
     </style>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
   </head>
   <body>
     <div id=terminal>
       <div id="canvas"></div>
+      <div id="buttons"></div>
       <input id="input" size=60></input>
+      <button onclick=toggle_buttons>Show/Hide</button>
       <div id="output"></div>
     </div>
     <script>
 
+      function toggle_buttons() {
+
+          buttons = getElementById('buttons')
+          if (buttons.style === "none") {
+              buttons.style = "block";
+          } else {
+              buttons.style = "none";
+          }
+      }
+      
       function escape(htmlStr) {
           return htmlStr.replace(/&/g, "&amp;")
               .replace(/</g, "&lt;")
@@ -76,6 +92,7 @@
           pyodide.runPythonAsync(
           `
             from collections import deque
+            from functools import partial
             from js import document
             from pyodide.ffi import create_proxy
 
@@ -120,8 +137,58 @@
 
                 return False
 
+            def set_up_buttons(farm):
+                print('SETTING UP BUTTONS')
+                shepherd = farm.shep
+
+                bbe = document.getElementById('buttons')
+
+                background = '#00ff00'
+
+                print(f'Number of CHILDREN before removal {len(bbe.children)}')
+                for child in list(bbe.children):
+                    #bbe.removeChild(child)
+                    child.remove()
+                print(f'Number of CHILDREN after removal {len(bbe.children)}')
+
+                lastsheep = None
+                for sheep, key, callback in shepherd.generate_key_bindings():
+                    if sheep != lastsheep:
+                        print(f'processing bindings for {sheep} {key}')
+                        div = document.createElement('div')
+                        div.className = 'evenly'
+
+                        bbe.appendChild(div)
+                        
+                    lastsheep = sheep
+
+                        
+                    button = document.createElement('Button')
+
+                    button.innerHTML = key
+                    button.style.background = background
+                    if key == ' ':
+                        button.innerHTML = 'Space'
+                    else:
+                        button.innerHTML = key * 4
+                    button.id = key
+                    button.className = 'cb'
+
+                    def show_key(event, key=None):
+                        magic.TheMagicRoundAbout.put_nowait(key, key)
+
+                    button.onclick = partial(show_key, key=key)
+                    div.appendChild(button)
+
+
+
+
             stdin.addEventListener("keydown", create_proxy(keydown))
 
+
+            button_relay = magic.spawn(magic.relay(
+                'oldgrey',
+                partial(set_up_buttons, farm=land)))
 
             await farm.start_and_run(land)
           `
