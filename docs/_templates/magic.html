@@ -15,7 +15,11 @@
       }
 
       .buttons {
-          text-aign: center;
+          width: 100%;
+          align: 'center';
+      }
+      .prompt {
+          width: 100%;
       }
 
     </style>
@@ -25,19 +29,21 @@
     <div id=terminal>
       <div id="canvas"></div>
       <div id="buttons"></div>
-      <input id="input" size=60></input>
-      <button onclick=toggle_buttons>Show/Hide</button>
+      <div id="prompt">
+        <input id="input"></input>
+        <button onclick=toggle_buttons()>Show/Hide</button>
+      </div>
       <div id="output"></div>
     </div>
     <script>
 
       function toggle_buttons() {
 
-          buttons = getElementById('buttons')
-          if (buttons.style === "none") {
-              buttons.style = "block";
+          buttons = document.getElementById('buttons')
+          if (buttons.style.display === "none") {
+              buttons.style.display = "block";
           } else {
-              buttons.style = "none";
+              buttons.style.display = "none";
           }
       }
       
