@@ -106,12 +106,14 @@
                 elif event.key == 'Tab':
                     completion = land.shell.complete(stdin.value)
                     if completion:
-                       stdin.value = completion
+                       tokens = stdin.value.split()
+                       stdin.value = ' '.join(tokens[:-1] + [completion])
                     event.preventDefault()
                     return True
                 elif event.key == "ArrowUp":
                     # Up pressed
                     stdin.value = history[0]
+                    history.rotate()
                 elif event.key == "I":
                     # I for idle, open some source code
                     pass

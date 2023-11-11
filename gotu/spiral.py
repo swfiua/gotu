@@ -1048,11 +1048,12 @@ class Spiral(magic.Ball):
         msuns = M / c.M_sun
         print("mass in suns:", msuns)
         
-        bondi = 2 * c.G * M * c.m_p / (3 * c.k_B * T)
-        print('Bondi:', bondi.to(equivalencies=u.mass_energy()))
-        self.bondi()
-        print('Eddington:', 'TODO')
+        print("Bondi:", self.bondi())
+
+        print('Eddington:', self.eddington())
+        
         print('Schwartzchild:', self.schwartzchild())
+        self.schwartzchild()
 
     def density(self):
         """ Return density of Mcent if it is a black hole """
@@ -1144,7 +1145,7 @@ class Spiral(magic.Ball):
               (2 * c.G * M/B).decompose())
         
         print('Bondi Sphere:', B.decompose() << u.lightyear)
-        return B.decompose()
+        return B.decompose() << u.lightyear
 
     def eddington(self, z=None):
         """ Eddington Sphere
