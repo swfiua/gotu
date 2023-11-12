@@ -591,7 +591,7 @@ class SkyMap(magic.Ball):
         
     async def run(self):
 
-                
+        self.set_mcent()
         #ax = fig.add_axes((0,0,1,1), projection='mollweide')
         ax = await self.get()
         ax.projection('mollweide')

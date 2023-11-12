@@ -14,13 +14,18 @@
           color: white;
       }
 
-      .buttons {
+      .evenly {
+          display: flex;
+          margin:auto;
           width: 100%;
-          align: 'center';
+          justify-content: center;
       }
-      .prompt {
-          width: 100%;
+      .cb {
+          flex-basis: 100%;
+          justify-content: stretch;
+          align-item: stretch;
       }
+
 
     </style>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
@@ -28,9 +33,13 @@
   <body>
     <div id=terminal>
       <div id="canvas"></div>
-      <div id="buttons"></div>
+      <div id="buttons" class="buttons">
+        <div class='evenly'>
+          <button>Be patient... it may take a minute to load...</button>
+        </div>
+      </div>
       <div id="prompt">
-        <input id="input"></input>
+        <input id="input" size=80></input>
         <button onclick=toggle_buttons()>Show/Hide</button>
       </div>
       <div id="output"></div>
@@ -160,7 +169,6 @@
                 lastsheep = None
                 for sheep, key, callback in shepherd.generate_key_bindings():
                     if sheep != lastsheep:
-                        print(f'processing bindings for {sheep} {key}')
                         div = document.createElement('div')
                         div.className = 'evenly'
 

@@ -33,4 +33,4 @@ M = 4e6
 n = 1
 T = 1
 
-bondi = 2 * constants.G * m * constants.m_p / (3 * constants.k_B * T)
+bondi = 2 * constants.G * M * constants.m_p / (3 * constants.k_B * T)
