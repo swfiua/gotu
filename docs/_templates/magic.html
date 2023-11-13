@@ -121,12 +121,29 @@
             ss = {{module}}.{{class}}()
             land = farm.Farm()
             land.add(ss)
-            
+
             history = deque()
             
             tmra = magic.TheMagicRoundAbout
 
             stdin = document.getElementById("input")
+
+            def set_full_width():
+                """ set the figure to full width """
+
+                # find the full width of the canvas div
+                cv = document.getElementById('canvas')
+                width = cv.offsetWidth
+
+                # set the figure with
+                fig = land.carpet.image
+                fig.set_figwidth(width/96.)
+
+                # recreate the figure with new width
+                element = fig.canvas.get_element("")
+                element.remove()
+                fig.show()
+
 
             def keydown(event, *args):
 
@@ -192,11 +209,10 @@
                     button.onclick = partial(show_key, key=key)
                     div.appendChild(button)
 
-
-
+            # set matplotlib figure to full width
+            set_full_width()
 
             stdin.addEventListener("keydown", create_proxy(keydown))
-
 
             button_relay = magic.spawn(magic.relay(
                 'oldgrey',
