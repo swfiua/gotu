@@ -209,6 +209,30 @@
                     button.onclick = partial(show_key, key=key)
                     div.appendChild(button)
 
+            def grow(event):
+                # find the full width of the canvas div
+                cv = document.getElementById('canvas')
+                width = cv.offsetWidth
+
+                # set the figure height
+                fig = land.carpet.image
+                height = fig.get_figheight()
+                height *= 1.1
+                fig.set_figheight(height)
+
+                # make it full width while we are at it
+                # this also recreates the figure
+                set_full_width()
+
+
+
+            button = document.createElement('Button')
+            button.id = 'grow'
+            button.innerHTML = "Grow"
+            button.onclick = grow
+            div = document.getElementById('prompt')
+            div.appendChild(button)
+
             # set matplotlib figure to full width
             set_full_width()
 
