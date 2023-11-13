@@ -154,18 +154,15 @@
                 return False
 
             def set_up_buttons(farm):
-                print('SETTING UP BUTTONS')
                 shepherd = farm.shep
 
                 bbe = document.getElementById('buttons')
 
                 background = '#00ff00'
 
-                print(f'Number of CHILDREN before removal {len(bbe.children)}')
                 for child in list(bbe.children):
                     #bbe.removeChild(child)
                     child.remove()
-                print(f'Number of CHILDREN after removal {len(bbe.children)}')
 
                 lastsheep = None
                 for sheep, key, callback in shepherd.generate_key_bindings():
