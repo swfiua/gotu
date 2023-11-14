@@ -423,9 +423,6 @@ class SkyMap(magic.Ball):
         # that setting fudge to 42 produces a viable model.
         self.fudge = 45.
 
-        # wavelength factor relative to Schwartzchild radius
-        self.sfactor = 10
-
         # Conversion from Holmberg radius mass to full stellar mass
         self.minmass = 6.  # min mass to include, log10(solar_mass)
         mean_sample_mass = self.sample_mass()
@@ -647,7 +644,7 @@ class SkyMap(magic.Ball):
         ax = await self.get()
         points, wave = waves(
             [x.amplitude.value * self.fudge for x in sample],
-            [self.sfactor * x.schwartzchild().value for x in sample],
+            [x.schwartzchild().value for x in sample],
             period=self.period)
         
         ax.plot(points, wave)
@@ -1047,8 +1044,10 @@ class Spiral(magic.Ball):
 
         msuns = M / c.M_sun
         print("mass in suns:", msuns)
-        
+
         print("Bondi:", self.bondi())
+
+        print("Acretion:", self.accretion() << u.solMass/u.year)
 
         print('Eddington:', self.eddington())
         
@@ -1109,7 +1108,13 @@ class Spiral(magic.Ball):
         amp = 3 * S / (2 * R)
 
         return amp
-        
+
+    def accretion(self):
+        """ Accretion rate """
+        bb = self.bondi()
+        aa = 2 * bb * bb * (self.n/u.m**3) * (
+            2 * math.pi * c.k_B * self.T * u.K * c.m_p)**0.5
+        return aa.decompose()
 
     def bondi(self):
         """ The Bondi Sphere
@@ -1120,30 +1125,11 @@ class Spiral(magic.Ball):
         """
         # convert central mass to kg.
         # Mcent is actually schwartzchild radius in light years
-        M = self.Mcent * u.lightyear.to(u.m) * u.m * c.c * c.c / (2 * c.G)
-        print(f'Mass, # suns, S radius: {M} {M / c.M_sun:g} {self.Mcent}')
+        M = self.lightyear_to_kg(self.Mcent)
+
         B = 2 * c.G * M * c.m_p / (3 * c.k_B * self.T * u.K)
 
         #to(u.m*83/u.s**2, equivalencies=u.mass_energy())}")
-        print(f"Bondi Radius {B}")
-        print('escape velocity', math.sqrt((2 * c.G * M / B).value))
-
-        # in natural units, c = G = 1, so we just need the mass of a
-        # proton in natural units, but that is it's Schwartzchild
-        # radius: 2GM/c^2
-        m_p = (2 * c.m_p * c.G / (c.c*c.c)) << u.lightyear
-
-        print(f'Schwartzchild radius of a proton {m_p}')
-
-        Mcentm = self.Mcent * u.lightyear << u.m
-        print('bondi in natural units???',
-              2 * self.Mcent * u.lightyear * m_p / (3 * c.k_B * self.T))
-
-        print('mean square velocity:',
-              (3 * c.k_B * self.T * u.K / c.m_p).decompose())
-        print('escape velocity squared:',
-              (2 * c.G * M/B).decompose())
-        
         print('Bondi Sphere:', B.decompose() << u.lightyear)
         return B.decompose() << u.lightyear
 
