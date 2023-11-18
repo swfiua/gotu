@@ -117,9 +117,10 @@ def main():
     
 if __name__ == '__main__':
 
+    from blume import farm
     fm = farm.Farm()
 
     dss = Dss()
     fm.add(dss)
-
+    
     farm.run(fm)

@@ -205,6 +205,7 @@ import math
 import statistics
 
 from collections import deque
+from functools import partial
 
 from pathlib import Path
 
@@ -372,6 +373,52 @@ class Cosmo:
 
         return None
 
+class Task:
+
+    def __init__(self,
+                 task,
+                 args=None,
+                 kwargs=None,
+                 active=True,
+                 plot=True):
+
+        self.task = task
+        self.args = args or []
+        self.kwargs = kwargs or {}
+        self.active = active
+        self.result = None
+        self.plot = plot
+
+    async def run(self):
+
+        args = self.args.copy()
+        if self.plot:
+            ax = await magic.TheMagicRoundAbout.get()
+            args = [ax] + args
+
+        print('RUNNNING TASK', self.task)
+        self.result = await self.task(*args, **self.kwargs)
+
+    
+class Tasks:
+
+    def __init__(self, tasks=None):
+
+        self.tasks = deque()
+
+    def add(self, task, plot=False, *args, active=True, **kwargs):
+        """ Add a task """
+        self.tasks.append(Task(task, args, kwargs, active, plot))
+
+    async def run(self, sleep=0):
+        """ Run the tasks """
+        for task in self.tasks:
+            await task.run()
+
+            # take a nap between tasks
+            await magic.sleep(sleep)
+        
+
 class SkyMap(magic.Ball):
     """Yet another table viewer? 
 
@@ -454,6 +501,15 @@ class SkyMap(magic.Ball):
         # initialise Mcent -- done this way because we need
         # to calculate h_factor based on mean sample mass
         self.set_mcent()
+        self.tasks = Tasks()
+        self.tasks.add(self.local_mode_sim, plot=False)
+        self.tasks.add(self.cmbsim, plot=False)
+        self.tasks.add(self.cmb_gwb, plot=False)
+        #await self.local_mode_sim()
+        #await self.cmbsim()
+        #await self.cmb_gwb()
+
+        
 
     def set_mcent(self):
         """ Set up central mass based on stellar mass """
@@ -652,13 +708,17 @@ class SkyMap(magic.Ball):
          
         ax.show()
 
-        await self.local_mode_sim()
-        await self.cmbsim()
-        await self.cmb_gwb()
-
+        await self.tasks.run()
+            
 
     async def cmbsim(self):
-        """ Calculate some CMB related numbers """
+        """ Calculate some CMB related numbers
+
+        This is really just a test of
+        planck_radiance_law_wavelength, checking that the
+        energy gives the same Ogamm0 as is implied by
+        the temperature.
+        """
 
         # Mass per unit volume, based on critical density and Ogamma
         # Assumes CMB makes up the vast majority of photons.
@@ -668,13 +728,13 @@ class SkyMap(magic.Ball):
         
         # What is the energy 
         mwave = 1e-3 * u.m
-        mass_mwave = c.h / (c.c * mwave)
+        mass_mwave = (c.h * c.c / mwave).to(u.kg, equivalencies=u.mass_energy())
         print(f"energy of {mwave} photon {mass_mwave}")
         print("photon density", cmb_mpuv / mass_mwave)
 
         # energy according to planck radiance
         energy, error = integrate.quad(
-            planck_radiance_law_wavelength,
+            partial(planck_radiance_law_wavelength, T=cosmo.Tcmb0),
             self.cmb_min, self.cmb_max)
         
         # this should relate to cmb per unit volume
@@ -686,7 +746,7 @@ class SkyMap(magic.Ball):
 
         # mass equivalent
         mass_equiv = (cmb_energy_density / (c.c * c.c)).value
-
+        print("Mass equivalent per cubic meter:", mass_equiv)
         cmbgamma = (mass_equiv /
                     self.cosmo.critical_density0.to(u.kg/u.m**3)).value
         # compare to critical density
@@ -712,7 +772,7 @@ class SkyMap(magic.Ball):
         # convert to total CMB energy in universe
         energy = density * (self.volume_of_universe << u.m**3).value
 
-        # Get Schwartzchild radiuses
+        # Get Schwartzchild radii
         sc = np.array([
             (2 * c.G * c.h / (x * c.c**3)).value for x in wavelengths])
 
@@ -747,11 +807,15 @@ class SkyMap(magic.Ball):
         hubble_tension = np.array([
             x.value/h0 for x in self.fudge * energy / wavelengths])
 
+        hd = (cosmo.hubble_distance << u.m).value
+        hubble_tension2 = np.array([
+            x.value * hd for x in self.fudge * energy / wavelengths])
+
         # Plot some stuff
 
         ax = await self.get()
         ax.set_title("Hubble Tension")
-        ax.plot(wavelengths,  (1+hubble_tension) * self.cosmo.H0)
+        ax.plot(wavelengths,  (1+hubble_tension2) * self.cosmo.H0)
         ax.plot(wavelengths, [self.cosmo.H0.value] * len(wavelengths))
         ax.show()
 
@@ -767,7 +831,7 @@ class SkyMap(magic.Ball):
         
         
         ax = await self.get()
-        ax.plot(wavelengths, energy)
+        ax.plot(wavelengths, energy * self.fudge)
         ax.set_title('Scaled energy')
         ax.show()
 
