@@ -502,13 +502,12 @@ class SkyMap(magic.Ball):
         # to calculate h_factor based on mean sample mass
         self.set_mcent()
         self.tasks = Tasks()
-        self.tasks.add(self.local_mode_sim, plot=False)
-        self.tasks.add(self.cmbsim, plot=False)
-        self.tasks.add(self.cmb_gwb, plot=False)
+        self.tasks.add(self.local_mode_sim)
+        self.tasks.add(self.cmbsim)
+        self.tasks.add(self.cmb_gwb)
         #await self.local_mode_sim()
         #await self.cmbsim()
         #await self.cmb_gwb()
-
         
 
     def set_mcent(self):
@@ -672,7 +671,6 @@ class SkyMap(magic.Ball):
         ax.set_title('Schwartzchild v amplitude')
         ax.scatter([x.schwartzchild().value for x in sample],
                    [x.amplitude.value for x in sample])
-        ax.show()
 
         await self.log10hist(
             [x.amplitude.value * self.fudge for x in sample],
@@ -681,6 +679,7 @@ class SkyMap(magic.Ball):
         await self.log10hist(
             [x.schwartzchild().value for x in sample],
             title='Schwartzschild (lightyear)')
+        ax.show()
         
         ax = await self.get()
         ax.hist([math.log10(x.lightyear_to_kg() / c.M_sun) for x in sample])
@@ -796,28 +795,16 @@ class SkyMap(magic.Ball):
 
         # can also calculate energy from density
         # energy2 = sc * 2 * math.pi * density * R * R
-        
-        # Now take the ratio of this amplitude to the wavelength
-        # and see how it compares to the Hubble constant in Hz.
-        # Why should there be a relation?  We are multiplying
-        # by the Hubble time, to get the size of the effect
-        # over the Hubble time - it appears commensurate
-        # with the Hubble tension.
-        h0 = cosmo.H0.to(1/u.s).value
-        hubble_tension = np.array([
-            x.value/h0 for x in self.fudge * energy / wavelengths])
-
-        hd = (cosmo.hubble_distance << u.m).value
-        hubble_tension2 = np.array([
-            x.value * hd for x in self.fudge * energy / wavelengths])
-
-        # Plot some stuff
-
         ax = await self.get()
-        ax.set_title("Hubble Tension")
-        ax.plot(wavelengths,  (1+hubble_tension2) * self.cosmo.H0)
-        ax.plot(wavelengths, [self.cosmo.H0.value] * len(wavelengths))
+        ax.set_title('Mass per photon')
+        ax.plot(wavelengths, mass_per_photon)
         ax.show()
+        
+        ax = await self.get()
+        ax.set_title('Total photons')
+        ax.plot(wavelengths, total_photons)
+        ax.show()
+        
 
         ax = await self.get()
         ax.set_title('planck radiance energy')
@@ -852,6 +839,26 @@ class SkyMap(magic.Ball):
 
         ax.show()
 
+        await self.htension(wavelengths, energy)
+
+    async def htension(self, wavelengths, energy):
+        
+        # Now take the ratio of this amplitude to the wavelength
+        # and see how it compares to the Hubble constant in Hz.
+        # Why should there be a relation?  We are multiplying
+        # by the Hubble time, to get the size of the effect
+        # over the Hubble time - it appears commensurate
+        # with the Hubble tension.
+        h0 = self.cosmo.H0.to(1/u.s).value
+        hubble_tension = np.array([
+            x.value/h0 for x in self.fudge * energy / wavelengths])
+
+        # Plot some stuff
+        ax = await self.get()
+        ax.set_title("Hubble Tension")
+        ax.plot(wavelengths,  (1+hubble_tension) * self.cosmo.H0)
+        ax.plot(wavelengths, [self.cosmo.H0.value] * len(wavelengths))
+        ax.show()
 
 
 def waves(amplitudes, wavelengths, phases=None, period=1, n=1000):

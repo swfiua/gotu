@@ -287,15 +287,17 @@ class Dss(magic.Ball):
         """ initialise """
         super().__init__()
 
-        self.theta = 0.1
-        self.phi = 5
+        self.theta = math.pi / 4
+        self.phi = 0.5
         self.size = 50
         self.aaa = magic.modes
-        
-        self.alpha, self.beta, self.gamma, self.delta = (1,1,1,1)
+
+        self.set_abcd()
 
     def set_abcd(self):
 
+        self.alpha, self.beta, self.gamma, self.delta = (
+            math.cosh(self.phi), 0., 0., math.cos(self.theta))
         self.a = (self.alpha + self.beta - self.gamma - self.delta) / 2
         self.b = (self.alpha - self.beta - self.gamma + self.delta) / 2
         self.c = (self.alpha + self.beta + self.gamma + self.delta) / 2
@@ -310,9 +312,8 @@ class Dss(magic.Ball):
 
         a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
 
-        print((a * b - c * d) <= (a*a - c*c - 1) * (b*b - d*d -1))
-
-        print((a*d - b*c) <= (a*a - c*c - b*b + d*d -1))
+        print((a * b - c * d)**2 <= (a*a - c*c - 1) * (b*b - d*d +1))
+        print((b*b - d*d +1) >= 0)
 
     def blue_shift_time(self, alpha=None, delta=None):
         """ """
@@ -323,6 +324,33 @@ class Dss(magic.Ball):
         etb = sqrt((1+a)/(a+d)) + sqrt((1-d)/(a-d))
         
         return math.log(etb)
+
+    def tofu(self, u):
+        """ -a sinh(t) sinh(u) + d cosh(t) cosh(u) = 1
+
+        work with U=e**u and T=e**t
+        """
+        U = math.e ** u
+
+        a, b, c, d = self.a, self.b, self.c, self.d
+
+        xx = (b * d) + ((U**2) * (1 - b*c - a*d)) + (a * c * U**4)
+        T = (U + math.sqrt(xx)) / (b - a * U**2)
+
+        # check equation
+        print(U,T)
+        t = math.log(T)
+        u = math.log(U)
+        sh = math.sinh
+        ch = math.cosh
+        check2 =  -a*t*U + b*T/U + c*U/T - d/T*U
+        print('check should be 2:', check2)
+
+        a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
+        check = - a * sh(t) * sh(u) + d * ch(t) * ch(u)
+        print('check should be 1:', check)
+        
+        return t
 
     def time_until_red_shift_matches_expected_for_distance(self, error=0):
         """ Curious how this value varies with phi and theta """
@@ -396,7 +424,7 @@ class Dss(magic.Ball):
         )
 
         #ax.figure._axstack.bubble(ax.delegate)
-        ax.figure.colorbar(aximg)
+        #ax.figure.colorbar(aximg)
         #ax.axis('off')
         ax.show()
 
@@ -540,14 +568,10 @@ async def run():
     farm = fm.Farm()
 
     dss2 = DeSitterSpace()
-    farm.add(dss)
     farm.add(dss2)
+    farm.add(dss)
     
     await farm.start()
-
-    print(dss.deSitter())
-
-    farm.shep.path.append(dss2)
 
     await farm.run()
         
