@@ -5,6 +5,83 @@
 I will try to give updates from time to time as to what is happening
 here.
 
+2023/12/7
+=========
+
+The big news of the year for the Geometry of the Universe was the
+detection of nanohertz gravitational waves by the Pulsar Timing Array
+team.
+
+It is a stunning achievement, using pulsars across our galaxy to
+detect ripples in space time with a period measured in years and an
+amplitude of just 10m.
+
+These low level gravitational waves are a prediction of the theory
+presented in `gotu`_.
+
+As a result I have been using the software here to explore data
+relating to the the theory.
+
+`astropy` has been extraordinarily helpful during this time.
+
+It really does have everything you need to explore the very latest
+observations of the universe.
+
+The `units`, `constants` and `cosmology` modules have been
+particularly useful.
+
+All the `cosmology.Cosmology` objects that are provided are instances
+of the FLRW class, describes itself as *An isotropic and homogeneous
+(Friedmann-Lemaitre-Robertson-Walker) cosmology*.
+
+These provided key parameters such as the split into dark matter, dark
+energy, baryonic matter, photon energy and the Cosmic Microwave
+Background temperature.
+
+For each parameter there is a corresponding function to give the value
+of the parameter at a particular *redshift*, z.  In FLRW cosmology, z
+is synonomous with both distance and age.
+
+In a cosmology with the Perfect Copernican Principle,  these functions
+all return the value for the current time, since it is assumed these
+values are constant through time.
+
+The `gotu.spiral.Cosmo` class is the beginnings of an attempt to build
+cosmology objects for a de Sitter universe.  The default object takes
+the current default cosmology from `astropy` to initialise the values
+for the current time and sets up functions that return the same value
+regardless of the $z$.
+
+The `gotu.spiral.SkyMap` uses this cosmology to estimate the mass of
+the universe relative to the observed stellar mass.  It uses the
+*heasarc* catalogue to get estimates of stellar mass for local
+galaxies. 
+
+Using this distribution and the Sciama Principle the software
+simulates the gravitational waves that the galactic centres should
+create.
+
+The intriguing bit is that the waves based on a universe of the Hubble
+scale generates waves about 45 times smaller than those observed.
+
+Which is about the same amount that the Cosmic Microwave Background is
+brighter than the thermalised energy emitted by all the galaxies in
+the visible universe.
+
+In a de Sitter universe the Hubble distance is also a significant
+parameter.  It is the radius of curvature of the universe.
+
+This radius is in no way an indication of the full size of the
+universe.  Light can and does travel very much farther.   At the
+Hubble scale, due to the curvature, it becomes a random walk and after
+N steps the expected distance from the origin is only sqrt(N) times
+the step size.  So the software let's you set the factor to scale
+things up by, as well as other parameters.
+
+If you are having trouble getting things running then take a look at
+the `blume` project, which is something I wrote to help me using
+`matplotlib`.
+
 2023/1/9
 ========
 
