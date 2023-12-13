@@ -68,35 +68,10 @@ class Supernovae(magic.Ball):
         self.tab = tab
 
         self.tasks.add(self.plot)
-        self.tasks.add(self.plot, zfield='zCMB')
-        self.tasks.add(self.plot2)
+        self.tasks.add(self.plot, zfield='zhelio')
+        #self.tasks.add(self.plot2)
 
 
-    async def plot1(self):
-
-        ax = await self.get()
-
-        bmag = self.tab['Bmag']
-        e_bmag = self.tab['e_Bmag']
-        lz = np.array([log(x) for x in self.tab['zCMB']])
-
-        ax.errorbar(lz, bmag, yerr=e_bmag, fmt='o')
-
-        line = statistics.linear_regression(lz, bmag)
-
-        xx = np.linspace(min(lz), max(lz), 100)
-        yy = line.intercept + line.slope * xx
-
-        ax.plot(xx, yy)
-        ax.show()
-        
-        res = bmag - (line.intercept + line.slope * lz)
-
-        hist = await self.get()
-        hist.hist(res, 12)
-
-        hist.show()
-        
     async def plot(self, zfield='zCMB'):
 
         ax = await self.get()
@@ -107,6 +82,9 @@ class Supernovae(magic.Ball):
 
         ax.errorbar(lz, bmag, yerr=e_bmag, fmt='o')
 
+        ax.set_ylabel('Bmag')
+        ax.set_xlabel('log(%s)' % zfield)
+
         line = statistics.linear_regression(lz, bmag)
 
         xx = np.linspace(min(lz), max(lz), 100)
@@ -119,7 +97,7 @@ class Supernovae(magic.Ball):
 
         hist = await self.get()
         hist.hist(res, 12)
-
+        hist.set_title('Residuals: Observed Bmag-expected|%s' % zfield)
         hist.show()
 
     async def plot2(self):
