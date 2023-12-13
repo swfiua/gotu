@@ -67,7 +67,12 @@ class Supernovae(magic.Ball):
 
         self.tab = tab
 
-    async def run(self):
+        self.tasks.add(self.plot)
+        self.tasks.add(self.plot, zfield='zCMB')
+        self.tasks.add(self.plot2)
+
+
+    async def plot1(self):
 
         ax = await self.get()
 
@@ -92,6 +97,43 @@ class Supernovae(magic.Ball):
 
         hist.show()
         
+    async def plot(self, zfield='zCMB'):
+
+        ax = await self.get()
+
+        bmag = self.tab['Bmag']
+        e_bmag = self.tab['e_Bmag']
+        lz = np.array([log(x) for x in self.tab[zfield]])
+
+        ax.errorbar(lz, bmag, yerr=e_bmag, fmt='o')
+
+        line = statistics.linear_regression(lz, bmag)
+
+        xx = np.linspace(min(lz), max(lz), 100)
+        yy = line.intercept + line.slope * xx
+
+        ax.plot(xx, yy)
+        ax.show()
+        
+        res = bmag - (line.intercept + line.slope * lz)
+
+        hist = await self.get()
+        hist.hist(res, 12)
+
+        hist.show()
+
+    async def plot2(self):
+
+        ax = await self.get()
+
+        lhz = np.array([log(x) for x in self.tab['zhelio']])
+        lcz = np.array([log(x) for x in self.tab['zCMB']])
+
+        ax.scatter(lhz, lcz)
+        ax.set_ylabel('zCMB')
+        ax.set_xlabel('zhelio')
+
+        ax.show()
         
 if __name__ == '__main__':
 

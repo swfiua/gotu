@@ -373,51 +373,6 @@ class Cosmo:
 
         return None
 
-class Task:
-
-    def __init__(self,
-                 task,
-                 args=None,
-                 kwargs=None,
-                 active=True,
-                 plot=True):
-
-        self.task = task
-        self.args = args or []
-        self.kwargs = kwargs or {}
-        self.active = active
-        self.result = None
-        self.plot = plot
-
-    async def run(self):
-
-        args = self.args.copy()
-        if self.plot:
-            ax = await magic.TheMagicRoundAbout.get()
-            args = [ax] + args
-
-        print('RUNNNING TASK', self.task)
-        self.result = await self.task(*args, **self.kwargs)
-
-    
-class Tasks:
-
-    def __init__(self, tasks=None):
-
-        self.tasks = deque()
-
-    def add(self, task, plot=False, *args, active=True, **kwargs):
-        """ Add a task """
-        self.tasks.append(Task(task, args, kwargs, active, plot))
-
-    async def run(self, sleep=0):
-        """ Run the tasks """
-        for task in self.tasks:
-            await task.run()
-
-            # take a nap between tasks
-            await magic.sleep(sleep)
-        
 
 class SkyMap(magic.Ball):
     """Yet another table viewer? 
@@ -501,7 +456,7 @@ class SkyMap(magic.Ball):
         # initialise Mcent -- done this way because we need
         # to calculate h_factor based on mean sample mass
         self.set_mcent()
-        self.tasks = Tasks()
+        self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
         self.tasks.add(self.cmb_gwb)
@@ -707,7 +662,7 @@ class SkyMap(magic.Ball):
          
         ax.show()
 
-        await self.tasks.run()
+        await super().run()
             
 
     async def cmbsim(self):
