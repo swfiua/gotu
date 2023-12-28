@@ -209,6 +209,8 @@ from functools import partial
 
 from pathlib import Path
 
+from scipy import fft
+
 import astropy.units as u
 import astropy.constants as c
 import astropy.coordinates as coord
@@ -223,7 +225,7 @@ from matplotlib import colors
 
 import numpy as np
 
-from scipy import integrate
+from scipy import integrate, signal
 
 from gotu import sd
 
@@ -446,6 +448,7 @@ class SkyMap(magic.Ball):
         self.h_factor = (stellar_mass / self.N) / mean_sample_mass
 
         self.period = 30    # years
+        self.fftlen = 32
 
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
@@ -473,7 +476,7 @@ class SkyMap(magic.Ball):
             stellar = (schwartzchild(c.M_sun) * gal.Mstellar) << u.lightyear
             black_hole = stellar.value * self.h_factor * self.m_bh
 
-            gal.Mcent = black_hole
+            gal.Mcent = black_hole.value
 
     def sample_mass(self):
         """ Return the sum of the masses of the sample
@@ -659,7 +662,15 @@ class SkyMap(magic.Ball):
         
         ax.plot(points, wave)
         ax.set_title('Gravitational Wave Background')
-         
+
+
+
+        ax = await self.get()
+        f, t, Sxx = signal.spectrogram(wave, 10)
+
+        ax.pcolormesh(t, f, Sxx, shading='gouraud')
+        ax.ylabel('Frequency [Hz]')
+        ax.xlabel('Time [sec]')
         ax.show()
 
         await super().run()
