@@ -235,6 +235,7 @@ class Jwst(magic.Ball):
 
         self.project = 'JWST'
         self.i2d = False
+        self.filetypes = set(('.jpg', '.png'))
 
         self.topn = 1
         self.do_product_list = False
@@ -376,8 +377,7 @@ class Jwst(magic.Ball):
 
         # download the product
         #result = Observations.download_file(prod['dataURI'])
-        filetypes = set(('.jpg', '.png'))
-        filetypes = set(('.jpg', '.png', '.fits'))
+        filetypes = self.filetypes
         #for key in ('jpegURL', 'dataURL', 'dataURI'):
         for key in ('jpegURL', 'dataURL'):
             
@@ -438,6 +438,7 @@ if __name__ == '__main__':
     parser.add_argument('--size', type=int)
     parser.add_argument('--project', default=None)
     parser.add_argument('--i2d', action='store_true')
+    parser.add_argument('--fits', action='store_true')
 
     args = parser.parse_args()
 
@@ -458,6 +459,8 @@ if __name__ == '__main__':
             jwst.locations.append(location)
 
     jwst.i2d = args.i2d
+    if args.fits:
+        jwst.filetypes = ['.fits']
         
     fm.add(jwst)
     magic.run(farm.start_and_run(fm))
