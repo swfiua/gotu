@@ -1,9 +1,45 @@
-""" Analysis of the evidence for dark energy
+"""Analysis of the evidence for dark energy
 
 http://cdsarc.u-strasbg.fr/viz-bin/ReadMe/J/MNRAS/475/193
 
 https://cdsarc.cds.unistra.fr/ftp/J/MNRAS/475/193/table6.dat
 
+The Supernovae class just digests a table of data.
+
+It is looking for a magnitude (Bmag) and a redshift value (z), as well
+as the error in the magnitude.
+
+It does a scatter plot of the data and does a linear regression to
+plot a least squares fit.
+
+Residuals are calculated as the difference between the observed
+magnitude and the magnitude expected assuming we lie on the best fit
+line.
+
+A histogram of the residuals is plotted.
+
+These are asymetric and consistent with a de Sitter Universe where
+each galaxy we observe has the Hubble line as an asymptote.
+
+To put another way, some galaxies are relatively new arrivals that
+have not yet accelerated away fast enough to give the redshift we
+would expect, given how far away they are.
+
+There seems good evidence in the data for the de Sitter Model.
+
+TODO: work on details based on arrival rate of new galaxies.
+
+Here's a try.  there are N=10**11 galaxies in the visible universe
+which is 10**10 years wide.
+
+there are pi * 10**2 days in a year, so pi * 10**13 days in the
+universe.
+
+We are getting about one gamma ray per day, so how small can a galaxy
+be and give a detectable gamma ray?
+
+Can we estimate where the cut-off is and get a better handle on
+distribution of gravitational waves un-accompanied by GRB?
 
 """
 

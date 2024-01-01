@@ -469,7 +469,7 @@ class SkyMap(magic.Ball):
         
 
     def set_mcent(self):
-        """ Set up central mass based on stellar mass """
+        """ Set up central mass of all spheres based on stellar mass """
 
         for gal in self.balls:
 
@@ -855,6 +855,7 @@ class Spiral(magic.Ball):
 
         super().__init__()
 
+        # FIXME subclass to create others
         self.modes = deque(
             ('galaxy', 'sun', 'sd'))
 
