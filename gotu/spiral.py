@@ -929,7 +929,7 @@ class Spiral(magic.Ball):
         # ??
 
         # A = K * \omega_0.  K = M for Sciama principle
-        # want 2 * A to be 
+        # want 2 * A to be the asymptotic tangential velocity
         self.A = self.K * solar_angular_velocity
 
         # or go with asymptotic tangential velocity of 0.6km/h
@@ -1280,6 +1280,13 @@ class Spiral(magic.Ball):
         ax.axis('off')
         ax.show()
 
+
+class LLPegasi(Spiral):
+
+
+    def __init__(self):
+
+        super().__init__()
 
 def pick(x, v, vmin, vmax):
 
