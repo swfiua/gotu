@@ -209,7 +209,7 @@ from functools import partial
 
 from pathlib import Path
 
-from scipy import fft
+from scipy import fft, integrate
 
 import astropy.units as u
 import astropy.constants as c
@@ -463,6 +463,7 @@ class SkyMap(magic.Ball):
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
         self.tasks.add(self.cmb_gwb)
+        self.tasks.add(self.gravity_waves)
         #await self.local_mode_sim()
         #await self.cmbsim()
         #await self.cmb_gwb()
@@ -651,8 +652,14 @@ class SkyMap(magic.Ball):
         ax.set_title('Black hole mass v amplitude')
         ax.show()
 
+        await super().run()
+
+
+    async def gravity_waves(self):
+        
         # try and simulate the wave
         period = self.period
+        sample = self.waves()
 
         ax = await self.get()
         points, wave = waves(
@@ -662,18 +669,31 @@ class SkyMap(magic.Ball):
         
         ax.plot(points, wave)
         ax.set_title('Gravitational Wave Background')
+        ax.show()
+        
 
-
+        f, t, Sxx = signal.spectrogram(wave, nperseg=self.fftlen)
+        print(len(wave), len(f), len(t), Sxx.shape)
+        ax = await self.get()
+        ax.plot(t)
+        ax.set_title('t for spect')
+        ax.show()
 
         ax = await self.get()
-        f, t, Sxx = signal.spectrogram(wave, 10)
-
+        ax.plot(f)
+        ax.set_title('f for spect')
+        ax.show()
+        
+        ax = await self.get()
         ax.pcolormesh(t, f, Sxx, shading='gouraud')
         ax.ylabel('Frequency [Hz]')
         ax.xlabel('Time [sec]')
         ax.show()
 
-        await super().run()
+        ax = await self.get()
+        ax.imshow(Sxx, cmap=magic.random_colour())
+        ax.set_title('imshow of spectrogram')
+        ax.show()
             
 
     async def cmbsim(self):
@@ -855,10 +875,6 @@ class Spiral(magic.Ball):
 
         super().__init__()
 
-        # FIXME subclass to create others
-        self.modes = deque(
-            ('galaxy', 'sun', 'sd'))
-
         # set up an initial mode
         self.cosmo = Cosmo()
 
@@ -868,8 +884,7 @@ class Spiral(magic.Ball):
         self.n = 1e5  # density in protons / m**3 1e2 - 1e12
         self.T = 3000
 
-        self.mode = None
-        self.mode_switch()
+        self.galaxy()
 
         self.details = True
 
@@ -901,61 +916,6 @@ class Spiral(magic.Ball):
         self.rmin = 5000
         self.rmax = 50000
 
-
-    def sun(self):
-
-        print('SUN!' * 10)
-        
-        solar_angular_velocity = 2 * math.pi * 365 / 25  # radians per year
-        
-        # Central mass.  Mass converted to Schwartzschild radius (in light years)
-        # Mass of 1 is approximately 3e12 solar masses.
-        self.Mcent = (schwartzchild(c.M_sun) << u.lightyear).value
-        self.Mball = 0.
-        self.Mdisc = 0.
-        self.omega0 = solar_angular_velocity # radians per year
-
-        # astronomical unit in light years
-        # au = 1 / 63241.08  ### can't remember how I calculated this
-        auasly = u.au.to(u.lightyear)
-        
-        self.rmin = 0.1 * auasly
-        self.rmax = 50 * auasly
-
-        self.K = self.Mcent
-
-        # solar wind goes from 30 km/s at 3 AU to 500 km/s at 40 AU
-        # so set A to 2 * 500 km/s in our units
-        # ??
-
-        # A = K * \omega_0.  K = M for Sciama principle
-        # want 2 * A to be the asymptotic tangential velocity
-        self.A = self.K * solar_angular_velocity
-
-        # or go with asymptotic tangential velocity of 0.6km/h
-        self.A = (((60 / 3600) * u.m/u.s) / c.c).value
-
-        # magic constant determined by overall energy in the orbit
-        self.EE = 5000
-
-
-        # constant, can be read from tangential velocity for small r
-        self.find_cc(tangential_velocity=self.rmin * self.omega0)
-        #self.CC = -0.1
-
-        # Apparent rate of precession of the roots of the spiral.
-        self.B = self.A / self.rmin
-
-        self.omega0 = self.A / self.K   # angular velocity in radians per year
-
-
-
-    def sd(self):
-        """ Spanish Dancer
-
-        TODO: import values from sd module?
-        """
-        pass
         
     def print_parms(self):
         
@@ -963,8 +923,6 @@ class Spiral(magic.Ball):
         print('CC', self.CC)
         print('A/K', self.A / self.K)
         print('rmin_check', self.rmin_check())
-        
-
     
     def find_cc(self, tangential_velocity):
 
@@ -1060,13 +1018,6 @@ class Spiral(magic.Ball):
                     - (2 * A*K*Log(1 + r/K)/r)**2 + EE);
         
         return energy
-
-    def mode_switch(self):
-
-        if self.mode != self.modes[0]:
-            self.mode = self.modes[0]
-            # run the mode
-            getattr(self, self.mode)()
 
     def spheres3(self):
         """ Bondi, Eddington and Schwartzchild
@@ -1245,7 +1196,6 @@ class Spiral(magic.Ball):
         if self.details:
             ax = await self.get()
 
-            import statistics
             print(min(vv), max(vv),
                   statistics.mean(vv), statistics.variance(vv))
             ax.plot(rr, vv, label='velocity')
@@ -1281,12 +1231,89 @@ class Spiral(magic.Ball):
         ax.show()
 
 
-class LLPegasi(Spiral):
+        # FIXME subclass to create others
+        self.modes = deque(
+            ('galaxy', 'sun', 'sd'))
 
+class Sun(Spiral):
 
     def __init__(self):
 
         super().__init__()
+        
+        solar_angular_velocity = 2 * math.pi * 365 / 25  # radians per year
+        
+        # Central mass.  Mass converted to Schwartzschild radius (in light years)
+        # Mass of 1 is approximately 3e12 solar masses.
+        self.Mcent = (schwartzchild(c.M_sun) << u.lightyear).value
+        self.Mball = 0.
+        self.Mdisc = 0.
+        self.omega0 = solar_angular_velocity # radians per year
+
+        # astronomical unit in light years
+        # au = 1 / 63241.08  ### can't remember how I calculated this
+        auasly = u.au.to(u.lightyear)
+        
+        self.rmin = 0.1 * auasly
+        self.rmax = 50 * auasly
+
+        self.K = self.Mcent
+
+        # solar wind goes from 30 km/s at 3 AU to 500 km/s at 40 AU
+        # so set A to 2 * 500 km/s in our units
+        # ??
+
+        # A = K * \omega_0.  K = M for Sciama principle
+        # want 2 * A to be the asymptotic tangential velocity
+        self.A = self.K * solar_angular_velocity
+
+        # or go with asymptotic tangential velocity of 0.6km/h
+        self.A = (((60 / 3600) * u.m/u.s) / c.c).value
+
+        # magic constant determined by overall energy in the orbit
+        self.EE = 5000
+
+
+        # constant, can be read from tangential velocity for small r
+        self.find_cc(tangential_velocity=self.rmin * self.omega0)
+        #self.CC = -0.1
+
+        # Apparent rate of precession of the roots of the spiral.
+        self.B = self.A / self.rmin
+
+        self.omega0 = self.A / self.K   # angular velocity in radians per year
+
+
+class SpanishDancer(Spiral):
+    """ Spanish Dancer """
+
+    def __init__(self):
+
+        super().__init__()
+
+        # TODO: import values from sd module?
+        
+
+
+class LLPegasi(Spiral):
+    """ Beautiful spiral with an 810 year period.
+
+
+    Dust around a binary system showing a clear spiral structure.
+
+    The gap between bands and their rate of expansion are consistent with
+    the pair's 810 year orbit based on their angular separation.
+
+    Distance is 1300 * u.pc
+
+    temperature 1800K
+    """
+    
+    def __init__(self):
+
+        super().__init__()
+        
+        
 
 def pick(x, v, vmin, vmax):
 
@@ -1426,7 +1453,7 @@ def from_heasarc(kwargs):
     return galaxy
 
 
-def sample_galaxies(n=1000):
+def sample_galaxies(n=1000, fudge=42):
 
     # distribution of stellar mass based on heasarc catalog
     cosmo = Cosmo()
@@ -1438,6 +1465,7 @@ def sample_galaxies(n=1000):
 
     #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
 
+    random_phi = RandomPhi()
     for mass in stellar.samples(n):
         galaxy = Spiral()
         
@@ -1445,11 +1473,61 @@ def sample_galaxies(n=1000):
         galaxy.distance = random.random() * hd << u.lightyear
         galaxy.dec = (random.random() * 180.0) - 90.0
         galaxy.ra = random.random() * 360.0
+
+        # magic to get theta distributed as sin(theta)
+        galaxy.theta = math.acos((2*random.random()-1))  
+
+        # want phi distributed as sinh(phi) ** 2
+        galaxy.phi = random_phi()
         galaxy.name = f'galaxy{n}'
 
         yield galaxy
 
+
+
+class RandomPhi:
+
+    def __init__(self, max_phi=5, min_phi=1e-3, n=10000):
+        """ return random phi distributed as sinh(phi)**2
+
+
+        How to do this?
+
+        scipy.integrate and random.sample
+        """
+        self.max_phi = max_phi or math.sqrt(42)
+        self.min_phi = min_phi or 1/1000
+        self.n = n or 10000
+
+        self.start()
+
+    def start(self):
+
+        def sinh2(x):
+
+            return math.sinh(x) ** 2
+
+        sample = []
+        values = np.linspace(self.min_phi, self.max_phi, self.n)
+        self.values = list(values)
+
+        lastx = values[0]
+        for x in values[1:]:
+            result = integrate.quad(sinh2, lastx, x)
+            sample.append(result[0])
+            lastx = x
+
+        print(min(sample), sample[0])
+        zval = sample[0]
+        self.counts = [int(s/zval) for s in sample]
+
+    def __call__(self):
+
+        return random.sample(self.values[1:], 1, counts=self.counts)[0]
+        
+
     
+                        
 
 def parse_radec(value):
 
@@ -1501,6 +1579,7 @@ async def run(**args):
             galaxies = list(sample_galaxies(args['n']))
         
         skymap = SkyMap(galaxies)
+        skymap.fudge = args['hitchhiker']
         farm.add(skymap)
 
 
@@ -1513,6 +1592,7 @@ def main(args=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--skymap', action='store_true')
+    parser.add_argument('--hitchhiker', type=float, default=42)
     parser.add_argument('--heasarc', action='store_true')
     parser.add_argument('-n', type=int, default=1000)
 

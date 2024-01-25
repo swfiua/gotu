@@ -65,6 +65,10 @@ def get_data():
     """ Just get the data for table 6.
 
     https://cdsarc.cds.unistra.fr/ftp/J/MNRAS/475/193/ReadMe
+
+    Saves file as table6.dat in current working directory.
+
+    Checks for file and uses that rather than request a new copy.
     """
 
     filename = Path('table6.dat')
