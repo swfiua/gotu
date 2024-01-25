@@ -339,12 +339,13 @@ class Dss(magic.Ball):
 
         # check equation
         print(U,T)
+        check2 =  (-a*T*U) + (b*T/U) + (c*U/T) - (d/T*U)
+        print('check should be 2:', check2)
+
         t = math.log(T)
         u = math.log(U)
         sh = math.sinh
         ch = math.cosh
-        check2 =  -a*t*U + b*T/U + c*U/T - d/T*U
-        print('check should be 2:', check2)
 
         a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
         check = - a * sh(t) * sh(u) + d * ch(t) * ch(u)
