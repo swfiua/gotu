@@ -209,7 +209,7 @@ from functools import partial
 
 from pathlib import Path
 
-from scipy import fft
+from scipy import fft, integrate
 
 import astropy.units as u
 import astropy.constants as c
@@ -672,7 +672,7 @@ class SkyMap(magic.Ball):
         ax.show()
         
 
-        f, t, Sxx = signal.spectrogram(wave)
+        f, t, Sxx = signal.spectrogram(wave, nperseg=self.fftlen)
         print(len(wave), len(f), len(t), Sxx.shape)
         ax = await self.get()
         ax.plot(t)
@@ -1196,7 +1196,6 @@ class Spiral(magic.Ball):
         if self.details:
             ax = await self.get()
 
-            import statistics
             print(min(vv), max(vv),
                   statistics.mean(vv), statistics.variance(vv))
             ax.plot(rr, vv, label='velocity')
@@ -1466,6 +1465,7 @@ def sample_galaxies(n=1000, fudge=42):
 
     #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
 
+    random_phi = RandomPhi()
     for mass in stellar.samples(n):
         galaxy = Spiral()
         
@@ -1473,13 +1473,61 @@ def sample_galaxies(n=1000, fudge=42):
         galaxy.distance = random.random() * hd << u.lightyear
         galaxy.dec = (random.random() * 180.0) - 90.0
         galaxy.ra = random.random() * 360.0
-        galaxy.theta = math.asin((2*random.random()-1))
-        galaxy.phi = math.asinh(math.sqrt(random.random() * fudge))
+
+        # magic to get theta distributed as sin(theta)
+        galaxy.theta = math.acos((2*random.random()-1))  
+
+        # want phi distributed as sinh(phi) ** 2
+        galaxy.phi = random_phi()
         galaxy.name = f'galaxy{n}'
 
         yield galaxy
 
+
+
+class RandomPhi:
+
+    def __init__(self, max_phi=5, min_phi=1e-3, n=10000):
+        """ return random phi distributed as sinh(phi)**2
+
+
+        How to do this?
+
+        scipy.integrate and random.sample
+        """
+        self.max_phi = max_phi or math.sqrt(42)
+        self.min_phi = min_phi or 1/1000
+        self.n = n or 10000
+
+        self.start()
+
+    def start(self):
+
+        def sinh2(x):
+
+            return math.sinh(x) ** 2
+
+        sample = []
+        values = np.linspace(self.min_phi, self.max_phi, self.n)
+        self.values = list(values)
+
+        lastx = values[0]
+        for x in values[1:]:
+            result = integrate.quad(sinh2, lastx, x)
+            sample.append(result[0])
+            lastx = x
+
+        print(min(sample), sample[0])
+        zval = sample[0]
+        self.counts = [int(s/zval) for s in sample]
+
+    def __call__(self):
+
+        return random.sample(self.values[1:], 1, counts=self.counts)[0]
+        
+
     
+                        
 
 def parse_radec(value):
 
