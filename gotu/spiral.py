@@ -202,6 +202,10 @@ import argparse
 import random
 
 import math
+
+# live dangerously, i almost nver import *, but for math I will make an exception
+from math import *
+
 import statistics
 
 from collections import deque
@@ -225,7 +229,7 @@ from matplotlib import colors
 
 import numpy as np
 
-from scipy import integrate, signal
+from scipy import integrate, signal, optimize
 
 from gotu import sd
 
@@ -397,18 +401,14 @@ class SkyMap(magic.Ball):
 
     """
 
-    def __init__(self, gals=None):
-
+    def __init__(self, gals=None, n=1566, fudge=None):
+        """
+        gals: list of Spiral() objects to initialise with
+        n: if gals is None, then generate a sample of size n
+        fudge: value for self.fudge
+        """
         super().__init__()
 
-        if gals is None:
-            try:
-                print('calling near_galaxies')
-                gals = [from_heasarc(x) for x in near_galaxies()]
-            except:
-                gals = list(sample_galaxies())
-        
-        self.balls = gals
         self.offset = 0.
 
         # set defaults from Cosmo object
@@ -425,11 +425,11 @@ class SkyMap(magic.Ball):
         # the CMB is 45 times brighter than you would expect based
         # on size of visible universe.  Hitchhikers should note
         # that setting fudge to 42 produces a viable model.
-        self.fudge = 45.
+        self.fudge = fudge or 45.
+        self.n = n or 1566
 
         # Conversion from Holmberg radius mass to full stellar mass
         self.minmass = 6.  # min mass to include, log10(solar_mass)
-        mean_sample_mass = self.sample_mass()
 
         hd = cosmo.hubble_distance << u.m
         volume_of_universe = (4/3) * math.pi * (hd**3)
@@ -438,36 +438,43 @@ class SkyMap(magic.Ball):
         mass_of_universe = critical_density * volume_of_universe
         self.mass_of_universe = mass_of_universe
 
-        # we want to scale things up to cosmo.Ob0
-        stellar_mass = cosmo.Ob0 * mass_of_universe << u.solMass
-
-        # Given number of galaxies, we can get the factor needed to scale
-        # the sample mass up to stellar_mass
-        self.N = 1e11
-        
-        self.h_factor = (stellar_mass / self.N) / mean_sample_mass
-
         self.period = 30    # years
         self.fftlen = 32
-
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
 
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
 
-        # initialise Mcent -- done this way because we need
-        # to calculate h_factor based on mean sample mass
-        self.set_mcent()
+        self.create_sample(gals)
+
         self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
         self.tasks.add(self.cmb_gwb)
         self.tasks.add(self.gravity_waves)
+        self.tasks.add(self.uoft)
         #await self.local_mode_sim()
         #await self.cmbsim()
         #await self.cmb_gwb()
+
+    def create_sample(self, gals=None):
         
+        self.balls = gals or list(sample_galaxies(
+            self.n, fudge=self.fudge, cosmo=self.cosmo))
+        mean_sample_mass = self.sample_mass()
+
+        stellar_mass = self.cosmo.Ob0 * self.mass_of_universe << u.solMass
+
+        # Given number of galaxies, we can get the factor needed to scale
+        # the sample mass up to the mass of baryonic matter.
+        self.N = 1e11
+        
+        self.h_factor = (stellar_mass / self.N) / mean_sample_mass
+
+        # initialise Mcent -- done this way because we need
+        # to calculate h_factor based on mean sample mass
+        self.set_mcent()
 
     def set_mcent(self):
         """ Set up central mass of all spheres based on stellar mass """
@@ -589,6 +596,42 @@ class SkyMap(magic.Ball):
             ra += 2 * math.pi
 
         return ra
+
+    async def uoft(self, t=0):
+
+        # use distance as t0, first time visible in our galaxy.
+        t0 = [(-1 * ball.distance.value) << u.year for ball in self.balls]
+
+        a = np.cosh([ball.phi for ball in self.balls])
+        d = np.cos([ball.theta for ball in self.balls])
+
+        # ?? 
+        maxu = sqrt((a+d)/(a-d))
+        uu = np.linspace(-3, maxu, 1000)
+
+        tt = np.linspace(0, 1, 100)
+
+        uu = []
+        for t in tt:
+            def f(u):
+                u = u[0]
+                return (a * sinh(u) * sinh(t) - d * cosh(u) * cosh(t)) + 1
+
+
+            uval = optimize.fsolve(f, .5)
+            uu.append(uval[0])
+
+
+        ax = await self.get()
+        ax.plot(tt, uu)
+        ax.show()
+
+        ax = await self.get()
+        
+        zz = [((d * tanh(u) - a * tanh(t))/(a * tanh(u) - d * tanh(t))) - 1
+              for u, t in zip(uu, tt)]
+        ax.plot(tt, zz)
+        ax.show()
 
     async def log10hist(self, values, n=10, title=None):
 
@@ -1174,6 +1217,8 @@ class Spiral(magic.Ball):
 
         return r << u.lightyear
 
+        
+
     async def run(self):
 
         # switch mode if it is time to do so
@@ -1231,9 +1276,6 @@ class Spiral(magic.Ball):
         ax.show()
 
 
-        # FIXME subclass to create others
-        self.modes = deque(
-            ('galaxy', 'sun', 'sd'))
 
 class Sun(Spiral):
 
@@ -1453,10 +1495,10 @@ def from_heasarc(kwargs):
     return galaxy
 
 
-def sample_galaxies(n=1000, fudge=42):
+def sample_galaxies(n=1000, fudge=42, cosmo=None):
 
     # distribution of stellar mass based on heasarc catalog
-    cosmo = Cosmo()
+    cosmo = cosmo or Cosmo()
     hd = cosmo.hubble_distance
     
     stellar = statistics.NormalDist(
@@ -1470,7 +1512,9 @@ def sample_galaxies(n=1000, fudge=42):
         galaxy = Spiral()
         
         galaxy.Mstellar = 10**mass
-        galaxy.distance = random.random() * hd << u.lightyear
+
+        # distance will also get used as t0: time of first contact
+        galaxy.distance = random.random() * hd * math.sqrt(fudge)
         galaxy.dec = (random.random() * 180.0) - 90.0
         galaxy.ra = random.random() * 360.0
 
@@ -1562,7 +1606,7 @@ def cleanse(data):
 
     return clean
 
-async def run(**args):
+async def run(args):
 
     farm = fm.Farm()
 
@@ -1570,16 +1614,12 @@ async def run(**args):
     spiral = Spiral()
     farm.add(spiral)
 
-    if args['skymap']:
-
-        if args['heasarc']:
+    if args.skymap:
+        galaxies = None
+        if args.heasarc:
             galaxies = list(from_heasarc(x) for x in near_galaxies())
-        else:
-            print('creating a galaxy sample')
-            galaxies = list(sample_galaxies(args['n']))
         
-        skymap = SkyMap(galaxies)
-        skymap.fudge = args['hitchhiker']
+        skymap = SkyMap(galaxies, n=args.n, fudge=args.hitchhiker)
         farm.add(skymap)
 
 
@@ -1598,7 +1638,7 @@ def main(args=None):
 
     args = parser.parse_args(args)
 
-    magic.run(run(**args.__dict__))
+    magic.run(run(args))
 
 
 
