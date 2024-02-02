@@ -638,7 +638,6 @@ class SkyMap(magic.Ball):
         # use distance as t0, first time visible in our galaxy.
         hd = self.cosmo.hubble_distance
         t0 = [(-1 * ball.distance/hd) for ball in self.balls]
-        print(t0[:5])
 
         a = np.cosh([ball.phi for ball in self.balls])
         d = np.cos([ball.theta for ball in self.balls])
@@ -656,33 +655,22 @@ class SkyMap(magic.Ball):
         umax = np.log(np.sqrt(B/A))
 
         # we want u for tt = tstar + t - t0
-        
-        def f(u, t):
-            u = u[0]
-            return (a * sinh(u) * sinh(t) - d * cosh(u) * cosh(t)) + 1
+        tt = tstar + t - t0 
+        uu = [ball.uoft(t) for t, ball in zip(tt, self.balls)]
 
-        x0 = [umax/2]
-        optimize.fsolve(f, x0, (t,))
-        tt = np.linspace(0, 1, 100)
-
-        uu = []
-        for t in tt:
-
-
-            uval = optimize.fsolve(f, .5)
-            uu.append(uval[0])
-
+        zz = []
+        xx = []
+        for uu, tt, ball in zip(uu, tt, self.balls):
+            z, x = ball.zandx(uu, tt)
+            zz.append(z)
+            xx.append(x)
 
         ax = await self.get()
-        ax.plot(tt, uu)
+        ax.plot(np.log(zz), xx)
         ax.show()
 
         ax = await self.get()
         
-        zz = [((d * tanh(u) - a * tanh(t))/(a * tanh(u) - d * tanh(t))) - 1
-              for u, t in zip(uu, tt)]
-        ax.plot(tt, zz)
-        ax.show()
 
     async def log10hist(self, values, n=10, title=None):
 
@@ -1293,7 +1281,7 @@ class Spiral(magic.Ball):
         T = ((U + sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
              / (B - A * U*U))
 
-        t = log(t)
+        t = log(T)
         
         z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
         
