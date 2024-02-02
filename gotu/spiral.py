@@ -597,25 +597,76 @@ class SkyMap(magic.Ball):
 
         return ra
 
+    def tofu(self, u):
+        """ Work in natural units, c=G=Hubble Distance=1
+
+        Time in Hubble times.
+        """
+        a = np.cosh([ball.phi for ball in self.balls])
+        d = np.cos([ball.theta for ball in self.balls])
+
+        # work with U = e**u and T=e**t
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        # first time visible is tstar given by
+        tstar = np.log(np.sqrt(A/B))
+        ax = self.get_nowait()
+        ax.plot(tstar, 'o', label='t*')
+
+        # the last time u that the source can be seen
+        # notice e^umax = 1/(e**tstar = e**(-tstar)
+        # so umax = -1 * tstar.
+        # t for umax is infinite and u for tstar is -infinity
+        umax = np.log(np.sqrt(B/A))
+        ax.plot(umax, 'o', label='umax')
+        ax.legend()
+        ax.show()
+        
+        U = e**u
+        T = ((U + np.sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
+             / (B - A * U*U))
+        
+        # use distance as t0, adjust time for t0
+        #hd = self.cosmo.hubble_distance
+        #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
+        return np.log(T)
+            
+        
     async def uoft(self, t=0):
 
         # use distance as t0, first time visible in our galaxy.
-        t0 = [(-1 * ball.distance.value) << u.year for ball in self.balls]
+        hd = self.cosmo.hubble_distance
+        t0 = [(-1 * ball.distance/hd) for ball in self.balls]
+        print(t0[:5])
 
         a = np.cosh([ball.phi for ball in self.balls])
         d = np.cos([ball.theta for ball in self.balls])
 
-        # ?? 
-        maxu = sqrt((a+d)/(a-d))
-        uu = np.linspace(-3, maxu, 1000)
+        A = D = (a - d)/2
+        B = C = (a + d)/2
 
+        # first time visible is tstar given by
+        tstar = np.log(np.sqrt(A/B))
+
+        # the last time u that the source can be seen
+        # notice e^umax = 1/(e**tstar = e**(-tstar)
+        # so umax = -1 * tstar.
+        # t for umax is infinite and u for tstar is -infinity
+        umax = np.log(np.sqrt(B/A))
+
+        # we want u for tt = tstar + t - t0
+        
+        def f(u, t):
+            u = u[0]
+            return (a * sinh(u) * sinh(t) - d * cosh(u) * cosh(t)) + 1
+
+        x0 = [umax/2]
+        optimize.fsolve(f, x0, (t,))
         tt = np.linspace(0, 1, 100)
 
         uu = []
         for t in tt:
-            def f(u):
-                u = u[0]
-                return (a * sinh(u) * sinh(t) - d * cosh(u) * cosh(t)) + 1
 
 
             uval = optimize.fsolve(f, .5)
@@ -1217,6 +1268,86 @@ class Spiral(magic.Ball):
 
         return r << u.lightyear
 
+    def tofu(self, u):
+        """ Work in natural units, c=G=Hubble Distance=1
+
+        Time in Hubble times.
+        """
+        a = cosh(self.phi)
+        d = cos(self.theta)
+
+        # work with U = e**u and T=e**t
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        # first time visible is tstar given by
+        tstar = log(sqrt(A/B))
+
+        # the last time u that the source can be seen
+        # notice e^umax = 1/(e**tstar = e**(-tstar)
+        # so umax = -1 * tstar.
+        # t for umax is infinite and u for tstar is -infinity
+        umax = log(sqrt(B/A))
+
+        U = e**u
+        T = ((U + sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
+             / (B - A * U*U))
+
+        t = log(t)
+        
+        z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+        
+        print(tstar, umax, T)
+        # use distance as t0, adjust time for t0
+        #hd = self.cosmo.hubble_distance
+        #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
+        return t
+
+    def zandx(self, t, u):
+        
+        a = cosh(self.phi)
+        d = cos(self.theta)
+
+        # work with U = e**u and T=e**t
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+
+        x = ((a-1) * cosh(t)) ** 2
+        x -= ((d-1) * sinh(t)) ** 2
+
+        return z, x
+
+    def uoft(self, t):
+
+        a = cosh(self.phi)
+        d = cos(self.theta)
+
+        # work with U = e**u and T=e**t
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        # first time visible is tstar given by
+        tstar = log(sqrt(A/B))
+
+        # the last time u that the source can be seen
+        # notice e^umax = 1/(e**tstar = e**(-tstar)
+        # so umax = -1 * tstar.
+        # t for umax is infinite and u for tstar is -infinity
+        umax = log(sqrt(B/A))
+
+        if t < tstar:
+            raise ValueError
+
+        def f(u):
+            return self.tofu(u) - t
+        
+        uval = optimize.fsolve(f, umax/2)[0]
+
+        assert t == self.tofu(uval)
+
+        return uval
         
 
     async def run(self):
