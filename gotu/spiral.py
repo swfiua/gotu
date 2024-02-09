@@ -661,15 +661,59 @@ class SkyMap(magic.Ball):
         zz = []
         xx = []
         for uu, tt, ball in zip(uu, tt, self.balls):
-            z, x = ball.zandx(uu, tt)
+            z, x = ball.zandx(tt, uu)
             zz.append(z)
             xx.append(x)
-
         ax = await self.get()
-        ax.plot(np.log(zz), xx)
+        ax.scatter(zz, xx)
+        ax.set_title('z v distance')
         ax.show()
 
+    async def explore(self):
+        
+        ball = random.choice(self.balls)
+
+        a = cosh(ball.phi)
+        d = cos(ball.theta)
+
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        # first time visible is tstar given by
+        tstar = np.log(np.sqrt(A/B))
+
+        tb = log((np.sqrt(a+1) + np.sqrt(1-d))/np.sqrt(a-d))
+
+        t = np.linspace(tb, tb+2, 1000)
+
+        uu = [ball.uoft(tt) for tt in t]
+        zx = [ball.zandx(tt, u) for u, tt in zip(uu,t)]
+        zz = [zzx[0] for zzx in zx]
+        xx = [zzx[1] for zzx in zx]
+        print('hello')
         ax = await self.get()
+        ax.set_title('t v u')
+        ax.plot(t, uu)
+        ax.show()
+        print('hello2')
+
+        ax = await self.get()
+        ax.set_title('t v z')
+        ax.plot(t, zz)
+        ax.show()
+        print('hello3')
+
+        ax = await self.get()
+        ax.set_title('t v d')
+        ax.plot(t, xx)
+        ax.show()
+        print('hello4')
+        
+        ax = await self.get()
+        ax.set_title('z v d')
+        ax.plot(zz, xx)
+        ax.show()
+        print('hello4')
         
 
     async def log10hist(self, values, n=10, title=None):
@@ -1285,14 +1329,13 @@ class Spiral(magic.Ball):
         
         z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
         
-        print(tstar, umax, T)
         # use distance as t0, adjust time for t0
         #hd = self.cosmo.hubble_distance
         #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
         return t
 
-    def zandx(self, t, u):
-        
+    def tstar(self):
+
         a = cosh(self.phi)
         d = cos(self.theta)
 
@@ -1300,10 +1343,30 @@ class Spiral(magic.Ball):
         A = D = (a - d)/2
         B = C = (a + d)/2
 
-        z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+        # first time visible is tstar given by
+        tstar = log(sqrt(A/B))
+
+        return tstar
+
+    def zandx(self, t, u):
+        
+        a = cosh(self.phi)
+        d = cos(self.theta)
+
+        # work with U = e**u and T=e**t
+        U = e ** u
+        T = e ** t
+        A = D = (a - d)/2
+        B = C = (a + d)/2
+
+        z = ((d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))) - 1
 
         x = ((a-1) * cosh(t)) ** 2
         x -= ((d-1) * sinh(t)) ** 2
+
+        x = sqrt((sinh(t) - sinh(u))**2 - (cosh(t) - cosh(u))**2)
+
+        x = 1 - (((B/T) - (A*T)) * U)
 
         return z, x
 
@@ -1329,11 +1392,13 @@ class Spiral(magic.Ball):
             raise ValueError
 
         def f(u):
+            u = u[0]
+            if u > umax: return 100
             return self.tofu(u) - t
         
         uval = optimize.fsolve(f, umax/2)[0]
 
-        assert t == self.tofu(uval)
+        assert np.allclose([t], [self.tofu(uval)])
 
         return uval
         
