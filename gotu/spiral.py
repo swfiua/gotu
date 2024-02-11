@@ -442,6 +442,8 @@ class SkyMap(magic.Ball):
         self.fftlen = 32
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
+        self.delta_t = 0.001 # time inc in natural units
+        self.t = 0
 
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
@@ -458,10 +460,26 @@ class SkyMap(magic.Ball):
         #await self.cmbsim()
         #await self.cmb_gwb()
 
-    def create_sample(self, gals=None):
-        
-        self.balls = gals or list(sample_galaxies(
-            self.n, fudge=self.fudge, cosmo=self.cosmo))
+    def create_sample(self, gals=None, n=None, t0=0):
+        """Create a new sample of galaxies
+
+        This also initialises some parameters, based on the sample.
+
+        The goal is to set the stellar masses to match the baryonic
+        matter as given by the cosmology Ob0.  This is then scaled so
+        that the sum of the central masses equals the mass of the
+        universe.
+
+        gals: if given, a list of galaxies to include.
+
+        """
+
+        self.balls = gals or []
+        self.balls += list(sample_galaxies(
+            n or self.n, fudge=self.fudge, t0=t0, cosmo=self.cosmo))
+
+        random.shuffle(self.balls)
+        # recalculate mean sample_mass
         mean_sample_mass = self.sample_mass()
 
         stellar_mass = self.cosmo.Ob0 * self.mass_of_universe << u.solMass
@@ -479,9 +497,10 @@ class SkyMap(magic.Ball):
     def set_mcent(self):
         """ Set up central mass of all spheres based on stellar mass """
 
+        msun = schwartzchild(c.M_sun)
         for gal in self.balls:
 
-            stellar = (schwartzchild(c.M_sun) * gal.Mstellar) << u.lightyear
+            stellar = (msun * gal.Mstellar) << u.lightyear
             black_hole = stellar.value * self.h_factor * self.m_bh
 
             gal.Mcent = black_hole.value
@@ -627,17 +646,15 @@ class SkyMap(magic.Ball):
         T = ((U + np.sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
              / (B - A * U*U))
         
-        # use distance as t0, adjust time for t0
-        #hd = self.cosmo.hubble_distance
-        #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
         return np.log(T)
             
         
-    async def uoft(self, t=0):
+    def uoft(self, t=0):
 
         # use distance as t0, first time visible in our galaxy.
         hd = self.cosmo.hubble_distance
-        t0 = [(-1 * ball.distance/hd) for ball in self.balls]
+        
+        t0 = [ball.t0 for ball in self.balls]
 
         a = np.cosh([ball.phi for ball in self.balls])
         d = np.cos([ball.theta for ball in self.balls])
@@ -655,7 +672,8 @@ class SkyMap(magic.Ball):
         umax = np.log(np.sqrt(B/A))
 
         # we want u for tt = tstar + t - t0
-        tt = tstar + t - t0 
+        tt = tstar + t - t0
+
         uu = [ball.uoft(t) for t, ball in zip(tt, self.balls)]
 
         zz = []
@@ -664,10 +682,94 @@ class SkyMap(magic.Ball):
             z, x = ball.zandx(tt, uu)
             zz.append(z)
             xx.append(x)
+
+        tb = [ball.tb() for ball in self.balls]
+        results = dict(distance=xx, z=zz, u=uu, t=tt, t0=t0, tb=tb)
+        return results
+
+
+    def find_distant(self, results):
+        """ Find objects we no longer care about """
+
+        max_distance = sqrt(self.fudge)
+        removals = set()
+
+        xx = results['distance']
+        zz = results['z']
+
+        for distance, redshift, ball in zip(xx, zz, self.balls):
+
+            # hopes deleting in a loop is cool..
+            if distance > max_distance:
+                removals.add(ball)
+
+        return removals
+
+    def remove(self, balls):
+
+        for ball in balls:
+            self.balls.remove(ball)
+
+
+    async def tick(self):
+ 
+        
+        t = self.t
+
+        results = self.uoft(t)
+
+
+        # BEFORE we plot, drop any balls that are over max_distance
+        # away and replace with a new sample
+        # Over time this should converge to what we see.
+        removals = self.find_distant(results)
+        self.remove(removals)
+        
+        
+        # do some plotting
         ax = await self.get()
-        ax.scatter(zz, xx)
-        ax.set_title('z v distance')
+
+        zz = np.array(results['z'])
+        t0 = np.array(results['t0'])
+        distance = np.array(results['distance'])
+        
+            
+        ax.scatter(zz, distance, c=t0)
+        ax.set_title(f't={t:} z v distance, mean(distance)={np.mean(distance)}')
+
+        statistics.linear_regression(zz, distance)
+        line = statistics.linear_regression(zz, distance)
+
+        xx = np.linspace(min(zz), max(zz), 100)
+        yy = line.intercept + line.slope * xx
+        #ax.plot(xx, yy)
+
+        # want to find line with slope such that nothing at
+        # that z has lower distance.
+        nn = len(distance)
+        slope = min(distance[nn//2:]/zz[nn//2])
+
+        print(line.slope, slope, line.slope/slope)
+
+        yy = slope * xx
+        #ax.plot(xx, yy)
+        
         ax.show()
+
+        #ax = await self.get()
+        #ax.plot(sorted(results['tb']))
+        #ax.show()
+
+        # increment time
+        self.t += self.delta_t
+
+        # Now generate some new spheres to replace removals
+        need = len(removals)
+
+        if need:
+            print(f'generating {need} new spheres, total {need + len(self.balls)}')
+            self.create_sample(n=need, gals=self.balls, t0=t)
+
 
     async def explore(self):
         
@@ -682,35 +784,34 @@ class SkyMap(magic.Ball):
         # first time visible is tstar given by
         tstar = np.log(np.sqrt(A/B))
 
-        tb = log((np.sqrt(a+1) + np.sqrt(1-d))/np.sqrt(a-d))
+        tb = log((sqrt(a+1) + sqrt(1-d))/sqrt(a-d))
 
-        t = np.linspace(tb, tb+2, 1000)
+        t = np.linspace(tstar, tstar+tb*2, 1000)
 
         uu = [ball.uoft(tt) for tt in t]
         zx = [ball.zandx(tt, u) for u, tt in zip(uu,t)]
         zz = [zzx[0] for zzx in zx]
         xx = [zzx[1] for zzx in zx]
-        print('hello')
+
+        phi, theta = ball.phi, ball.theta
         ax = await self.get()
-        ax.set_title('t v u')
+        thetaphi = f'{phi:.3} {theta/pi:.2} tb={tb:.3}'
+        ax.set_title('t v u ' + thetaphi)
         ax.plot(t, uu)
         ax.show()
-        print('hello2')
 
         ax = await self.get()
-        ax.set_title('t v z')
+        ax.set_title('t v z ' + thetaphi)
         ax.plot(t, zz)
         ax.show()
-        print('hello3')
 
         ax = await self.get()
-        ax.set_title('t v d')
+        ax.set_title(f't v d ' + thetaphi)
         ax.plot(t, xx)
         ax.show()
-        print('hello4')
         
         ax = await self.get()
-        ax.set_title('z v d')
+        ax.set_title(f'z v d ' + thetaphi)
         ax.plot(zz, xx)
         ax.show()
         print('hello4')
@@ -1348,6 +1449,14 @@ class Spiral(magic.Ball):
 
         return tstar
 
+    def tb(self):
+        """ blue shift period """
+        a = cosh(self.phi)
+        d = cos(self.theta)
+        tb = log((sqrt(a+1) + sqrt(1-d))/sqrt(a-d))
+
+        return tb
+
     def zandx(self, t, u):
         
         a = cosh(self.phi)
@@ -1395,10 +1504,14 @@ class Spiral(magic.Ball):
             u = u[0]
             if u > umax: return 100
             return self.tofu(u) - t
-        
-        uval = optimize.fsolve(f, umax/2)[0]
 
-        assert np.allclose([t], [self.tofu(uval)])
+        try:
+            uval = optimize.fsolve(f, umax/2)[0]
+        except Exception as e:
+            uval=0
+            print(f'XXXXXXXXXXX {e}')
+
+        #assert np.allclose([t], [self.tofu(uval)])
 
         return uval
         
@@ -1679,7 +1792,7 @@ def from_heasarc(kwargs):
     return galaxy
 
 
-def sample_galaxies(n=1000, fudge=42, cosmo=None):
+def sample_galaxies(n=1000, fudge=42, t0=0, cosmo=None):
 
     # distribution of stellar mass based on heasarc catalog
     cosmo = cosmo or Cosmo()
@@ -1691,7 +1804,7 @@ def sample_galaxies(n=1000, fudge=42, cosmo=None):
 
     #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
 
-    random_phi = RandomPhi()
+    random_phi = RandomPhi(max_phi=sqrt(fudge), min_phi=1e-10)
     for mass in stellar.samples(n):
         galaxy = Spiral()
         
@@ -1708,6 +1821,7 @@ def sample_galaxies(n=1000, fudge=42, cosmo=None):
         # want phi distributed as sinh(phi) ** 2
         galaxy.phi = random_phi()
         galaxy.name = f'galaxy{n}'
+        galaxy.t0 = t0
 
         yield galaxy
 
