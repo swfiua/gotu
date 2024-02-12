@@ -442,7 +442,7 @@ class SkyMap(magic.Ball):
         self.fftlen = 32
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
-        self.delta_t = 0.001 # time inc in natural units
+        self.delta_t = 2 # time inc in natural units
         self.t = 0
 
         # local simulation only
@@ -475,10 +475,11 @@ class SkyMap(magic.Ball):
         """
 
         self.balls = gals or []
-        self.balls += list(sample_galaxies(
-            n or self.n, fudge=self.fudge, t0=t0, cosmo=self.cosmo))
 
-        random.shuffle(self.balls)
+        dt = self.delta_t
+        self.balls += list(sample_galaxies(
+            n or self.n, fudge=self.fudge, t0=t0, delta_t=dt, cosmo=self.cosmo))
+
         # recalculate mean sample_mass
         mean_sample_mass = self.sample_mass()
 
@@ -697,12 +698,13 @@ class SkyMap(magic.Ball):
         xx = results['distance']
         zz = results['z']
 
-        for distance, redshift, ball in zip(xx, zz, self.balls):
-
-            # hopes deleting in a loop is cool..
+        dd = set()
+        for distance, ball in zip(xx, self.balls):
             if distance > max_distance:
                 removals.add(ball)
 
+        print('Removals', len(removals), len(dd), len(dd & removals), max_distance)
+        
         return removals
 
     def remove(self, balls):
@@ -714,28 +716,31 @@ class SkyMap(magic.Ball):
     async def tick(self):
  
         
-        t = self.t
-
-        results = self.uoft(t)
-
 
         # BEFORE we plot, drop any balls that are over max_distance
         # away and replace with a new sample
         # Over time this should converge to what we see.
-        removals = self.find_distant(results)
-        self.remove(removals)
-        
-        
+        # increment time
+        self.t = self.delta_t
+        t = self.t
+
+        result = self.uoft(t)
+       
         # do some plotting
         ax = await self.get()
 
-        zz = np.array(results['z'])
-        t0 = np.array(results['t0'])
-        distance = np.array(results['distance'])
+        #bad = self.find_distant(result)
+        #self.remove(bad)
+
+        result = self.uoft(t)
         
-            
+        zz = np.array(result['z'])
+        t0 = np.array(result['t0'])
+        distance = np.array(result['distance'])
+        result['xdist'] = [ball.xdistance for ball in self.balls]
+
         ax.scatter(zz, distance, c=t0)
-        ax.set_title(f't={t:} z v distance, mean(distance)={np.mean(distance)}')
+        ax.set_title(f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}')
 
         statistics.linear_regression(zz, distance)
         line = statistics.linear_regression(zz, distance)
@@ -743,32 +748,24 @@ class SkyMap(magic.Ball):
         xx = np.linspace(min(zz), max(zz), 100)
         yy = line.intercept + line.slope * xx
         #ax.plot(xx, yy)
-
-        # want to find line with slope such that nothing at
-        # that z has lower distance.
-        nn = len(distance)
-        slope = min(distance[nn//2:]/zz[nn//2])
-
-        print(line.slope, slope, line.slope/slope)
-
-        yy = slope * xx
-        #ax.plot(xx, yy)
-        
         ax.show()
 
-        #ax = await self.get()
-        #ax.plot(sorted(results['tb']))
-        #ax.show()
+        ax = await self.get()
+        ax.set_title('Theta')
+        ax.hist(np.array([bb.theta for bb in self.balls]), 20)
+        ax.show()
 
-        # increment time
-        self.t += self.delta_t
+        ax = await self.get()
+        ax.set_title('Phi')
+        ax.hist(np.array([bb.phi for bb in self.balls]), 20)
+        ax.show()
 
-        # Now generate some new spheres to replace removals
-        need = len(removals)
-
+        return
+        need = len(self.balls)
+        self.balls = deque()
         if need:
             print(f'generating {need} new spheres, total {need + len(self.balls)}')
-            self.create_sample(n=need, gals=self.balls, t0=t)
+            self.create_sample(n=need, gals=self.balls, t0=t-(self.delta_t))
 
 
     async def explore(self):
@@ -1792,7 +1789,7 @@ def from_heasarc(kwargs):
     return galaxy
 
 
-def sample_galaxies(n=1000, fudge=42, t0=0, cosmo=None):
+def sample_galaxies(n=1000, fudge=42, t0=0, delta_t=0, cosmo=None):
 
     # distribution of stellar mass based on heasarc catalog
     cosmo = cosmo or Cosmo()
@@ -1821,7 +1818,8 @@ def sample_galaxies(n=1000, fudge=42, t0=0, cosmo=None):
         # want phi distributed as sinh(phi) ** 2
         galaxy.phi = random_phi()
         galaxy.name = f'galaxy{n}'
-        galaxy.t0 = t0
+        galaxy.t0 = t0 + random.random() * delta_t
+        galaxy.xdistance = sqrt(fudge)
 
         yield galaxy
 
@@ -1859,7 +1857,6 @@ class RandomPhi:
             sample.append(result[0])
             lastx = x
 
-        print(min(sample), sample[0])
         zval = sample[0]
         self.counts = [int(s/zval) for s in sample]
 
