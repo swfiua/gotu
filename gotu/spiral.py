@@ -208,7 +208,7 @@ from math import *
 
 import statistics
 
-from collections import deque
+from collections import deque, Counter
 from functools import partial
 
 from pathlib import Path
@@ -447,9 +447,11 @@ class SkyMap(magic.Ball):
 
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
+        self.filter = False
+        self.minz = 0.1
 
         self.create_sample(gals)
-
+        self.good = dict()
         self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
@@ -650,15 +652,19 @@ class SkyMap(magic.Ball):
         return np.log(T)
             
         
-    def uoft(self, t=0):
+    def uoft(self, t=0, balls=None):
 
         # use distance as t0, first time visible in our galaxy.
         hd = self.cosmo.hubble_distance
-        
-        t0 = [ball.t0 for ball in self.balls]
 
-        a = np.cosh([ball.phi for ball in self.balls])
-        d = np.cos([ball.theta for ball in self.balls])
+        balls = balls or self.balls
+
+        t0 = [ball.t0 for ball in balls]
+
+        phi = [ball.phi for ball in balls]
+        theta = [ball.theta for ball in balls]
+        a = np.cosh(phi)
+        d = np.cos(theta)
 
         A = D = (a - d)/2
         B = C = (a + d)/2
@@ -675,17 +681,18 @@ class SkyMap(magic.Ball):
         # we want u for tt = tstar + t - t0
         tt = tstar + t - t0
 
-        uu = [ball.uoft(t) for t, ball in zip(tt, self.balls)]
+        uu = [ball.uoft(t) for t, ball in zip(tt, balls)]
 
         zz = []
         xx = []
-        for uu, tt, ball in zip(uu, tt, self.balls):
-            z, x = ball.zandx(tt, uu)
+        for uuu, ttt, ball in zip(uu, tt, balls):
+            z, x = ball.zandx(ttt, uuu)
             zz.append(z)
             xx.append(x)
 
-        tb = [ball.tb() for ball in self.balls]
-        results = dict(distance=xx, z=zz, u=uu, t=tt, t0=t0, tb=tb)
+        tb = [ball.tb() for ball in balls]
+        results = dict(distance=xx, z=zz, u=uu, t=tt, t0=t0, tb=tb,
+                       phi=phi, theta=theta)
         return results
 
 
@@ -714,58 +721,61 @@ class SkyMap(magic.Ball):
 
 
     async def tick(self):
- 
-        
 
-        # BEFORE we plot, drop any balls that are over max_distance
-        # away and replace with a new sample
-        # Over time this should converge to what we see.
-        # increment time
+        self.create_sample()
         self.t = self.delta_t
         t = self.t
 
         result = self.uoft(t)
        
+        # filter sample to get those nearer than the sqrt(self.fudge)
+        max_distance = sqrt(self.fudge)
+
+        # get array of bools indicating values we want to keep
+        if self.filter:
+            keep = [(distance < max_distance and redshift > self.minz)
+                    for redshift, distance
+                    in zip(result['z'], result['distance'])]
+
+            if np.any(keep):
+
+                for key, value in result.items():
+                    keepers = np.array(value)[keep]
+                    if key in self.good:
+                        self.good[key] = np.concatenate((self.good[key], keepers))
+                    else:
+                        self.good[key] = keepers
+
+            result = self.good
+
+        if not result: return
+
+        zz = np.array(result['z'])
+
+        t0 = np.array(result['t0'])
+        distance = np.array(result['distance'])
+
         # do some plotting
         ax = await self.get()
 
-        #bad = self.find_distant(result)
-        #self.remove(bad)
-
-        result = self.uoft(t)
-        
-        zz = np.array(result['z'])
-        t0 = np.array(result['t0'])
-        distance = np.array(result['distance'])
-        result['xdist'] = [ball.xdistance for ball in self.balls]
-
         ax.scatter(zz, distance, c=t0)
-        ax.set_title(f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}')
-
-        statistics.linear_regression(zz, distance)
-        line = statistics.linear_regression(zz, distance)
-
-        xx = np.linspace(min(zz), max(zz), 100)
-        yy = line.intercept + line.slope * xx
-        #ax.plot(xx, yy)
+        ax.grid(True)
+        ax.set_title(
+            f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}' +
+            f'max(phi)={sqrt(self.fudge):.2}')
         ax.show()
 
         ax = await self.get()
         ax.set_title('Theta')
-        ax.hist(np.array([bb.theta for bb in self.balls]), 20)
+        ax.hist(np.array(result['theta']), 20)
         ax.show()
 
         ax = await self.get()
         ax.set_title('Phi')
-        ax.hist(np.array([bb.phi for bb in self.balls]), 20)
+        ax.hist(np.array(result['phi']), 20)
         ax.show()
 
         return
-        need = len(self.balls)
-        self.balls = deque()
-        if need:
-            print(f'generating {need} new spheres, total {need + len(self.balls)}')
-            self.create_sample(n=need, gals=self.balls, t0=t-(self.delta_t))
 
 
     async def explore(self):
@@ -1801,7 +1811,8 @@ def sample_galaxies(n=1000, fudge=42, t0=0, delta_t=0, cosmo=None):
 
     #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
 
-    random_phi = RandomPhi(max_phi=sqrt(fudge), min_phi=1e-10)
+    random_phi = RandomPhi(max_phi=sqrt(fudge), min_phi=max(1e-10, sqrt(fudge)/2))
+    
     for mass in stellar.samples(n):
         galaxy = Spiral()
         
