@@ -449,6 +449,7 @@ class SkyMap(magic.Ball):
         self.max_distance = 1e8 * u.lightyear
         self.filter = False
         self.minz = 0.1
+        self.min_phi = 0.1
 
         self.create_sample(gals)
         self.good = dict()
@@ -480,7 +481,9 @@ class SkyMap(magic.Ball):
 
         dt = self.delta_t
         self.balls += list(sample_galaxies(
-            n or self.n, fudge=self.fudge, t0=t0, delta_t=dt, cosmo=self.cosmo))
+            n or self.n, fudge=self.fudge, t0=t0, delta_t=dt,
+            min_phi=self.min_phi,
+            cosmo=self.cosmo))
 
         # recalculate mean sample_mass
         mean_sample_mass = self.sample_mass()
@@ -758,7 +761,9 @@ class SkyMap(magic.Ball):
         # do some plotting
         ax = await self.get()
 
-        ax.scatter(zz, distance, c=t0)
+        ax.scatter(zz, distance, c=t0, cmap=magic.random_colour())
+        zline = np.linspace(min(distance), max(distance), 100)
+        ax.plot(zline, zline)
         ax.grid(True)
         ax.set_title(
             f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}' +
@@ -1799,7 +1804,7 @@ def from_heasarc(kwargs):
     return galaxy
 
 
-def sample_galaxies(n=1000, fudge=42, t0=0, delta_t=0, cosmo=None):
+def sample_galaxies(n=1000, fudge=42, t0=0, delta_t=0, min_phi=None, cosmo=None):
 
     # distribution of stellar mass based on heasarc catalog
     cosmo = cosmo or Cosmo()
@@ -1811,7 +1816,8 @@ def sample_galaxies(n=1000, fudge=42, t0=0, delta_t=0, cosmo=None):
 
     #h1 = NormalDist(mu=6.368135788262371, sigma=2.9859747769592895)
 
-    random_phi = RandomPhi(max_phi=sqrt(fudge), min_phi=max(1e-10, sqrt(fudge)/2))
+    min_phi = min_phi or sqrt(fudge/2)
+    random_phi = RandomPhi(max_phi=sqrt(fudge), min_phi=min_phi)
     
     for mass in stellar.samples(n):
         galaxy = Spiral()
