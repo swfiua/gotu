@@ -442,7 +442,7 @@ class SkyMap(magic.Ball):
         self.fftlen = 32
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
-        self.delta_t = 1 # time inc in natural units
+        self.delta_t = 6 # time inc in natural units
         self.t = 0
 
         # local simulation only
@@ -480,7 +480,8 @@ class SkyMap(magic.Ball):
 
         self.balls = gals or []
 
-        dt = self.delta_t
+        #dt = self.delta_t
+        dt = 0
         self.balls += list(sample_galaxies(
             n or self.n, fudge=self.fudge, t0=t0, delta_t=dt,
             min_phi=self.min_phi,
@@ -723,10 +724,21 @@ class SkyMap(magic.Ball):
         for ball in balls:
             self.balls.remove(ball)
 
+    async def ticker(self):
+        
+        self.create_sample(self.balls)
+
+        delta_t = self.delta_t / 100
+        self.t = 0
+        while True:
+            self.t += delta_t
+            done = await self.tick()
+
+            if done: return
+
     async def tick(self):
 
-        self.create_sample()
-        t = self.delta_t
+        t = self.t
         result = self.uoft(t)
        
         # filter sample to get those nearer than the sqrt(self.fudge)
@@ -735,7 +747,8 @@ class SkyMap(magic.Ball):
         # get array of bools indicating values we want to keep
         if self.filter:
             keep = [(distance < max_distance and
-                     redshift > self.minz)
+                     #redshift > self.minz and
+                     t0 < self.max_t0)
                     for redshift, distance, t0
                     in zip(result['z'], result['distance'], result['t0'])]
 
