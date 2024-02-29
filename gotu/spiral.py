@@ -442,14 +442,15 @@ class SkyMap(magic.Ball):
         self.fftlen = 32
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
-        self.delta_t = 2 # time inc in natural units
+        self.delta_t = 1 # time inc in natural units
         self.t = 0
 
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
-        self.filter = False
+        self.filter = True
         self.minz = 0.1
         self.min_phi = 0.1
+        self.max_t0 = self.delta_t
 
         self.create_sample(gals)
         self.good = dict()
@@ -722,13 +723,10 @@ class SkyMap(magic.Ball):
         for ball in balls:
             self.balls.remove(ball)
 
-
     async def tick(self):
 
         self.create_sample()
-        self.t = self.delta_t
-        t = self.t
-
+        t = self.delta_t
         result = self.uoft(t)
        
         # filter sample to get those nearer than the sqrt(self.fudge)
@@ -736,22 +734,28 @@ class SkyMap(magic.Ball):
 
         # get array of bools indicating values we want to keep
         if self.filter:
-            keep = [(distance < max_distance and redshift > self.minz)
-                    for redshift, distance
-                    in zip(result['z'], result['distance'])]
+            keep = [(distance < max_distance and
+                     redshift > self.minz)
+                    for redshift, distance, t0
+                    in zip(result['z'], result['distance'], result['t0'])]
 
             if np.any(keep):
-
+                print(f'Keeping {len(keep)} t={t}')
                 for key, value in result.items():
                     keepers = np.array(value)[keep]
                     if key in self.good:
                         self.good[key] = np.concatenate((self.good[key], keepers))
                     else:
                         self.good[key] = keepers
+            else:
+                return True
+
+            # delete any balls not keeping
+            for keeper, ball in zip(keep, self.balls):
+                if not keeper:
+                    self.balls.remove(ball)
 
             result = self.good
-
-        if not result: return
 
         zz = np.array(result['z'])
 
@@ -764,10 +768,14 @@ class SkyMap(magic.Ball):
         ax.scatter(zz, distance, c=t0, cmap=magic.random_colour())
         zline = np.linspace(min(distance), max(distance), 100)
         ax.plot(zline, zline)
+
+        if len(zz) > 2:
+            line = statistics.linear_regression(zz, distance, proportional=True)
+            ax.plot(zline, (zline * line.slope) + line.intercept)
         ax.grid(True)
         ax.set_title(
             f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}' +
-            f'max(phi)={sqrt(self.fudge):.2}')
+            f' max(phi)={sqrt(self.fudge):.2}')
         ax.show()
 
         ax = await self.get()
@@ -781,7 +789,6 @@ class SkyMap(magic.Ball):
         ax.show()
 
         return
-
 
     async def explore(self):
         
@@ -1138,12 +1145,9 @@ class Spiral(magic.Ball):
 
         # Central mass.  Mass converted to Schwartzschild radius (in light years)
         # Mass of 1 is approximately 3e12 solar masses.
-        self.Mcent = 0.03
+        self.set_mcent(0.03)
         self.Mball = 0.
         self.Mdisc = 0.
-
-        self.K = self.Mcent
-        self.omega0 = self.A / self.K   # angular velocity in radians per year
 
         # magic constant determined by overall energy in the orbit
         self.EE = -0.00000345
@@ -1155,7 +1159,15 @@ class Spiral(magic.Ball):
         self.rmin = 5000
         self.rmax = 50000
 
-        
+    def set_mcent(self, mcent):
+
+        self.Mcent = mcent
+
+        self.K = self.Mcent
+        self.omega0 = self.A / self.K   # angular velocity in radians per year
+
+        # FIXME: should find self.CC
+
     def print_parms(self):
         
         print('omega0', self.omega0)
@@ -1526,12 +1538,26 @@ class Spiral(magic.Ball):
         #assert np.allclose([t], [self.tofu(uval)])
 
         return uval
+
+    async def wits(self):
+
+        rr = np.linspace(self.rmin, self.rmax, 100)
+
+        nn = 100
+
+        ax = await self.get()
+        ax.projection('polar')
+
+        data = []
+        for r in rr:
+            r, self.v(r), random.random() * pi
+            
+        #vv = [self.v(r) for r in rr]
+        vv = self.v(rr)
+
         
 
     async def run(self):
-
-        # switch mode if it is time to do so
-        self.mode_switch()
 
         self.spheres3()
 
@@ -1563,6 +1589,8 @@ class Spiral(magic.Ball):
             ax.plot(rr, rdd, label='rdoubledot')
             ax.legend(loc=0)
             ax.show()
+
+            await self.wits()
 
         thetadot = vv/rr;
 

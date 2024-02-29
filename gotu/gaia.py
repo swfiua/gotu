@@ -44,6 +44,8 @@ from astropy.table import Table, vstack
 from astropy import coordinates
 from astropy import units as u
 
+from astroquery.gaia import Gaia
+
 import healpy as hp
 
 from blume.magic import Ball
@@ -57,10 +59,11 @@ from blume import magic
 
 from blume import farm as fm
 
-TABLE = 'gaiadr2.gaia_source'
+TABLE = 'gaiadr3.gaia_source'
 TABLE_SIZE=1692919134
 
-COLUMNS = ('source_id', 'random_index', 'ra', 'dec', 'parallax', 'radial_velocity')
+COLUMNS = ('source_id', 'random_index', 'b', 'l', 'ra', 'dec',
+           'parallax', 'radial_velocity')
 
 FILENAME = 'radial_velocity2.fits'
 
@@ -72,16 +75,12 @@ def get_sample(squeal, filename=None):
     else:
         print(squeal)
 
-
-    from astroquery.gaia import Gaia
-    job = Gaia.launch_job_async(
+    job = Gaia.launch_job(
         squeal,
         output_file=str(filename),
         dump_to_file=filename)
 
     print('*' * 49)
-    print(job)
-    job.wait_for_job_end()
     print(job)
     
     return job.get_results()
@@ -102,7 +101,7 @@ class Milky(Ball):
         self.sagastar = True
         self.clip = 25  # either side
 
-        self.keys = deque(('r_est', 'radial_velocity'))
+        self.keys = deque(('parallax', 'radial_velocity'))
 
         self.coord = deque((('C', 'G'), 'C', 'E'))
         
@@ -128,6 +127,8 @@ class Milky(Ball):
 
     async def get_samples(self):
 
+        Gaia.ROW_LIMIT = self.topn
+        
         while len(self.bunches) < self.nbunch:
 
             squeal = self.get_squeal()
@@ -136,7 +137,7 @@ class Milky(Ball):
             # take sample
             bid = len(self.bunches)
             path = Path(f'bunch_{bid}.fits')
-            bunch = magic.spawn(get_sample(squeal, str(path)))
+            bunch = get_sample(squeal, str(path))
 
             self.bunches.append(bunch)
             
@@ -169,16 +170,20 @@ class Milky(Ball):
         modulus = 997
         
         squeal = (
-            f'SELECT top {self.topn} {columns} ' +
+            f'SELECT top {self.topn} {COLUMNS} ' +
             #f'SELECT {columns} ' +
-            'FROM external.gaiadr2_geometric_distance ' +
-            'JOIN gaiadr2.gaia_source USING (source_id) ' +
+            'FROM gaiadr3.gaiadr3.gaia_source ' +
             #'WHERE r_est < 1000 AND teff_val > 7000 ')
             #f'WHERE MOD(random_index, {modulus}) = 0')
             #f'WHERE random_index in {sample} ' +
             f'WHERE radial_velocity is not null ' +
             f'AND MOD(random_index, {modulus}) = {len(self.bunches)}')
 
+        squeal = (f'SELECT top {self.topn} * ' +
+            'FROM gaiadr3.gaia_source ' +
+            f'WHERE radial_velocity is not null ' +
+            f'AND MOD(random_index, {modulus}) = {len(self.bunches)}')
+            
 
         #squeal = f'select top 100000 {columns} from {table} where radial_velocity IS NOT NULL'
         #squeal = f'select top 1000 {coumns} from {table} where mod(random_index, 1000000) = 0'
@@ -212,7 +217,7 @@ class Milky(Ball):
 
             ra = np.concatenate((ra, rra))
             dec = np.concatenate((dec, ddec))
-            dist = np.concatenate((dist, [x['r_est'] for x in table]))
+            dist = np.concatenate((dist, [1/x['parallax'] for x in table]))
 
             coords = coordinates.SkyCoord(ra, dec, unit='deg')
 
@@ -233,14 +238,14 @@ class Milky(Ball):
 
             vmin, vmax = np.percentile(cdata, (self.clip, 100-self.clip))
 
-            if False:
+            if True:
                 ax = await self.get()
                 ax.projection('polar')
 
                 dist = dist.clip(max=6000)
 
                 ax.scatter(dec,
-                           dist,
+                           1/dist,
                            s=0.1,
                            c=cdata.clip(vmin, vmax),
                            cmap=magic.random_colour())
@@ -296,10 +301,6 @@ async def run(args):
 
     farm = fm.Farm()
     farm.add(milky)
-
-    # farm strageness, whilst I figure out how it should work
-    # add to path to get key events at start 
-    farm.shep.path.append(milky)
 
     await farm.start()
 
