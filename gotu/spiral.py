@@ -449,7 +449,8 @@ class SkyMap(magic.Ball):
         self.max_distance = 1e8 * u.lightyear
         self.filter = True
         self.minz = 0.1
-        self.min_phi = 0.1
+        self.min_phi = 0.001
+        self.max_phi = 0.5
         self.max_t0 = self.delta_t
 
         self.create_sample(gals)
@@ -480,10 +481,10 @@ class SkyMap(magic.Ball):
 
         self.balls = gals or []
 
-        #dt = self.delta_t
-        dt = 0
+        dt = self.delta_t
+        #dt = 0
         self.balls += list(sample_galaxies(
-            n or self.n, fudge=self.fudge, t0=t0, delta_t=dt,
+            n or self.n, fudge=self.max_phi**2, t0=t0, delta_t=dt,
             min_phi=self.min_phi,
             cosmo=self.cosmo))
 
@@ -726,18 +727,36 @@ class SkyMap(magic.Ball):
 
     async def ticker(self):
         
-        self.create_sample(self.balls)
-
-        delta_t = self.delta_t / 100
-        self.t = 0
+        delta_t = self.delta_t / 100.
+        self.t = 0.
+        self.balls = []
         while True:
             self.t += delta_t
             done = await self.tick()
+            if done: return
+
+    async def walker(self, inc=0.1):
+
+        self.create_sample()
+        for ball in self.balls:
+            ball.t0 = 0.
+
+        self.good = {}
+        self.t = 0
+
+        while True:
+            self.t += inc
+            done = await self.tick()
 
             if done: return
+            await magic.sleep(self.sleep)
+
 
     async def tick(self):
 
+        #self.create_sample()
+
+        #t = self.delta_t
         t = self.t
         result = self.uoft(t)
        
@@ -753,7 +772,11 @@ class SkyMap(magic.Ball):
                     in zip(result['z'], result['distance'], result['t0'])]
 
             if np.any(keep):
-                print(f'Keeping {len(keep)} t={t}')
+
+                if self.good:
+                    print(f'Keeping {len(keep)} t={t} good={len(self.good["theta"])}')
+                else:
+                    print(f'Keeping {len(keep)} t={t}')
                 for key, value in result.items():
                     keepers = np.array(value)[keep]
                     if key in self.good:
@@ -778,18 +801,32 @@ class SkyMap(magic.Ball):
         # do some plotting
         ax = await self.get()
 
-        ax.scatter(zz, distance, c=t0, cmap=magic.random_colour())
-        zline = np.linspace(min(distance), max(distance), 100)
-        ax.plot(zline, zline)
+        colours = magic.random_colour()
 
-        if len(zz) > 2:
-            line = statistics.linear_regression(zz, distance, proportional=True)
-            ax.plot(zline, (zline * line.slope) + line.intercept)
+        ax.scatter(zz, distance, c=result['theta'],
+                   cmap=colours)
+        zline = np.linspace(min(distance), max(distance), 100)
+        line = statistics.linear_regression(zz, distance, proportional=True)
+        ax.plot(zline, zline)
+        ax.plot(zline, (zline * line.slope) + line.intercept)
         ax.grid(True)
         ax.set_title(
             f't={t:.3f} z v distance, t0={min(t0):.4} to {max(t0):.4}' +
-            f' max(phi)={sqrt(self.fudge):.2}')
+            f' max(phi)={self.max_phi:.2} slope:{line.slope:.2}')
         ax.show()
+
+        redszz = zz[zz>0]
+        redsdist = distance[zz>0]
+        if len(redszz) > 2:
+            axz = await self.get()
+            axz.scatter(redszz, redsdist, c=result['theta'][zz>0],
+                        cmap=colours)
+            line = statistics.linear_regression(redszz, redsdist, proportional=True)
+            axz.plot(zline, zline)
+            axz.plot(zline, (zline * line.slope) + line.intercept)
+            axz.set_title(f"Best fit slope: {line.slope:.4}")
+            axz.grid(True)
+            axz.show()
 
         ax = await self.get()
         ax.set_title('Theta')

@@ -60,15 +60,34 @@ from blume import magic
 from blume import farm as fm
 
 TABLE = 'gaiadr3.gaia_source'
-TABLE_SIZE=1692919134
+TABLE_SIZE=1811709771
 
 COLUMNS = ('source_id', 'random_index', 'b', 'l', 'ra', 'dec',
-           'parallax', 'radial_velocity')
+           'parallax',
+           'pmra', 'pmdec', 'radial_velocity')
 
 FILENAME = 'radial_velocity2.fits'
 
+def get_squeal(bunch, nbunch):
 
-def get_sample(squeal, filename=None):
+    columns = (', ').join(COLUMNS)
+
+    bunch_size = int(TABLE_SIZE / nbunch)
+    start = bunch * bunch_size
+    end = start + bunch_size
+
+    squeal = (f'SELECT {columns} ' +
+        f'FROM {TABLE} ' +
+        f'WHERE radial_velocity is not null ' +
+        f'AND random_index BETWEEN {start} AND {end}')
+
+
+    #squeal = f'select top 100000 {columns} from {table} where radial_velocity IS NOT NULL'
+    #squeal = f'select top 1000 {coumns} from {table} where mod(random_index, 1000000) = 0'
+    print(squeal)
+    return squeal
+
+def get_sample(squeal):
 
     if len(squeal) > 1000:
         print(f'squeal: {squeal[:360]} .. {squeal[-180:]}')
@@ -86,6 +105,25 @@ def get_sample(squeal, filename=None):
     return job.get_results()
 
 
+def get_samples(n=1000):
+
+    for bid in range(n):
+
+        path = Path(f'bunch_{bid}.fits.gz')
+
+        if path.exists():
+            print('already exists:', path)
+            continue
+        
+        squeal = get_squeal(bid, n)
+        
+        print('launching gaia async job for:', path)
+        job = Gaia.launch_job_async(
+            squeal,
+            output_file=str(path),
+            dump_to_file=True)
+
+
 class Milky(Ball):
 
     def __init__(self, bunch=1, topn=1): 
@@ -97,14 +135,10 @@ class Milky(Ball):
         self.bix = 0
         self.topn = topn
         self.level = 6
-        self.galactic = True
-        self.sagastar = True
         self.clip = 25  # either side
 
         self.keys = deque(('parallax', 'radial_velocity'))
 
-        self.coord = deque((('C', 'G'), 'C', 'E'))
-        
 
     async def start(self):
         """ start async task to read/download data """
@@ -112,7 +146,7 @@ class Milky(Ball):
         # load any bunches there are
         # for now, keep them separate
         path = Path()
-        for bunch in path.glob('bunch*.fits'):
+        for bunch in path.glob('bunch*.fits.gz'):
             if bunch.exists():
                 table = Table.read(bunch)
                 self.bunches.append(table)
@@ -122,180 +156,149 @@ class Milky(Ball):
 
             await magic.sleep(0)
 
-        # launch a task to get more bunches, if needed
-        magic.spawn(self.get_samples())
-
-    async def get_samples(self):
-
-        Gaia.ROW_LIMIT = self.topn
+    def build_table(self):
         
-        while len(self.bunches) < self.nbunch:
+        #print(hpxmap)
+        # Sag A*
 
-            squeal = self.get_squeal()
+        table = vstack(list(self.bunches))
 
-
-            # take sample
-            bid = len(self.bunches)
-            path = Path(f'bunch_{bid}.fits')
-            bunch = get_sample(squeal, str(path))
-
-            self.bunches.append(bunch)
-            
-    def get_squeal(self):
-
-        columns = (', ').join(COLUMNS)
-        columns = '*'
-        table = TABLE
-        sample = tuple(range(self.topn))
-        squeal = f'select top {self.topn} {columns} from {table} where random_index in {sample}'
-        squeal = f'select top {self.topn} gaia_healpix_index(6, source_id) as healpix_6 count(*) from {table} where random_index in {sample}'
-        squeal = f'select top {self.topn} count(*) from {table} where random_index in {sample}'
-
-        example_squeal = "SELECT TOP 10"
-        "gaia_healpix_index(6, source_id) AS healpix_6,"
-        "count(*) / 0.83929 as sources_per_sq_deg,"
-        "avg(astrometric_n_good_obs_al) AS avg_n_good_al,"
-        "avg(astrometric_n_good_obs_ac) AS avg_n_good_ac,"
-        "avg(astrometric_n_good_obs_al + astrometric_n_good_obs_ac) AS avg_n_good,"
-        "avg(astrometric_excess_noise) as avg_excess_noise"
-        "FROM gaiadr1.tgas_source"
-        "GROUP BY healpix_6"
-
-
-        columns = 'source_id, ra, dec, phot_g_mean_mag, r_est, r_lo, r_hi, teff_val, radial_velocity, random_index'
-
-        #inflate = 1
-        #sample = tuple(random.randint(0, TABLE_SIZE)
-        #               for x in range(self.topn * inflate))
-        modulus = 997
-        
-        squeal = (
-            f'SELECT top {self.topn} {COLUMNS} ' +
-            #f'SELECT {columns} ' +
-            'FROM gaiadr3.gaiadr3.gaia_source ' +
-            #'WHERE r_est < 1000 AND teff_val > 7000 ')
-            #f'WHERE MOD(random_index, {modulus}) = 0')
-            #f'WHERE random_index in {sample} ' +
-            f'WHERE radial_velocity is not null ' +
-            f'AND MOD(random_index, {modulus}) = {len(self.bunches)}')
-
-        squeal = (f'SELECT top {self.topn} * ' +
-            'FROM gaiadr3.gaia_source ' +
-            f'WHERE radial_velocity is not null ' +
-            f'AND MOD(random_index, {modulus}) = {len(self.bunches)}')
-            
-
-        #squeal = f'select top 100000 {columns} from {table} where radial_velocity IS NOT NULL'
-        #squeal = f'select top 1000 {coumns} from {table} where mod(random_index, 1000000) = 0'
-
-        return squeal
+        self.table = table
 
     async def run(self):
 
-        #print(hpxmap)
-        # Sag A*
+        if not hasattr(self, 'table'):
+            self.build_table()
+
+        table = self.table
+        ra = table['ra']
+        dec = table['dec']
+        pmra = table['pmra']
+        pmdec = table['pmdec']
+        radial_velocity = table['radial_velocity']
+        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
+
+        coords = coordinates.ICRS(
+            ra = ra, 
+            dec = dec, 
+            distance = dist, 
+            pm_ra_cosdec = pmra, 
+            pm_dec = pmdec, 
+            radial_velocity = radial_velocity)            
+
+        fudge = 2.
+
+        X_GC_sun_kpc = fudge * 8.    #[kpc]
+        Z_GC_sun_kpc = 0.025 #[kpc] (e.g. Juric et al. 2008)
+
+        #circular velocity of the Galactic potential at the radius of the Sun:
+        vcirc_kms = 220. #[km/s] (e.g. Bovy 2015)
+
+        #Velocity of the Sun w.r.t. the Local Standard of Rest (e.g. Schoenrich et al. 2009):
+        U_LSR_kms = 11.1  # [km/s]
+        V_LSR_kms = 12.24 # [km/s]
+        W_LSR_kms = 7.25  # [km/s]
+
+        #Galactocentric velocity of the Sun:
+        vX_GC_sun_kms = -U_LSR_kms           # = -U              [km/s]
+        vY_GC_sun_kms =  V_LSR_kms+vcirc_kms # = V+v_circ(R_Sun) [km/s]
+        vZ_GC_sun_kms =  W_LSR_kms           # = W               [km/s]
+
+        # keep proper motion of Sgr A* constant! 
+        vY_GC_sun_kms = X_GC_sun_kpc * vY_GC_sun_kms / X_GC_sun_kpc
+
+        gc = coordinates.Galactocentric(
+            galcen_distance = X_GC_sun_kpc*u.kpc,
+            galcen_v_sun = coordinates.CartesianDifferential(
+                [-vX_GC_sun_kms, vY_GC_sun_kms, vZ_GC_sun_kms] * u.km/u.s),
+            z_sun = Z_GC_sun_kpc*u.kpc)
+
+        self.galcen = galcen = coords.transform_to(gc)
+        xs, ys, zs = galcen.x.to(u.kpc), galcen.y.to(u.kpc), galcen.z.to(u.kpc)
+        vxs, vys, vzs = galcen.v_x, galcen.v_y, galcen.v_z
+
+        XS = np.nan_to_num(
+            np.vstack([xs.value, ys.value, zs.value, vxs.value, vys.value, vzs.value]).T)
+
+        # centre view on sun
+        xmin, ymin, radius = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc, 35
+
+        Xlimits = [[xmin - radius, xmin + radius], [-radius, radius], [-20, 20], 
+                   [-250, 250], [-250, 250], [-250, 250]]
+        Xlabels = ['$x$', '$y$', '$z$', r'$v_x$', r'$v_y$', r'$v_z$']
+
+        d2d = np.sqrt(XS[:, 0] ** 2 + XS[:, 1] ** 2)
+        units = XS[:, 0:2] / d2d[:, None]
+        perps = np.zeros_like(units)
+        perps[:, 0] = units[:, 1]
+        perps[:, 1] = -units[:, 0]
+        vtans = np.nan_to_num(np.sum(perps * XS[:, 3:5], axis=1))
+        R = np.sqrt(XS[:, 0] ** 2 + XS[:, 1] ** 2) # in cylindrical coordinates! # + XS[:, 2] ** 2)
+
+        print(f'observations: {len(ra)}')
+        cdata = table['radial_velocity']
+        
+        vmin, vmax = np.percentile(cdata, (self.clip, 100-self.clip))
+
+        if False:
+            ax = await self.get()
+            ax.projection('polar')
+
+            dist = dist.clip(max=6000)
+
+            ax.scatter(ra,
+                       dist,
+                       s=0.1,
+                       c=cdata.clip(vmin, vmax),
+                       cmap=magic.random_colour())
+            #plt.colorbar()
+            #await self.put(magic.fig2data(plt))
+            ax.show()
+                
+        ax = await self.get()
+        ax.projection('mollweide')
+
+        ras = coords.ra.rad - math.pi
+        decs = coords.dec
+
+        print(len(ras), len(decs))
+        ax.scatter([x for x in ras],
+                   [x.rad for x in decs],
+                   s=0.1,
+                   #c=cdata.clip(vmin, vmax),
+                   c=vtans.clip(-300, 300),
+                   cmap=magic.random_colour())
+
+
         sagra = coordinates.Angle('17h45m20.0409s')
         sagdec = coordinates.Angle('-29d0m28.118s')
-        print(f'sag A* {sagra.deg} {sagdec}')
 
-        ra = np.zeros(0)
-        dec = np.zeros(0)
-        dist = np.zeros(0)
-        cdata = np.zeros(0)
+        self.sagastar = sagastar = coordinates.SkyCoord(sagra, sagdec)
+        print(f'sag A* {sagastar.ra} {sagastar.dec} {sagastar.galactic.l} {sagastar.galactic.b}')
+        ax.scatter([sagastar.ra.rad], [sagastar.dec.rad], c='r')
+        ax.show()
 
-        key = self.keys[0]
+        ax = await self.get()
+        ax.projection('mollweide')
+        ax.scatter(
+            (((table['l'] + 180.) % 360.)-180.)*math.pi/180.,
+            table['b'] * math.pi/180., s=0.1, c=vtans, vmin=-300, vmax=300,
+            cmap=magic.random_colour())
+        self.vtans = vtans
+        ax.show()
 
-        while True:
+        ax = await self.get()
+        mask = abs(vtans) < 300
+        ax.scatter(R[mask], vtans[mask], c=table['l'][mask])
+        ax.show()
 
-            table = self.bunches[0]
-            self.bunches.rotate()
-            
-            # Rotate the view
-            #rot = hp.rotator.Rotator(coord=self.coord[0], deg=False)
-            
-            rra, ddec = [x['ra'] for x in table],  [x['dec'] for x in table]
-
-            ra = np.concatenate((ra, rra))
-            dec = np.concatenate((dec, ddec))
-            dist = np.concatenate((dist, [1/x['parallax'] for x in table]))
-
-            coords = coordinates.SkyCoord(ra, dec, unit='deg')
-
-            badval = 1e20
-            count = 0
-
-            print(f'observations: {len(ra)}')
-
-            dkey = table[key]
-            print(dkey.mean())
-            
-            dkey.fill_value = dkey.mean()
-            dkey.fill_value = -400
-            print(dkey.min())
-            cdata = np.concatenate((
-                cdata,
-                dkey.filled()))
-
-            vmin, vmax = np.percentile(cdata, (self.clip, 100-self.clip))
-
-            if True:
-                ax = await self.get()
-                ax.projection('polar')
-
-                dist = dist.clip(max=6000)
-
-                ax.scatter(dec,
-                           1/dist,
-                           s=0.1,
-                           c=cdata.clip(vmin, vmax),
-                           cmap=magic.random_colour())
-                #plt.colorbar()
-                #await self.put(magic.fig2data(plt))
-                ax.show()
-                
-            ax = await self.get()
-            ax.projection('mollweide')
-
-            if self.galactic:
-                ras = ((coords.galactic.l.rad + math.pi) % (2 * math.pi)) - math.pi
-                decs = coords.galactic.b
-            else:
-                ras = coords.ra.rad - math.pi
-                decs = coords.dec
-
-            ax.scatter([x for x in ras],
-                       [x.rad for x in decs],
-                       s=0.1, c=cdata.clip(vmin, vmax),
-                       cmap=magic.random_colour())
-
-
-            #ax.scatter([math.radians(x) - math.pi for x in ra],
-            #           [math.radians(x) for x in dec],
-            #           s=0.1, c=cdata.clip(vmin, vmax),
-            #           cmap=magic.random_colour())
-            ax.scatter([sagra.deg], [sagdec.deg], c='r')
-            # show a point at the origin
-            #ax.scatter([0.0], [0.0])
-
-            print(f'FFFFF {sagra.deg} {sagdec.deg}')
-            
-            ax.show()
-
-            await magic.sleep(self.sleep)
-
-
-    async def rotate_view(self):
-        """ Galactic or Equator? """
-        if self.coord == ('C', 'G'):
-            self.coord = 'C'
-
-        elif self.coord == 'C':
-            self.coord = 'E'
-        else:
-            self.coord = ('C', 'G')
-            
 
 async def run(args):
+
+    if args.download:
+        # just download the data
+        get_samples(args.bunch)
+        return
 
     milky = Milky(args.bunch, args.topn)
 
@@ -311,9 +314,9 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-bunch', type=int, default=1)
-    parser.add_argument('-topn', type=int, default=10)
-
+    parser.add_argument('--bunch', type=int, default=100)
+    parser.add_argument('--topn', type=int, default=10)
+    parser.add_argument('--download', action='store_true')
 
     magic.run(run(parser.parse_args()))
     
