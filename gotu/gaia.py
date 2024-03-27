@@ -134,9 +134,9 @@ class Milky(Ball):
         self.nbunch = bunch
         self.bix = 0
         self.topn = topn
-        self.level = 6
+        self.runs = 0
         self.clip = 25  # either side
-
+        self.fudge = 2.
         self.keys = deque(('parallax', 'radial_velocity'))
 
 
@@ -145,11 +145,14 @@ class Milky(Ball):
 
         # load any bunches there are
         # for now, keep them separate
+        self.nbins = 200
+        self.vrcounts = np.zeros((self.nbins, self.nbins))
+        self.buckets = np.zeros(self.nbins)
+        self.counts = np.zeros(self.nbins)
         path = Path()
         for bunch in path.glob('bunch*.fits.gz'):
             if bunch.exists():
-                table = Table.read(bunch)
-                self.bunches.append(table)
+                self.bunches.append(bunch)
 
             if len(self.bunches) == self.nbunch:
                 break
@@ -167,6 +170,17 @@ class Milky(Ball):
 
     async def run(self):
 
+        self.runs += 1
+        print("number of runs", self.runs)
+        for x in range(1):
+            self.calculate()
+
+        await self.plots()
+        
+    def calculate(self):
+        
+        self.table = Table.read(self.bunches[0])
+        self.bunches.rotate()
         if not hasattr(self, 'table'):
             self.build_table()
 
@@ -186,7 +200,7 @@ class Milky(Ball):
             pm_dec = pmdec, 
             radial_velocity = radial_velocity)            
 
-        fudge = 2.
+        fudge = self.fudge
 
         X_GC_sun_kpc = fudge * 8.    #[kpc]
         Z_GC_sun_kpc = 0.025 #[kpc] (e.g. Juric et al. 2008)
@@ -217,81 +231,67 @@ class Milky(Ball):
         xs, ys, zs = galcen.x.to(u.kpc), galcen.y.to(u.kpc), galcen.z.to(u.kpc)
         vxs, vys, vzs = galcen.v_x, galcen.v_y, galcen.v_z
 
-        XS = np.nan_to_num(
-            np.vstack([xs.value, ys.value, zs.value, vxs.value, vys.value, vzs.value]).T)
-
         # centre view on sun
         xmin, ymin, radius = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc, 35
 
-        Xlimits = [[xmin - radius, xmin + radius], [-radius, radius], [-20, 20], 
-                   [-250, 250], [-250, 250], [-250, 250]]
-        Xlabels = ['$x$', '$y$', '$z$', r'$v_x$', r'$v_y$', r'$v_z$']
-
-        d2d = np.sqrt(XS[:, 0] ** 2 + XS[:, 1] ** 2)
-        units = XS[:, 0:2] / d2d[:, None]
-        perps = np.zeros_like(units)
-        perps[:, 0] = units[:, 1]
-        perps[:, 1] = -units[:, 0]
-        vtans = np.nan_to_num(np.sum(perps * XS[:, 3:5], axis=1))
-        R = np.sqrt(XS[:, 0] ** 2 + XS[:, 1] ** 2) # in cylindrical coordinates! # + XS[:, 2] ** 2)
+        d2d = np.sqrt(xs.value ** 2 + ys.value ** 2)
+        xperps = ys.value / d2d
+        yperps = -xs.value / d2d
+        vtans = np.nan_to_num((xperps * vxs.value) + (yperps * vys.value))
 
         print(f'observations: {len(ra)}')
         cdata = table['radial_velocity']
         
-        vmin, vmax = np.percentile(cdata, (self.clip, 100-self.clip))
+        rmax = 40.
+        offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
+        mask = ((-500 <= vtans) & (vtans <= 700) &
+                (np.abs(table['b']) < 10.) &
+                (d2d > offset) & (d2d < rmax + offset))
 
-        if False:
-            ax = await self.get()
-            ax.projection('polar')
+        print(f'Filtering from {len(mask)} to {len(mask[mask])}')
+        minv, maxv = -300, 500
+        rr = d2d[mask]
+        vv = vtans[mask]
 
-            dist = dist.clip(max=6000)
+        buckets = self.buckets
+        counts = self.counts
+        rsize = rmax/(self.nbins-1)
+        vsize = (maxv-minv)/(self.nbins-1)
+        
+        for r, v in zip(rr, vv):
+            bb = int((r-offset) // rsize)
+            vv = int((max(min(v, maxv), minv) - minv) // vsize)
+            self.vrcounts[bb, vv] += 1
+            buckets[bb] += v
+            counts[bb] += 1
 
-            ax.scatter(ra,
-                       dist,
-                       s=0.1,
-                       c=cdata.clip(vmin, vmax),
-                       cmap=magic.random_colour())
-            #plt.colorbar()
-            #await self.put(magic.fig2data(plt))
-            ax.show()
-                
-        ax = await self.get()
-        ax.projection('mollweide')
-
-        ras = coords.ra.rad - math.pi
-        decs = coords.dec
-
-        print(len(ras), len(decs))
-        ax.scatter([x for x in ras],
-                   [x.rad for x in decs],
-                   s=0.1,
-                   #c=cdata.clip(vmin, vmax),
-                   c=vtans.clip(-300, 300),
-                   cmap=magic.random_colour())
-
-
-        sagra = coordinates.Angle('17h45m20.0409s')
-        sagdec = coordinates.Angle('-29d0m28.118s')
-
-        self.sagastar = sagastar = coordinates.SkyCoord(sagra, sagdec)
-        print(f'sag A* {sagastar.ra} {sagastar.dec} {sagastar.galactic.l} {sagastar.galactic.b}')
-        ax.scatter([sagastar.ra.rad], [sagastar.dec.rad], c='r')
-        ax.show()
+    async def plots(self):
+        
+        rmax = 40.
+        X_GC_sun_kpc = self.fudge * 8.    #[kpc]
+        offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
 
         ax = await self.get()
-        ax.projection('mollweide')
-        ax.scatter(
-            (((table['l'] + 180.) % 360.)-180.)*math.pi/180.,
-            table['b'] * math.pi/180., s=0.1, c=vtans, vmin=-300, vmax=300,
-            cmap=magic.random_colour())
-        self.vtans = vtans
+        minv, maxv = -300, 500
+        extent = (offset, rmax+offset, minv, maxv)
+
+        counts = self.counts
+        assert np.alltrue((self.vrcounts.T/(counts+1)) <= 1.)
+        #extent=None
+        #ax.scatter(d2d[mask], vtans[mask].clip(minv, maxv), c=ys.value[mask], s=0.05)
+        ax.imshow(self.vrcounts[:, 1:-1].T/(counts+1),
+                  origin='lower',
+                  extent=extent,
+                  aspect='auto',
+                  cmap=magic.random_colour())
+        #ax.plot(offset + np.linspace(0, rmax, self.nbins),
+        #        (buckets/counts).clip(minv, maxv), 'ro')
         ax.show()
 
-        ax = await self.get()
-        mask = abs(vtans) < 300
-        ax.scatter(R[mask], vtans[mask], c=table['l'][mask])
-        ax.show()
-
+        #ax = await self.get()
+        #ax.scatter(xs.value[mask], ys.value[mask],
+        #           c=vtans[mask], cmap=magic.random_colour(), s=0.05)
+        #ax.show()
 
 async def run(args):
 
