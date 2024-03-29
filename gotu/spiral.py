@@ -448,9 +448,9 @@ class SkyMap(magic.Ball):
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
         self.filter = True
-        self.minz = 0.1
+        self.minz = -1.
         self.min_phi = 0.001
-        self.max_phi = 0.5
+        self.max_phi = 2.0
         self.max_t0 = self.delta_t
 
         self.create_sample(gals)
@@ -815,12 +815,14 @@ class SkyMap(magic.Ball):
             f' max(phi)={self.max_phi:.2} slope:{line.slope:.2}')
         ax.show()
 
-        redszz = zz[zz>0]
-        redsdist = distance[zz>0]
+        mask = (zz>0) & (distance < 2)
+        redszz = zz[mask]
+        redsdist = distance[mask]
         if len(redszz) > 2:
             axz = await self.get()
-            axz.scatter(redszz, redsdist, c=result['theta'][zz>0],
+            axz.scatter(redszz, redsdist, c=result['theta'][mask],
                         cmap=colours)
+            zline = np.linspace(min(redsdist), max(redsdist), 100)
             line = statistics.linear_regression(redszz, redsdist, proportional=True)
             axz.plot(zline, zline)
             axz.plot(zline, (zline * line.slope) + line.intercept)
@@ -1207,7 +1209,7 @@ class Spiral(magic.Ball):
 
         # range of radius r to consider, in light years
         self.rmin = 5000
-        self.rmax = 50000
+        self.rmax = 100000
 
     def set_mcent(self, mcent):
 
@@ -1660,6 +1662,11 @@ class Spiral(magic.Ball):
         ax.plot(thetaValues - (B * tvalues), rr)
         ax.plot(thetaValues - (B * tvalues) + math.pi, rr)
         ax.axis('off')
+        ax.show()
+
+        ax = await self.get()
+        ax.set_title('r v t')
+        ax.plot(rr, tvalues)
         ax.show()
 
 
