@@ -36,6 +36,11 @@ Specifically, where is it relative to the galactic centre?
 
 Recognising that the galactic centre is a bit of a puzzle itself.
 
+2024/3/29
+=========
+
+
+
 """
 import argparse
 from collections import deque
@@ -172,12 +177,6 @@ class Milky(Ball):
 
         self.runs += 1
         print("number of runs", self.runs)
-        for x in range(1):
-            self.calculate()
-
-        await self.plots()
-        
-    def calculate(self):
         
         self.table = Table.read(self.bunches[0])
         self.bunches.rotate()
@@ -245,7 +244,7 @@ class Milky(Ball):
         rmax = 40.
         offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
         mask = ((-500 <= vtans) & (vtans <= 700) &
-                (np.abs(table['b']) < 10.) &
+                (np.abs(table['b']) < 15.) &
                 (d2d > offset) & (d2d < rmax + offset))
 
         print(f'Filtering from {len(mask)} to {len(mask[mask])}')
@@ -259,24 +258,20 @@ class Milky(Ball):
         vsize = (maxv-minv)/(self.nbins-1)
         
         for r, v in zip(rr, vv):
-            bb = int((r-offset) // rsize)
-            vv = int((max(min(v, maxv), minv) - minv) // vsize)
-            self.vrcounts[bb, vv] += 1
-            buckets[bb] += v
-            counts[bb] += 1
-
-    async def plots(self):
-        
-        rmax = 40.
-        X_GC_sun_kpc = self.fudge * 8.    #[kpc]
-        offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
+            rbucket = int((r-offset) // rsize)
+            vbucket = int((max(min(v, maxv), minv) - minv) // vsize)
+            self.vrcounts[rbucket, vbucket] += 1
+            buckets[rbucket] += v
+            counts[rbucket] += 1
 
         ax = await self.get()
-        minv, maxv = -300, 500
+        print(dir(coords))
+        ax.scatter(rr, vv, c=table['b'][mask].value, s=0.1, cmap=magic.random_colour())
+        ax.show()
+
+        ax = await self.get()
         extent = (offset, rmax+offset, minv, maxv)
 
-        counts = self.counts
-        assert np.alltrue((self.vrcounts.T/(counts+1)) <= 1.)
         #extent=None
         #ax.scatter(d2d[mask], vtans[mask].clip(minv, maxv), c=ys.value[mask], s=0.05)
         ax.imshow(self.vrcounts[:, 1:-1].T/(counts+1),
