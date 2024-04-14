@@ -73,16 +73,18 @@ COLUMNS = ('source_id', 'random_index', 'b', 'l', 'ra', 'dec',
 
 FILENAME = 'radial_velocity2.fits'
 
-def get_squeal(bunch, nbunch):
+def get_squeal(bunch, nbunch, columns=None, table=None):
 
-    columns = (', ').join(COLUMNS)
+    columns = columns or (', ').join(COLUMNS)
+    table = table or TABLE
 
     bunch_size = int(TABLE_SIZE / nbunch)
     start = bunch * bunch_size
     end = start + bunch_size
 
+
     squeal = (f'SELECT {columns} ' +
-        f'FROM {TABLE} ' +
+        f'FROM {table} ' +
         f'WHERE radial_velocity is not null ' +
         f'AND random_index BETWEEN {start} AND {end}')
 
@@ -110,7 +112,7 @@ def get_sample(squeal):
     return job.get_results()
 
 
-def get_samples(n=1000):
+def get_samples(n=1000, columns=None, table=None):
 
     for bid in range(n):
 
@@ -119,8 +121,8 @@ def get_samples(n=1000):
         if path.exists():
             print('already exists:', path)
             continue
-        
-        squeal = get_squeal(bid, n)
+
+        squeal = get_squeal(bid, n, columns=columns, table=None)
         
         print('launching gaia async job for:', path)
         job = Gaia.launch_job_async(
@@ -291,8 +293,12 @@ class Milky(Ball):
 async def run(args):
 
     if args.download:
+        columns = None
+        if args.full:
+            columns = '*'
+            
         # just download the data
-        get_samples(args.bunch)
+        get_samples(args.bunch, columns=columns, table=args.table)
         return
 
     milky = Milky(args.bunch, args.topn)
@@ -312,6 +318,10 @@ if __name__ == '__main__':
     parser.add_argument('--bunch', type=int, default=100)
     parser.add_argument('--topn', type=int, default=10)
     parser.add_argument('--download', action='store_true')
+    parser.add_argument('--full', action='store_true',
+                        help='download all columns in table')
+    parser.add_argument('--table', default=TABLE,
+                        help='table name to extract')
 
     magic.run(run(parser.parse_args()))
     
