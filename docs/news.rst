@@ -5,6 +5,84 @@
 I will try to give updates from time to time as to what is happening
 here.
 
+2024/4/4
+========
+
+Today's date, 4**3 = 64.
+
+It has been a busy winter of explorations.
+
+The main module is the `gotu.spiral` module which is an evolving
+galactic and galaxy simulation.
+
+It contains most implementations of most of the key formulae from
+`gotu`_.
+
+The module now include a simulation of new galaxies arriving in a de
+Sitter Space universe. It produces plots of blue/red-shift against
+distance for a sample of arrivals.
+
+The goal is to understand the observations of supernovae, which gives
+a good sample of galactic distances and redshifts.  This sample is
+showing that there is more going on than a simple relation between
+redshift and distance.  In Big Bang parlance, the expansion of the
+universe has accelerated.
+
+In the de Sitter model there only an asymptotic relation between
+redshift and distance.  All the galaxies we see eventually recede at
+the Hubble rate.
+
+They burst on the scene, highly blue shifted for what is often a short
+period of time before they accelerate away from us and reach the
+Hubble flow.
+
+The distribution of galaxies we see is skewed to those that have been
+around a good while, and those are all approaching the Hubble flow.
+More particularly, many galaxies do not hang around long enough for a
+super nova event to happen.
+
+When a new galaxy appears it is at the Hubble distance.  This is due
+to the curvature of the universe.  For a galaxy beyond the Hubble
+distance, most of its light bends before it reaches us.
+
+See recent commits to the `gotu.spiral` module for more on this.
+
+Gaia and the galactic centre
+----------------------------
+
+The `gotu.gaia` module can now download data from the ESA's Gaia
+program and create plots showing the Galactic rotation curve.
+
+image:: images/gaia.png
+
+The image above shows the Milky Way's rotation curve, the tangential
+velocity, in km/s on the y-axis and the distance from the galactic
+centre, in kpc on the x-axis.
+
+To create the image a grid of tangential velocity (y-axis) and
+distance from the galactic centre (x-axis) was created.
+
+Counts were then done on the 33 million Gaia (data release 3), to
+establish how many were in each bin.
+
+The number of observations at each distance varies significantly as
+you move out from the galactic centre, so the counts were then
+normalised by dividing the count in each bin by the sum for all bins
+with the same distance from the galactic centre.
+
+The resulting grid is then plotted with matplotlib, which maps the
+counts, now in the range [0, 1], to colours based on a colormap.
+
+The image is stunning, a real example of how the Gaia mission creates
+better insight into our own galaxy.
+
+This image also assumes that the centre of the Milky Way is actually
+twice as far away as Sgr A*, which in this image is around 8kpc from
+the origin, where we see the most common tangential velocity is close
+to zero.
+
+See the `gotu.gaia` module for more on this. 
+
 2023/12/7
 =========
 

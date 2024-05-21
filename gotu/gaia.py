@@ -1,5 +1,4 @@
-"""
-Display data from Gaia
+"""Display data from Gaia
 
 All thanks to the European Space Agency for data and images such as this.
 
@@ -36,10 +35,45 @@ Specifically, where is it relative to the galactic centre?
 
 Recognising that the galactic centre is a bit of a puzzle itself.
 
-2024/3/29
+2024/4/29
 =========
 
+In a recent paper X. Ou et al.
+https://doi.org/10.1093/mnras/stae034 used Gaia and other data sources
+to calculate a galactic rotation curve for the Milk Way.
 
+The finding was that the galaxy had a typical rotation curve, rising
+linearly to 200km/s, remaining at that velocity out to 25kpc.
+
+Xiaowei was kind enough to provide code
+(https://github.com/aceilers/spectroscopic_parallax) which shows how
+to set up astropy coordinates for each Gaia observation based on a
+given location of the galactic centre.
+
+The code now has a --download option, that will download the Gaia
+observations for all stars for which there is a non-null radial
+velocity into a number (default=1000) of bunches.
+
+This splits the ~34 million observations into separate files that are
+downloaded using separate queries.  It is likely there will be
+timeouts and failures, but you can start looking at the data as soon
+as a few bunches have been downloaded.
+
+It is recomended to create a fresh folder, cd to that folder and then
+run:
+
+    python3 -m gotu.gaia --download
+
+You can then run:
+
+    python3 -m gotu.gaia
+
+To view the bunches that have been downloaded, the full dataset is not
+needed to get a good qualitative feel for what is going on.
+
+Please be nice to the Gaia servers.  TODO: look into options for
+sharing tables on Gaia servers.  Also, how to summarise the data?  Bin
+counts?
 
 """
 import argparse
@@ -245,14 +279,19 @@ class Milky(Ball):
         
         rmax = 40.
         offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
+        offset = 0.0
         mask = ((-500 <= vtans) & (vtans <= 700) &
                 (np.abs(table['b']) < 15.) &
                 (d2d > offset) & (d2d < rmax + offset))
+
+        phi = np.arctan2(xs.value, -(ys.value)) - (np.pi / 3)
+        phi[phi < math.pi] += 2 * math.pi
 
         print(f'Filtering from {len(mask)} to {len(mask[mask])}')
         minv, maxv = -300, 500
         rr = d2d[mask]
         vv = vtans[mask]
+        pp = phi[mask]
 
         buckets = self.buckets
         counts = self.counts
@@ -267,8 +306,13 @@ class Milky(Ball):
             counts[rbucket] += 1
 
         ax = await self.get()
-        print(dir(coords))
-        ax.scatter(rr, vv, c=table['b'][mask].value, s=0.1, cmap=magic.random_colour())
+
+        cmap = magic.random_colour()
+        ax.scatter(rr, vv, c=pp, s=0.1, cmap=cmap)
+        ax.show()
+
+        ax = await self.get()
+        ax.scatter(xs[mask], ys[mask], c=pp, s=0.1, cmap=cmap)
         ax.show()
 
         ax = await self.get()
@@ -280,7 +324,9 @@ class Milky(Ball):
                   origin='lower',
                   extent=extent,
                   aspect='auto',
-                  cmap=magic.random_colour())
+                  cmap=cmap)
+        #cplot = ax.twinx()
+        #cplot.plot(np.linspace(0, rmax, self.nbins), counts)
         #ax.plot(offset + np.linspace(0, rmax, self.nbins),
         #        (buckets/counts).clip(minv, maxv), 'ro')
         ax.show()
@@ -315,7 +361,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--bunch', type=int, default=100)
+    parser.add_argument('--bunch', type=int, default=1000)
     parser.add_argument('--topn', type=int, default=10)
     parser.add_argument('--download', action='store_true')
     parser.add_argument('--full', action='store_true',
