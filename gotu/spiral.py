@@ -842,12 +842,27 @@ class SkyMap(magic.Ball):
 
         return
 
-    async def explore(self):
-        
-        ball = random.choice(self.balls)
+    async def explore(self, thetas=None, phis=None):
 
-        a = cosh(ball.phi)
-        d = cos(ball.theta)
+        ax1 = await self.get()
+        ax2 = await self.get()
+        ax3 = await self.get()
+        ax4 = await self.get()
+
+        if thetas is None or phis is None:
+            ball = random.choice(self.balls)
+            thetas = thetas or list(ball.theta)
+            phis = phis or list(ball.phi)
+
+        for theta in thetas:
+            for phi in phis:
+                await self.plotthetaphi(theta, phi, self.delta_t,
+                                        ax1, ax2, ax3, ax4)
+
+    async def plotthetaphi(self, theta, phi, tmax,
+                           ax1=None, ax2=None, ax3=None, ax4=None):
+        a = cosh(phi)
+        d = cos(theta)
 
         A = D = (a - d)/2
         B = C = (a + d)/2
@@ -857,35 +872,37 @@ class SkyMap(magic.Ball):
 
         tb = log((sqrt(a+1) + sqrt(1-d))/sqrt(a-d))
 
-        t = np.linspace(tstar, tstar+tb*2, 1000)
+        t = np.linspace(tstar, tstar+tmax, 1000)
 
-        uu = [ball.uoft(tt) for tt in t]
-        zx = [ball.zandx(tt, u) for u, tt in zip(uu,t)]
+        uu = [uoft(tt, theta, phi) for tt in t]
+        zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
         zz = [zzx[0] for zzx in zx]
         xx = [zzx[1] for zzx in zx]
 
-        phi, theta = ball.phi, ball.theta
-        ax = await self.get()
+        ax = ax1 or await self.get()
         thetaphi = f'{phi:.3} {theta/pi:.2} tb={tb:.3}'
-        ax.set_title('t v u ' + thetaphi)
-        ax.plot(t, uu)
+        ax.set_title('t-t* v u')
+        ax.plot(t-tstar, uu, label=thetaphi)
+        ax.legend()
         ax.show()
 
-        ax = await self.get()
-        ax.set_title('t v z ' + thetaphi)
-        ax.plot(t, zz)
+        ax = ax2 or await self.get()
+        ax.set_title('t-t* v z')
+        ax.plot(t-tstar, zz, label=thetaphi)
+        ax.legend()
         ax.show()
 
-        ax = await self.get()
-        ax.set_title(f't v d ' + thetaphi)
-        ax.plot(t, xx)
+        ax = ax3 or await self.get()
+        ax.set_title(f't-t* v d')
+        ax.plot(t-tstar, xx, label=thetaphi)
+        ax.legend()
         ax.show()
         
-        ax = await self.get()
-        ax.set_title(f'z v d ' + thetaphi)
-        ax.plot(zz, xx)
+        ax = ax4 or await self.get()
+        ax.set_title(f'z v d')
+        ax.plot(zz, xx, label=thetaphi)
+        ax.legend()
         ax.show()
-        print('hello4')
         
 
     async def log10hist(self, values, n=10, title=None):
@@ -1482,34 +1499,9 @@ class Spiral(magic.Ball):
 
         Time in Hubble times.
         """
-        a = cosh(self.phi)
-        d = cos(self.theta)
 
-        # work with U = e**u and T=e**t
-        A = D = (a - d)/2
-        B = C = (a + d)/2
+        return tofu(u, theta, phi)
 
-        # first time visible is tstar given by
-        tstar = log(sqrt(A/B))
-
-        # the last time u that the source can be seen
-        # notice e^umax = 1/(e**tstar = e**(-tstar)
-        # so umax = -1 * tstar.
-        # t for umax is infinite and u for tstar is -infinity
-        umax = log(sqrt(B/A))
-
-        U = e**u
-        T = ((U + sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
-             / (B - A * U*U))
-
-        t = log(T)
-        
-        z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
-        
-        # use distance as t0, adjust time for t0
-        #hd = self.cosmo.hubble_distance
-        #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
-        return t
 
     def tstar(self):
 
@@ -1534,62 +1526,12 @@ class Spiral(magic.Ball):
         return tb
 
     def zandx(self, t, u):
-        
-        a = cosh(self.phi)
-        d = cos(self.theta)
 
-        # work with U = e**u and T=e**t
-        U = e ** u
-        T = e ** t
-        A = D = (a - d)/2
-        B = C = (a + d)/2
-
-        z = ((d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))) - 1
-
-        x = ((a-1) * cosh(t)) ** 2
-        x -= ((d-1) * sinh(t)) ** 2
-
-        x = sqrt((sinh(t) - sinh(u))**2 - (cosh(t) - cosh(u))**2)
-
-        x = 1 - (((B/T) - (A*T)) * U)
-
-        return z, x
+        return zandx(t, u, self.theta, self.phi)
 
     def uoft(self, t):
 
-        a = cosh(self.phi)
-        d = cos(self.theta)
-
-        # work with U = e**u and T=e**t
-        A = D = (a - d)/2
-        B = C = (a + d)/2
-
-        # first time visible is tstar given by
-        tstar = log(sqrt(A/B))
-
-        # the last time u that the source can be seen
-        # notice e^umax = 1/(e**tstar = e**(-tstar)
-        # so umax = -1 * tstar.
-        # t for umax is infinite and u for tstar is -infinity
-        umax = log(sqrt(B/A))
-
-        if t < tstar:
-            raise ValueError
-
-        def f(u):
-            u = u[0]
-            if u > umax: return 100
-            return self.tofu(u) - t
-
-        try:
-            uval = optimize.fsolve(f, umax/2)[0]
-        except Exception as e:
-            uval=0
-            print(f'XXXXXXXXXXX {e}')
-
-        #assert np.allclose([t], [self.tofu(uval)])
-
-        return uval
+        return uoft(t, self.theta, self.phi)
 
     async def wits(self):
 
@@ -1669,7 +1611,97 @@ class Spiral(magic.Ball):
         ax.plot(rr, tvalues)
         ax.show()
 
+def zandx(t, u, theta, phi):
 
+    a = cosh(phi)
+    d = cos(theta)
+
+    # work with U = e**u and T=e**t
+    U = e ** u
+    T = e ** t
+    A = D = (a - d)/2
+    B = C = (a + d)/2
+
+    z = ((d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))) - 1
+
+    x = ((a-1) * cosh(t)) ** 2
+    x -= ((d-1) * sinh(t)) ** 2
+
+    x = sqrt((sinh(t) - sinh(u))**2 - (cosh(t) - cosh(u))**2)
+
+    x = 1 - (((B/T) - (A*T)) * U)
+
+    return z, x
+
+def uoft(t, theta, phi):
+
+    a = cosh(phi)
+    d = cos(theta)
+
+    # work with U = e**u and T=e**t
+    A = D = (a - d)/2
+    B = C = (a + d)/2
+
+    # first time visible is tstar given by
+    tstar = log(sqrt(A/B))
+
+    # the last time u that the source can be seen
+    # notice e^umax = 1/(e**tstar = e**(-tstar)
+    # so umax = -1 * tstar.
+    # t for umax is infinite and u for tstar is -infinity
+    umax = log(sqrt(B/A))
+
+    if t < tstar:
+        raise ValueError
+
+    def f(u):
+        u = u[0]
+        if u > umax: return 100
+        return tofu(u, theta, phi) - t
+
+    try:
+        uval = optimize.fsolve(f, umax/2)[0]
+    except Exception as e:
+        uval=0
+        print(f'XXXXXXXXXXX {e}')
+
+    #assert np.allclose([t], [self.tofu(uval)])
+
+    return uval
+
+def tofu(u, theta, phi):
+    """ Work in natural units, c=G=Hubble Distance=1
+
+    Time in Hubble times.
+    """
+    a = cosh(phi)
+    d = cos(theta)
+
+    # work with U = e**u and T=e**t
+    A = D = (a - d)/2
+    B = C = (a + d)/2
+
+    # first time visible is tstar given by
+    tstar = log(sqrt(A/B))
+
+    # the last time u that the source can be seen
+    # notice e^umax = 1/(e**tstar = e**(-tstar)
+    # so umax = -1 * tstar.
+    # t for umax is infinite and u for tstar is -infinity
+    umax = log(sqrt(B/A))
+
+    U = e**u
+    T = ((U + sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
+         / (B - A * U*U))
+
+    t = log(T)
+
+    z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+
+    # use distance as t0, adjust time for t0
+    #hd = self.cosmo.hubble_distance
+    #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
+    return t
 
 class Sun(Spiral):
 
