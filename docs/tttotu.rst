@@ -60,7 +60,6 @@ A miscellaneous bunch of short scripts to explore my interests of the
 day.
 
 
-
 blume 2019-
 ----------
 
@@ -72,19 +71,16 @@ Initially a home for the `matplotlib.table.Table` class.  See
 
 Is there anything better than an editor and a console?
 
+blume.console
+
 gotu 2021-
 ----------
 
 gotu.jwst
 
-gotu.wits
+gotu.spiral
 
-blume.gaia
-
-gotu.aidss2
-
-blume.console
-
+gotu.gaia
 
 Code Life cycle
 ===============

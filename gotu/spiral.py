@@ -191,9 +191,34 @@ What about the spiral module?
 =============================
 
 The idea is to create a visualisation of the formation of spiral
-galaxies with a *\omega m / r* model.
+galaxies with a *omega m / r* model.
 
 It would be good to also be able to model binary systems while we are at it.
+
+2024 July Update
+================
+
+This module has now hit 2000 lines and has evolved into a joint
+exploration of the Sciama Principle and de Sitter Space.
+
+There are simulations of the gravitational wave background from
+distant galaxies and a collection of pieces of code that I have
+written to help my own understanding of de Sitter Space.
+
+The full de Sitter Space is a space-time with the Perfect Copernican
+Principle: there are no special places or times, it has looked like it
+does now for some considerable time.
+
+de Sitter Space has constant negative curvature, and it is this
+curvature that means that geodesics, the paths of typical galaxies
+through our visible universe follow hyperbolae.
+
+Pairs of geodesics separate exponentially in both forwards and
+backwards time.  It is this forwards separation that explains redshift.
+
+The separation in backwards time is generally overlooked, but this
+balances things out with blue shifted galaxies, new arrivals in our
+visible universe.
 
 """
 
@@ -372,12 +397,11 @@ class Cosmo:
         print(cd, cd2, M)
     
     def is_flat(self):
-        """ Not sure what the answer is to this.
+        """ de Sitter Space has constant negative curvature
 
-        Perhaps, "asymptotically flat"?
+        Hence, it is not flat.
         """
-
-        return None
+        return False
 
 
 class SkyMap(magic.Ball):
@@ -448,7 +472,7 @@ class SkyMap(magic.Ball):
         # local simulation only
         self.max_distance = 1e8 * u.lightyear
         self.filter = True
-        self.minz = -1.
+        self.minz = 1.
         self.min_phi = 0.001
         self.max_phi = 2.0
         self.max_t0 = self.delta_t
@@ -666,6 +690,7 @@ class SkyMap(magic.Ball):
         balls = balls or self.balls
 
         t0 = [ball.t0 for ball in balls]
+        tb = [ball.tb() for ball in balls]
 
         phi = [ball.phi for ball in balls]
         theta = [ball.theta for ball in balls]
@@ -685,7 +710,7 @@ class SkyMap(magic.Ball):
         umax = np.log(np.sqrt(B/A))
 
         # we want u for tt = tstar + t - t0
-        tt = tstar + t - t0
+        tt = tb + tstar + t - t0
 
         uu = [ball.uoft(t) for t, ball in zip(tt, balls)]
 
@@ -735,14 +760,20 @@ class SkyMap(magic.Ball):
             done = await self.tick()
             if done: return
 
-    async def walker(self, inc=0.1):
+    async def walker(self, inc=0.1, t0=0., maxtheta=None):
 
         self.create_sample()
+
         for ball in self.balls:
             ball.t0 = 0.
 
+            if maxtheta:
+                maxacos = cos(maxtheta)
+                xxx = 1./(1-maxacos)
+                ball.theta = math.acos(1.0-(random.random()/xxx))
+
         self.good = {}
-        self.t = 0
+        self.t = t0 or 0.
 
         while True:
             self.t += inc
@@ -765,9 +796,8 @@ class SkyMap(magic.Ball):
 
         # get array of bools indicating values we want to keep
         if self.filter:
-            keep = [(distance < max_distance and
-                     #redshift > self.minz and
-                     t0 < self.max_t0)
+            keep = [(redshift < max_distance) or
+                    (distance <= max_distance and t0 < self.max_t0)
                     for redshift, distance, t0
                     in zip(result['z'], result['distance'], result['t0'])]
 
@@ -792,6 +822,9 @@ class SkyMap(magic.Ball):
                     self.balls.remove(ball)
 
             result = self.good
+
+        await self.showzdimage()
+        return
 
         zz = np.array(result['z'])
 
@@ -840,27 +873,74 @@ class SkyMap(magic.Ball):
         ax.hist(np.array(result['phi']), 20)
         ax.show()
 
+        await self.showzdimage()
+
         return
 
-    async def explore(self, thetas=None, phis=None):
+
+    async def showzdimage(self):
+
+        result = self.good
+        zz = np.array(result['z'])
+        t0 = np.array(result['t0'])
+        distance = np.array(result['distance'])
+
+        size = 100, 100
+        grid = np.zeros(size)
+        minz, maxz = 0, sqrt(self.fudge)
+        mind, maxd = minz, maxz
+
+        zd = distance.clip(mind, maxd)
+        zz = zz.clip(minz, maxz)
+        dsize = (maxd-mind)/size[0]
+        zsize = (maxz-minz)/size[1]
+
+        for d, z in zip(zd, zz):
+            #print(z,d)
+            zbucket = int((z-minz) // zsize)
+            dbucket = int((d-mind) // dsize)
+            grid[dbucket, zbucket] += 1
+
+        grid = grid[1:-1][1:-1]
+        norms = grid / (sum(grid)+1)
+        #print(sum(grid))
+
+        ax = await self.get()
+        extent = (minz, maxz, mind, maxd)
+        ax.imshow(norms,
+                  origin='lower',
+                  aspect='auto',
+                  extent=extent,
+                  cmap=magic.random_colour())
+
+        ax.show()
+                
+
+    async def explore(self, thetas=None, phis=None, thetaphis=None, samples=None,
+                      tborigin=True):
 
         ax1 = await self.get()
         ax2 = await self.get()
         ax3 = await self.get()
         ax4 = await self.get()
 
-        if thetas is None or phis is None:
-            ball = random.choice(self.balls)
-            thetas = thetas or list(ball.theta)
-            phis = phis or list(ball.phi)
+        # ignore thetas, phis
+        if samples:
+            balls = random.sample(self.balls, samples)
+            thetaphis = sorted([ (ball.theta, ball.phi) for ball in balls])
 
-        for theta in thetas:
-            for phi in phis:
-                await self.plotthetaphi(theta, phi, self.delta_t,
-                                        ax1, ax2, ax3, ax4)
+        if thetas is not None:
+            thetaphis = [(theta, phi) for theta in thetas for phi in phis]
+            
+        for theta, phi in thetaphis:
+            await self.plotthetaphi(theta, phi, self.delta_t,
+                                    ax1, ax2, ax3, ax4,
+                                    tborigin=tborigin)
+            await magic.sleep(0)
 
     async def plotthetaphi(self, theta, phi, tmax,
-                           ax1=None, ax2=None, ax3=None, ax4=None):
+                           ax1=None, ax2=None, ax3=None, ax4=None,
+                           tborigin=True):
         a = cosh(phi)
         d = cos(theta)
 
@@ -872,36 +952,45 @@ class SkyMap(magic.Ball):
 
         tb = log((sqrt(a+1) + sqrt(1-d))/sqrt(a-d))
 
-        t = np.linspace(tstar, tstar+tmax, 1000)
+        t = np.linspace(tb+tstar, tb+tstar+tmax, 5000)
 
         uu = [uoft(tt, theta, phi) for tt in t]
         zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
-        zz = [zzx[0] for zzx in zx]
-        xx = [zzx[1] for zzx in zx]
+        zz = np.array([zzx[0] for zzx in zx])
+        xx = np.array([zzx[1] for zzx in zx])
+
+        mask = xx < self.max_distance.value
 
         ax = ax1 or await self.get()
-        thetaphi = f'{phi:.3} {theta/pi:.2} tb={tb:.3}'
+        thetaphi = f'phi={phi:.3} theta={theta/pi:.2} tb={tb:.3}'
         ax.set_title('t-t* v u')
         ax.plot(t-tstar, uu, label=thetaphi)
         ax.legend()
         ax.show()
 
+        if tborigin:
+            ttb = t-(tstar+tb)
+            title = 't-(t*+tb) v '
+        else:
+            ttb = t - tstar
+            title = 't-t* v '
+            
         ax = ax2 or await self.get()
-        ax.set_title('t-t* v z')
-        ax.plot(t-tstar, zz, label=thetaphi)
+        ax.set_title(title + 'z')
+        ax.plot(ttb, zz, label=thetaphi)
         ax.legend()
         ax.show()
 
         ax = ax3 or await self.get()
-        ax.set_title(f't-t* v d')
-        ax.plot(t-tstar, xx, label=thetaphi)
+        ax.set_title(title + 'd')
+        ax.plot(ttb, xx, label=thetaphi)
         ax.legend()
         ax.show()
         
         ax = ax4 or await self.get()
         ax.set_title(f'z v d')
-        ax.plot(zz, xx, label=thetaphi)
-        ax.legend()
+        ax.plot(zz[mask], xx[mask], 'o', label=thetaphi)
+        ax.mlegend()
         ax.show()
         
 

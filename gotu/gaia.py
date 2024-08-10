@@ -85,8 +85,6 @@ from astropy import units as u
 
 from astroquery.gaia import Gaia
 
-import healpy as hp
-
 from blume.magic import Ball
 
 import numpy as np
@@ -200,24 +198,14 @@ class Milky(Ball):
 
             await magic.sleep(0)
 
-    def build_table(self):
-        
-        #print(hpxmap)
-        # Sag A*
+    def add_bunch(self):
 
-        table = vstack(list(self.bunches))
-
-        self.table = table
-
-    async def run(self):
-
-        self.runs += 1
-        print("number of runs", self.runs)
-        
-        self.table = Table.read(self.bunches[0])
+        table = Table.read(self.bunches[0])
         self.bunches.rotate()
-        if not hasattr(self, 'table'):
-            self.build_table()
+        self.table = table
+        return table
+
+    def to_galactocentric(self):
 
         table = self.table
         ra = table['ra']
@@ -237,8 +225,8 @@ class Milky(Ball):
 
         fudge = self.fudge
 
-        X_GC_sun_kpc = fudge * 8.    #[kpc]
-        Z_GC_sun_kpc = 0.025 #[kpc] (e.g. Juric et al. 2008)
+        self.X_GC_sun_kpc = X_GC_sun_kpc = fudge * 8.    #[kpc]
+        self.Z_GC_sun_kpc = Z_GC_sun_kpc = 0.025 #[kpc] (e.g. Juric et al. 2008)
 
         #circular velocity of the Galactic potential at the radius of the Sun:
         vcirc_kms = 220. #[km/s] (e.g. Bovy 2015)
@@ -263,10 +251,35 @@ class Milky(Ball):
             z_sun = Z_GC_sun_kpc*u.kpc)
 
         self.galcen = galcen = coords.transform_to(gc)
+        
+        return galcen
+    
+    async def run(self):
+
+        self.runs += 1
+        print("number of runs", self.runs)
+        
+  
+        table = self.add_bunch()
+        
+
+        ra = table['ra']
+        dec = table['dec']
+        pmra = table['pmra']
+        pmdec = table['pmdec']
+        radial_velocity = table['radial_velocity']
+        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
+
+        # get galactocentric coords
+        galcen = self.to_galactocentric()
+
         xs, ys, zs = galcen.x.to(u.kpc), galcen.y.to(u.kpc), galcen.z.to(u.kpc)
         vxs, vys, vzs = galcen.v_x, galcen.v_y, galcen.v_z
 
         # centre view on sun
+        X_GC_sun_kpc = self.X_GC_sun_kpc
+        Z_GC_sun_kpc = self.Z_GC_sun_kpc
+        
         xmin, ymin, radius = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc, 35
 
         d2d = np.sqrt(xs.value ** 2 + ys.value ** 2)
@@ -305,21 +318,26 @@ class Milky(Ball):
             buckets[rbucket] += v
             counts[rbucket] += 1
 
-        ax = await self.get()
 
         cmap = magic.random_colour()
-        ax.scatter(rr, vv, c=pp, s=0.1, cmap=cmap)
-        ax.show()
 
-        ax = await self.get()
-        ax.scatter(xs[mask], ys[mask], c=pp, s=0.1, cmap=cmap)
-        ax.show()
+        if False:
+            ax = await self.get()
+            ax.scatter(rr, vv, c=pp, s=0.1, cmap=cmap)
+            ax.show()
+
+            ax = await self.get()
+            ax.scatter(xs[mask], ys[mask], c=pp, s=0.1, cmap=cmap)
+            ax.show()
 
         ax = await self.get()
         extent = (offset, rmax+offset, minv, maxv)
 
         #extent=None
         #ax.scatter(d2d[mask], vtans[mask].clip(minv, maxv), c=ys.value[mask], s=0.05)
+        ax.set_title('Milky Way rotation curve from Gaia data.')
+        ax.set_xlabel('distance from galactic centre in kpc')
+        ax.set_ylabel('tangential velocity in km/s')
         ax.imshow(self.vrcounts[:, 1:-1].T/(counts+1),
                   origin='lower',
                   extent=extent,
@@ -335,6 +353,25 @@ class Milky(Ball):
         #ax.scatter(xs.value[mask], ys.value[mask],
         #           c=vtans[mask], cmap=magic.random_colour(), s=0.05)
         #ax.show()
+
+
+    async def spirals(self):
+
+        table = self.add_bunch()
+        
+
+        ra = table['ra']
+        dec = table['dec']
+        pmra = table['pmra']
+        pmdec = table['pmdec']
+        radial_velocity = table['radial_velocity']
+        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
+
+        # get galactocentric coords
+        galcen = self.to_galactocentric()
+
+        
+    
 
 async def run(args):
 
