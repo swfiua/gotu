@@ -355,6 +355,8 @@ class Cosmo:
 
                 setattr(self, attr, getattr(cosmo, attr))
                 setattr(self, attr[:-1], f)
+                
+        self.scale_factor = cosmo.scale_factor
 
     @property
     def hubble_distance(self):
@@ -466,7 +468,7 @@ class SkyMap(magic.Ball):
         self.fftlen = 32
         self.cmb_min = 1e-4  # u.m
         self.cmb_max = 0.004 # u.m
-        self.delta_t = 6 # time inc in natural units
+        self.delta_t = 0.001 # time inc in natural units
         self.t = 0
 
         # local simulation only
@@ -475,10 +477,14 @@ class SkyMap(magic.Ball):
         self.minz = 1.
         self.min_phi = 0.001
         self.max_phi = 2.0
-        self.max_t0 = self.delta_t
+        self.max_t0 = self.delta_t * 1000
+        self.maxtheta = None
+        self.mintheta = 0
+        self.tborigin = True
 
         self.create_sample(gals)
         self.good = dict()
+        self.tablecounts = TableCounts(xname='z', yname='distance')
         self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
@@ -760,6 +766,45 @@ class SkyMap(magic.Ball):
             done = await self.tick()
             if done: return
 
+    async def counter(self):
+
+        self.create_sample()
+        maxtheta = self.maxtheta
+        mintheta = self.mintheta
+        for ball in self.balls:
+            if maxtheta or mintheta:
+                maxcos, mincos = cos(maxtheta), cos(mintheta)
+                # need uniform numbers in range [maxcos, mincos]
+                if maxcos < mincos:
+                    maxcos, mincos = mincos, maxcos
+                rand = (random.random() * (maxcos-mincos)) + mincos
+                ball.theta = math.acos(rand)
+        
+            t = ball.tstar()
+
+            if self.tborigin:
+                t += ball.tb()
+
+            while True:
+                z, x = ball.zandx(t)
+
+                # adjust distance for scale factor, adjust z too...
+                scale = self.cosmo.scale_factor(x)
+                z *= scale
+                x *= scale
+                
+                if z > self.tablecounts.maxx:
+                    break
+                if z > 0 and x > self.tablecounts.maxy:
+                    break
+
+                #weight = 1/(x*x)
+                weight = 1
+                self.tablecounts.update([z], [x], weight)
+                t += self.delta_t
+            print(f'{t:8.2f} {ball.theta} {ball.phi} {z} {x} {ball.zandx(t-(2*self.delta_t))}')
+            await self.tablecounts.show(self)
+            
     async def walker(self, inc=0.1, t0=0., maxtheta=None):
 
         self.create_sample()
@@ -886,7 +931,8 @@ class SkyMap(magic.Ball):
         distance = np.array(result['distance'])
 
         size = 100, 100
-        grid = np.zeros(size)
+        self.grid = np.zeros(size)
+        grid = self.grid
         minz, maxz = 0, sqrt(self.fudge)
         mind, maxd = minz, maxz
 
@@ -901,7 +947,7 @@ class SkyMap(magic.Ball):
             dbucket = int((d-mind) // dsize)
             grid[dbucket, zbucket] += 1
 
-        grid = grid[1:-1][1:-1]
+        grid = grid[1:-1, 1:-1]
         norms = grid / (sum(grid)+1)
         #print(sum(grid))
 
@@ -914,10 +960,25 @@ class SkyMap(magic.Ball):
                   cmap=magic.random_colour())
 
         ax.show()
-                
 
-    async def explore(self, thetas=None, phis=None, thetaphis=None, samples=None,
-                      tborigin=True):
+        # see what a grid sample looks like
+        width, height = grid.shape
+        csize = width * height
+        choices = list(range(csize))
+        sample = random.choices(choices, weights=grid.flatten(), k=1566)
+        ax = await self.get()
+
+        xx = [x%width for x in sample]
+        yy = [int(x/width) for x in sample]
+        ax.scatter(xx, yy)
+        #ax.hist(sample)
+        ax.show()
+
+        ax = await self.get()
+        ax.imshow(grid[1:-1, 1:-1], origin='lower', aspect='auto')
+        ax.show()
+
+    async def explore(self, thetas=None, phis=None, thetaphis=None, samples=None):
 
         ax1 = await self.get()
         ax2 = await self.get()
@@ -933,14 +994,12 @@ class SkyMap(magic.Ball):
             thetaphis = [(theta, phi) for theta in thetas for phi in phis]
             
         for theta, phi in thetaphis:
-            await self.plotthetaphi(theta, phi, self.delta_t,
-                                    ax1, ax2, ax3, ax4,
-                                    tborigin=tborigin)
+            await self.plotthetaphi(theta, phi, self.max_t0,
+                                    ax1, ax2, ax3, ax4)
             await magic.sleep(0)
 
     async def plotthetaphi(self, theta, phi, tmax,
-                           ax1=None, ax2=None, ax3=None, ax4=None,
-                           tborigin=True):
+                           ax1=None, ax2=None, ax3=None, ax4=None):
         a = cosh(phi)
         d = cos(theta)
 
@@ -952,7 +1011,14 @@ class SkyMap(magic.Ball):
 
         tb = log((sqrt(a+1) + sqrt(1-d))/sqrt(a-d))
 
-        t = np.linspace(tb+tstar, tb+tstar+tmax, 5000)
+        if self.tborigin:
+            t = np.linspace(tb+tstar, tb+tstar+tmax, 5000)
+            ttb = t-(tstar+tb)
+            title = 't-(t*+tb) v '
+        else:
+            t = np.linspace(tstar, tstar+tmax, 5000)
+            ttb = t - tstar
+            title = 't-t* v '
 
         uu = [uoft(tt, theta, phi) for tt in t]
         zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
@@ -968,12 +1034,6 @@ class SkyMap(magic.Ball):
         ax.legend()
         ax.show()
 
-        if tborigin:
-            ttb = t-(tstar+tb)
-            title = 't-(t*+tb) v '
-        else:
-            ttb = t - tstar
-            title = 't-t* v '
             
         ax = ax2 or await self.get()
         ax.set_title(title + 'z')
@@ -1267,6 +1327,97 @@ def waves(amplitudes, wavelengths, phases=None, period=1, n=1000):
     return points, wave
                                
 
+class TableCounts:
+
+    def __init__(self, width=200, height=200,
+                 minx=0, maxx=1,
+                 miny=0, maxy=1,
+                 xname='x', yname='y',
+                 inset=None):
+        
+        self.grid = np.zeros((width, height))
+        self.minx = minx
+        self.maxx = maxx
+        self.miny = miny
+        self.maxy = maxy
+        self.xname = xname
+        self.yname = yname
+        self.inset = inset or (1, 1, -1, -1)
+
+    def reset(self, width=None, height=None):
+
+        if width is None: width = self.grid.shape[0]
+        if height is None: height = self.grid.shape[1]
+        self.grid = np.zeros((width, height))
+        
+    def update(self, xlist, ylist, weight=1):
+
+        width, height = self.grid.shape
+
+        xinc = (self.maxx - self.minx) / width
+        yinc = (self.maxy - self.miny) / height
+
+        for x, y in zip(xlist, ylist):
+
+            xbucket = int((x-self.minx) // xinc)
+            ybucket = int((y-self.miny) // yinc)
+            if xbucket <= 0 or xbucket >= width:
+                continue
+            if ybucket <= 0 or ybucket >= height:
+                continue
+            
+            self.grid[ybucket, xbucket] += weight
+
+    async def show(self, tmra):
+
+        x, y, xx, yy = self.inset
+        
+        grid = self.grid[x:xx, y:yy]
+        width, height = grid.shape
+        print('wh', width, height)
+        xnorms = grid / (sum(grid)+1)
+        ynorms = (grid.T / (sum(grid.T)+1)).T
+
+        ax = await tmra.get()
+        extent = (self.minx, self.maxx, self.miny, self.maxy)
+        ax.imshow(xnorms,
+                  origin='lower',
+                  aspect='auto',
+                  extent=extent,
+                  cmap=magic.random_colour())
+        ax.set_title(f'Normalised by {self.xname}')
+        ax.show()
+
+        ax = await tmra.get()
+        ax.imshow(ynorms,
+                  origin='lower',
+                  aspect='auto',
+                  extent=extent,
+                  cmap=magic.random_colour())
+        ax.set_title(f'Normalised by {self.yname}')
+        ax.show()
+
+
+        # see what a grid sample looks like
+        width, height = grid.shape
+        csize = width * height
+        choices = list(range(csize))
+        weights = grid.flatten()
+        
+        if sum(weights):
+            sample = random.choices(choices, weights=weights, k=1566)
+            ax = await tmra.get()
+
+            xx = [x%width for x in sample]
+            yy = [int(x/width) for x in sample]
+            ax.scatter(xx, yy)
+            ax.show()
+
+        ax = await tmra.get()
+        ax.imshow(grid, origin='lower', aspect='auto')
+        ax.show()
+
+        
 class Spiral(magic.Ball):
     """  Model a spiral galaxy
 
@@ -1589,7 +1740,7 @@ class Spiral(magic.Ball):
         Time in Hubble times.
         """
 
-        return tofu(u, theta, phi)
+        return tofu(u, self.theta, self.phi)
 
 
     def tstar(self):
@@ -1614,7 +1765,10 @@ class Spiral(magic.Ball):
 
         return tb
 
-    def zandx(self, t, u):
+    def zandx(self, t=None, u=None):
+
+        if u is None: u = self.uoft(t)
+        if t is None: t = self.tofu(u)
 
         return zandx(t, u, self.theta, self.phi)
 
@@ -1878,7 +2032,6 @@ def pick(x, v, vmin, vmax):
     loc = n * (x - vmin) / vmax
 
     return v[loc]
-
 
 def cpr():
     """  Started as Mathematica code from the new paradigm.
