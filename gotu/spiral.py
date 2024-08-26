@@ -227,6 +227,7 @@ import argparse
 import random
 
 import math
+import time
 
 # live dangerously, i almost nver import *, but for math I will make an exception
 from math import *
@@ -481,6 +482,8 @@ class SkyMap(magic.Ball):
         self.maxtheta = None
         self.mintheta = 0
         self.tborigin = True
+        self.toff = 0.1
+        self.scale_for_curvature = True
 
         self.create_sample(gals)
         self.good = dict()
@@ -771,7 +774,10 @@ class SkyMap(magic.Ball):
         self.create_sample()
         maxtheta = self.maxtheta
         mintheta = self.mintheta
+
+        tt = 0.
         for ball in self.balls:
+            t1 = time.time()
             if maxtheta or mintheta:
                 maxcos, mincos = cos(maxtheta), cos(mintheta)
                 # need uniform numbers in range [maxcos, mincos]
@@ -780,7 +786,7 @@ class SkyMap(magic.Ball):
                 rand = (random.random() * (maxcos-mincos)) + mincos
                 ball.theta = math.acos(rand)
         
-            t = ball.tstar()
+            t = ball.tstar() + self.toff
 
             if self.tborigin:
                 t += ball.tb()
@@ -789,10 +795,11 @@ class SkyMap(magic.Ball):
                 z, x = ball.zandx(t)
 
                 # adjust distance for scale factor, adjust z too...
-                scale = self.cosmo.scale_factor(x)
-                z *= scale
-                x *= scale
-                
+                # ie repace x by x/1+x, ditto z.
+                if self.scale_for_curvature:
+                    x *= self.cosmo.scale_factor(x)
+                    z *= self.cosmo.scale_factor(z)
+
                 if z > self.tablecounts.maxx:
                     break
                 if z > 0 and x > self.tablecounts.maxy:
@@ -802,8 +809,16 @@ class SkyMap(magic.Ball):
                 weight = 1
                 self.tablecounts.update([z], [x], weight)
                 t += self.delta_t
-            print(f'{t:8.2f} {ball.theta} {ball.phi} {z} {x} {ball.zandx(t-(2*self.delta_t))}')
-            await self.tablecounts.show(self)
+
+            #print(f'{t:8.2f} {ball.theta:6.3f} {ball.phi:6.2f} {z:6.2f} {x:6.2f}')
+            t2 = time.time()
+            tt += t2-t1
+            if tt > self.sleep:
+                await self.tablecounts.show(self)
+                tt = 0.
+
+        # one last show
+        await self.tablecounts.show(self)
             
     async def walker(self, inc=0.1, t0=0., maxtheta=None):
 
@@ -1370,16 +1385,30 @@ class TableCounts:
 
     async def show(self, tmra):
 
-        x, y, xx, yy = self.inset
-        
+        y, x, yy, xx = self.inset
+
+        # take inset
         grid = self.grid[x:xx, y:yy]
-        width, height = grid.shape
-        print('wh', width, height)
+
+        # adjust minx, maxx, miny, maxy for inset
+        minx, maxx, miny, maxy = self.minx, self.maxx, self.miny, self.maxy
+        height, width = self.grid.shape
+        
+        xinc = (maxx - minx) / width
+        yinc = (maxy - miny) / height
+        minx += xinc * x
+        maxx += xinc * xx
+        miny += yinc * y
+        maxy += yinc * yy
+        
+        height, width = grid.shape
+
         xnorms = grid / (sum(grid)+1)
         ynorms = (grid.T / (sum(grid.T)+1)).T
 
         ax = await tmra.get()
-        extent = (self.minx, self.maxx, self.miny, self.maxy)
+        extent = (minx, maxx, miny, maxy)
+        
         ax.imshow(xnorms,
                   origin='lower',
                   aspect='auto',
@@ -1399,7 +1428,6 @@ class TableCounts:
 
 
         # see what a grid sample looks like
-        width, height = grid.shape
         csize = width * height
         choices = list(range(csize))
         weights = grid.flatten()
@@ -1408,13 +1436,17 @@ class TableCounts:
             sample = random.choices(choices, weights=weights, k=1566)
             ax = await tmra.get()
 
-            xx = [x%width for x in sample]
-            yy = [int(x/width) for x in sample]
+            xinc = (maxx - minx) / width
+            yinc = (maxy - miny) / height
+
+            xx = np.array([minx + ((x%width) * xinc) for x in sample])
+            yy = np.array([miny + ((int(x/width)) * yinc) for x in sample])
+
             ax.scatter(xx, yy)
             ax.show()
 
         ax = await tmra.get()
-        ax.imshow(grid, origin='lower', aspect='auto')
+        ax.imshow(grid, origin='lower', aspect='auto', extent=extent)
         ax.show()
 
         
