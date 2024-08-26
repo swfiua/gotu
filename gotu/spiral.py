@@ -487,7 +487,7 @@ class SkyMap(magic.Ball):
 
         self.create_sample(gals)
         self.good = dict()
-        self.tablecounts = TableCounts(xname='z', yname='distance')
+        self.tablecounts = magic.TableCounts(xname='z', yname='distance')
         self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)
@@ -776,6 +776,8 @@ class SkyMap(magic.Ball):
         mintheta = self.mintheta
 
         tt = 0.
+
+        xname, yname = 'z', 'r'
         for ball in self.balls:
             t1 = time.time()
             if maxtheta or mintheta:
@@ -797,6 +799,7 @@ class SkyMap(magic.Ball):
                 # adjust distance for scale factor, adjust z too...
                 # ie repace x by x/1+x, ditto z.
                 if self.scale_for_curvature:
+                    xname, yname = 'z/(1+z)', 'r/(1+r)'
                     x *= self.cosmo.scale_factor(x)
                     z *= self.cosmo.scale_factor(z)
 
@@ -814,11 +817,11 @@ class SkyMap(magic.Ball):
             t2 = time.time()
             tt += t2-t1
             if tt > self.sleep:
-                await self.tablecounts.show(self)
+                await self.tablecounts.show(xname=xname, yname=yname)
                 tt = 0.
 
         # one last show
-        await self.tablecounts.show(self)
+        await self.tablecounts.show(xname=xname, yname=yname)
             
     async def walker(self, inc=0.1, t0=0., maxtheta=None):
 
@@ -1342,112 +1345,6 @@ def waves(amplitudes, wavelengths, phases=None, period=1, n=1000):
     return points, wave
                                
 
-class TableCounts:
-
-    def __init__(self, width=200, height=200,
-                 minx=0, maxx=1,
-                 miny=0, maxy=1,
-                 xname='x', yname='y',
-                 inset=None):
-        
-        self.grid = np.zeros((width, height))
-        self.minx = minx
-        self.maxx = maxx
-        self.miny = miny
-        self.maxy = maxy
-        self.xname = xname
-        self.yname = yname
-        self.inset = inset or (1, 1, -1, -1)
-
-    def reset(self, width=None, height=None):
-
-        if width is None: width = self.grid.shape[0]
-        if height is None: height = self.grid.shape[1]
-        self.grid = np.zeros((width, height))
-        
-    def update(self, xlist, ylist, weight=1):
-
-        width, height = self.grid.shape
-
-        xinc = (self.maxx - self.minx) / width
-        yinc = (self.maxy - self.miny) / height
-
-        for x, y in zip(xlist, ylist):
-
-            xbucket = int((x-self.minx) // xinc)
-            ybucket = int((y-self.miny) // yinc)
-            if xbucket <= 0 or xbucket >= width:
-                continue
-            if ybucket <= 0 or ybucket >= height:
-                continue
-            
-            self.grid[ybucket, xbucket] += weight
-
-    async def show(self, tmra):
-
-        y, x, yy, xx = self.inset
-
-        # take inset
-        grid = self.grid[x:xx, y:yy]
-
-        # adjust minx, maxx, miny, maxy for inset
-        minx, maxx, miny, maxy = self.minx, self.maxx, self.miny, self.maxy
-        height, width = self.grid.shape
-        
-        xinc = (maxx - minx) / width
-        yinc = (maxy - miny) / height
-        minx += xinc * x
-        maxx += xinc * xx
-        miny += yinc * y
-        maxy += yinc * yy
-        
-        height, width = grid.shape
-
-        xnorms = grid / (sum(grid)+1)
-        ynorms = (grid.T / (sum(grid.T)+1)).T
-
-        ax = await tmra.get()
-        extent = (minx, maxx, miny, maxy)
-        
-        ax.imshow(xnorms,
-                  origin='lower',
-                  aspect='auto',
-                  extent=extent,
-                  cmap=magic.random_colour())
-        ax.set_title(f'Normalised by {self.xname}')
-        ax.show()
-
-        ax = await tmra.get()
-        ax.imshow(ynorms,
-                  origin='lower',
-                  aspect='auto',
-                  extent=extent,
-                  cmap=magic.random_colour())
-        ax.set_title(f'Normalised by {self.yname}')
-        ax.show()
-
-
-        # see what a grid sample looks like
-        csize = width * height
-        choices = list(range(csize))
-        weights = grid.flatten()
-        
-        if sum(weights):
-            sample = random.choices(choices, weights=weights, k=1566)
-            ax = await tmra.get()
-
-            xinc = (maxx - minx) / width
-            yinc = (maxy - miny) / height
-
-            xx = np.array([minx + ((x%width) * xinc) for x in sample])
-            yy = np.array([miny + ((int(x/width)) * yinc) for x in sample])
-
-            ax.scatter(xx, yy)
-            ax.show()
-
-        ax = await tmra.get()
-        ax.imshow(grid, origin='lower', aspect='auto', extent=extent)
-        ax.show()
 
         
 class Spiral(magic.Ball):
