@@ -165,7 +165,7 @@ def get_samples(n=1000, columns=None, table=None):
 
 class Milky(Ball):
 
-    def __init__(self, bunch=1, topn=1): 
+    def __init__(self, bunch=1, topn=1, path='.'): 
 
         super().__init__()
 
@@ -178,25 +178,18 @@ class Milky(Ball):
         self.fudge = 2.
         self.keys = deque(('parallax', 'radial_velocity'))
 
+        self.tablecounts = magic.TableCounts(
+            maxx=40.,
+            miny=-300, maxy=500,
+            width=200, height=200)
 
-    async def start(self):
-        """ start async task to read/download data """
-
-        # load any bunches there are
-        # for now, keep them separate
-        self.nbins = 200
-        self.vrcounts = np.zeros((self.nbins, self.nbins))
-        self.buckets = np.zeros(self.nbins)
-        self.counts = np.zeros(self.nbins)
-        path = Path()
+        path = Path(path)
         for bunch in path.glob('bunch*.fits.gz'):
             if bunch.exists():
                 self.bunches.append(bunch)
 
             if len(self.bunches) == self.nbunch:
                 break
-
-            await magic.sleep(0)
 
     def add_bunch(self):
 
@@ -280,79 +273,30 @@ class Milky(Ball):
         X_GC_sun_kpc = self.X_GC_sun_kpc
         Z_GC_sun_kpc = self.Z_GC_sun_kpc
         
-        xmin, ymin, radius = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc, 35
+        xmin, ymin = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc
 
-        d2d = np.sqrt(xs.value ** 2 + ys.value ** 2)
+        d2d = np.nan_to_num(np.sqrt(xs.value ** 2 + ys.value ** 2))
         xperps = ys.value / d2d
         yperps = -xs.value / d2d
         vtans = np.nan_to_num((xperps * vxs.value) + (yperps * vys.value))
 
         print(f'observations: {len(ra)}')
         cdata = table['radial_velocity']
-        
-        rmax = 40.
-        offset = (X_GC_sun_kpc / self.fudge) * (self.fudge - 1)
-        offset = 0.0
-        mask = ((-500 <= vtans) & (vtans <= 700) &
-                (np.abs(table['b']) < 15.) &
-                (d2d > offset) & (d2d < rmax + offset))
+
+        rmin, rmax = self.tablecounts.minx, self.tablecounts.maxx
+        mask = ((np.abs(table['b']) < 15.) &
+                (d2d>rmin) & (d2d < rmax))
 
         phi = np.arctan2(xs.value, -(ys.value)) - (np.pi / 3)
         phi[phi < math.pi] += 2 * math.pi
 
-        print(f'Filtering from {len(mask)} to {len(mask[mask])}')
-        minv, maxv = -300, 500
         rr = d2d[mask]
         vv = vtans[mask]
         pp = phi[mask]
 
-        buckets = self.buckets
-        counts = self.counts
-        rsize = rmax/(self.nbins-1)
-        vsize = (maxv-minv)/(self.nbins-1)
-        
-        for r, v in zip(rr, vv):
-            rbucket = int((r-offset) // rsize)
-            vbucket = int((max(min(v, maxv), minv) - minv) // vsize)
-            self.vrcounts[rbucket, vbucket] += 1
-            buckets[rbucket] += v
-            counts[rbucket] += 1
+        self.tablecounts.update(rr, vv)
 
-
-        cmap = magic.random_colour()
-
-        if False:
-            ax = await self.get()
-            ax.scatter(rr, vv, c=pp, s=0.1, cmap=cmap)
-            ax.show()
-
-            ax = await self.get()
-            ax.scatter(xs[mask], ys[mask], c=pp, s=0.1, cmap=cmap)
-            ax.show()
-
-        ax = await self.get()
-        extent = (offset, rmax+offset, minv, maxv)
-
-        #extent=None
-        #ax.scatter(d2d[mask], vtans[mask].clip(minv, maxv), c=ys.value[mask], s=0.05)
-        ax.set_title('Milky Way rotation curve from Gaia data.')
-        ax.set_xlabel('distance from galactic centre in kpc')
-        ax.set_ylabel('tangential velocity in km/s')
-        ax.imshow(self.vrcounts[:, 1:-1].T/(counts+1),
-                  origin='lower',
-                  extent=extent,
-                  aspect='auto',
-                  cmap=cmap)
-        #cplot = ax.twinx()
-        #cplot.plot(np.linspace(0, rmax, self.nbins), counts)
-        #ax.plot(offset + np.linspace(0, rmax, self.nbins),
-        #        (buckets/counts).clip(minv, maxv), 'ro')
-        ax.show()
-
-        #ax = await self.get()
-        #ax.scatter(xs.value[mask], ys.value[mask],
-        #           c=vtans[mask], cmap=magic.random_colour(), s=0.05)
-        #ax.show()
+        await self.tablecounts.show()
 
 
     async def spirals(self):

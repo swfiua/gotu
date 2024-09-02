@@ -5,6 +5,29 @@
 I will try to give updates from time to time as to what is happening
 here.
 
+2024/8/28
+=========
+
+I will be giving a talk, *Exploring the Milky Way with astropy,
+matplotlib and Gaia* at Pycon Ireland in Dublin.
+
+More information on the talk can be found here:
+
+https://sessionize.com/john-gill
+
+Over the summer I have been focussing on my understanding uniformly
+curved space time, trying to understand what it should look like and
+whether it explains the observations of the Dark Energy Survey and the
+Hubble tension.
+
+At the same time I have been working on visualisations of the Gaia
+data to explore the Milky Way's galactic rotation curve.
+
+Both of these involve two variables, the former distance and
+tangential velocity, the latter redshift and distance.
+
+
+
 2024/4/4
 ========
 

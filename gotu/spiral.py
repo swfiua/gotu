@@ -482,7 +482,7 @@ class SkyMap(magic.Ball):
         self.maxtheta = None
         self.mintheta = 0
         self.tborigin = True
-        self.toff = 0.1
+        self.toff = 0.0
         self.scale_for_curvature = True
 
         self.create_sample(gals)
