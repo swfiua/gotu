@@ -178,10 +178,15 @@ class Milky(Ball):
         self.fudge = 2.
         self.keys = deque(('parallax', 'radial_velocity'))
 
+        title = 'Milky Way rotation curve'
         self.tablecounts = magic.TableCounts(
             maxx=40.,
             miny=-300, maxy=500,
-            width=200, height=200)
+            width=200, height=200,
+            title=title,
+            xname='distance from galactic centre (kpc)',
+            yname='tangential velocity (km/s)'
+        )
 
         path = Path(path)
         for bunch in path.glob('bunch*.fits.gz'):

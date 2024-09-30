@@ -483,11 +483,12 @@ class SkyMap(magic.Ball):
         self.mintheta = 0
         self.tborigin = True
         self.toff = 0.0
-        self.scale_for_curvature = True
+        self.scale_for_curvature = False
 
         self.create_sample(gals)
         self.good = dict()
-        self.tablecounts = magic.TableCounts(xname='z', yname='distance')
+        self.tablecounts = magic.TableCounts(
+            xname='z', yname='distance', maxx=10, maxy=10)
         self.tasks = magic.Tasks()
         self.tasks.add(self.local_mode_sim)
         self.tasks.add(self.cmbsim)

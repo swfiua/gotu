@@ -23,26 +23,60 @@ Introduction to de Sitter Space.  This will use matplotlib to
 visualise geodesics in de Sitter Space, allowing us to explore the
 subtle relation between redshift and distance.
 
-Downloading and visualising the supernovae data and testing whether it is consistent with de Sitter Space.
+Downloading and visualising the supernovae data and testing whether it
+is consistent with de Sitter Space.
 
 Since gotu uses blume, the workshop will begin with an introduction to blume.
 
 The goal is for attendees to have at least half the workshop time to
 explore the ideas and data sets for themselves.
 
+Introduction
+============
+
+Johnny Gill
+===========
+
+Flash Warnings
+==============
+
+Lots of axes flying around.
+
+
 Blume
 =====
 
+Is there anything better than an editor, a console and a bunch of 100
+line python scripts?
 
 
-James Webb Telescope
-====================
+Observations
+============
+
+Hubble Space Telescope
+
+Event Horizon Telescope(s)
+
+Planck Mission
+
+LIGO
+
+Pulsar Timing Array
+
+JWST
+====
 
 Gaia
 ====
 
+astroquery and mast
+-------------------
+
 The Milky Way Rotation Curve
 ============================
+
+astropy
+-------
 
 Spiral Galaxies
 ---------------

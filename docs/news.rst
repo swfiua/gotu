@@ -76,7 +76,7 @@ Gaia and the galactic centre
 The `gotu.gaia` module can now download data from the ESA's Gaia
 program and create plots showing the Galactic rotation curve.
 
-image:: images/gaia.png
+.. image:: images/gaia.png
 
 The image above shows the Milky Way's rotation curve, the tangential
 velocity, in km/s on the y-axis and the distance from the galactic
