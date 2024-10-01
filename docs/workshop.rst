@@ -49,6 +49,15 @@ Blume
 Is there anything better than an editor, a console and a bunch of 100
 line python scripts?
 
+Patterns
+========
+
+print to debug
+
+add complexity while figuring out how things work.
+
+no problem a layer of indirection cannot solve
+
 
 Observations
 ============

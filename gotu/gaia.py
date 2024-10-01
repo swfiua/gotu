@@ -304,6 +304,11 @@ class Milky(Ball):
         await self.tablecounts.show()
 
 
+        ax = await self.get()
+        ax.scatter(ra, dec, c=vtans)
+        ax.show()
+
+
     async def spirals(self):
 
         table = self.add_bunch()

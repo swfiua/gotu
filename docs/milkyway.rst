@@ -17,36 +17,14 @@ Thanks
 .. image:: images/spanish_dancer.png
 
 
-
-
 python
 ------
 
-matplotlib
-----------
+PyCon Ireland
 
-astropy
--------
 
-wikipedia, open source, open data
----------------------------------
-
-Astronomers
------------
-
-Workshop
-========
-
-priors for astronomical data analysis
-
-advert for workshop
-
-What does a de Sitter/Sciama prior look like?
-
-Simulate 10^7 galaxies of mass 10^15
-   
 Europython 2022, Dublin
-=======================
++++++++++++++++++++++++
 
 The first pictures from James Webb arrived during the conference, good
 times ahead for cosmologists.
@@ -68,36 +46,57 @@ the data behind some of the incredible images the space telescope is
 giving us.
 
 .. image:: images/m74.png
+           
+
+matplotlib
+----------
 
 Dublin, 2003
-============
 
-.. images:: images/table_demo
-
-
-Spanish Dancer
-==============
-
-NGC 1566
+.. image:: images/table_demo.png
 
 
+astropy
+-------
 
-.. image:: images/spanish1.png
+Cosmology
 
-mixing download and viewing
+Units
 
-blume.train
+Constants
 
-**Alternate between python and cosmology, code and maths.**
+Coordinates
+
+Astroquery
+
+.. image:: images/carina.png
 
 
-Milky Way:
+wikipedia, open source, open data
+---------------------------------
+
+Astronomers
+-----------
+
+Space telescopes
+
+Gravitational Wave Detectors
+
+Pulsar Timing Array
+
+Event Horizon Telescope
+
 
 Personal Projects
 =================
 
 karmapi
 -------
+
+Tools to record and display data from raspberry pi's with sensehats
+and cameras.
+
+Personal toolkit for viewing things with matplotlib.
 
 .. image:: images/spanish2.png
 
@@ -108,7 +107,7 @@ Better Looking Universal Matplotlib Engine
 
 A quest for a universal table
 
-.. image:: images/spanish3.png
+.. image:: images/spanish1.png
 
 gotu
 ----
@@ -118,8 +117,31 @@ The Geometry of the Universe
 .. image:: images/gotu.png
 
 
+Spanish Dancer
+==============
+
+NGC 1566
+
+.. image:: images/spanish3.png
+
+mixing download and viewing
+
+blume.train
+
+**Alternate between python and cosmology, code and maths.**
+
+
+Milky Way
+=========
+
 Gaia
 ====
+
+Galactic Rotation Curves
+========================
+
+Xaowei paper.
+
 
 Sciama
 ======
@@ -129,26 +151,40 @@ Sciama
    M \omega / r
    
 
+
+Sagittarius A*
+==============
+
+.. image:: images/sgrastar.png
+
+
+Most observed black hole.
+
+Black Holes
+
+
+   
 distance and redshift
 =====================
 
-
-Patterns
-========
-
-print to debug
-
-add complexity while figuring out how things work.
-
-no problem a layer of indirection cannot solve
+.. image:: images/zvr.png
 
 
 
-Blume
-=====
+
+
+           
 
 Workshop
 ========
+
+priors for astronomical data analysis
+
+advert for workshop
+
+What does a de Sitter/Sciama prior look like?
+
+Simulate 10^7 galaxies of mass 10^15
 
 blume
 
@@ -158,7 +194,5 @@ spiral
 
 skymap
 
-Projects
-========
 
 
