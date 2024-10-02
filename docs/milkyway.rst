@@ -10,6 +10,12 @@ A story with no beginning
 A time and a place when everything started?
 
 
+Johnny Gill
+===========
+
+.. image:: images/johny.png
+
+
 Thanks
 ======
 
@@ -67,7 +73,7 @@ Constants
 
 Coordinates
 
-Astroquery
+Astroquery, tables
 
 .. image:: images/carina.png
 
@@ -90,8 +96,8 @@ Event Horizon Telescope
 Personal Projects
 =================
 
-karmapi
--------
+karmapi, 2016
+-------------
 
 Tools to record and display data from raspberry pi's with sensehats
 and cameras.
@@ -100,8 +106,8 @@ Personal toolkit for viewing things with matplotlib.
 
 .. image:: images/spanish2.png
 
-blume
------
+blume, 2019
+-----------
 
 Better Looking Universal Matplotlib Engine
 
@@ -109,13 +115,26 @@ A quest for a universal table
 
 .. image:: images/spanish1.png
 
-gotu
-----
+gotu, 2021
+----------
 
 The Geometry of the Universe
 
+Fred, Colin and Copernicus
+==========================
+
+
+Fred Hoyle and Colin Rourke
+---------------------------
+
+
 .. image:: images/gotu.png
 
+
+Copernicus
+==========
+
+.. image:: images/copernicus.png
 
 Spanish Dancer
 ==============
@@ -130,20 +149,27 @@ blume.train
 
 **Alternate between python and cosmology, code and maths.**
 
-
 Milky Way
 =========
 
-Gaia
-====
+Gaia and wits
+=============
+
+Where is the Sun?
+
+Can Gaia help answer this question?
+
 
 Galactic Rotation Curves
 ========================
 
 Xaowei paper.
 
+Tangential velocities beyond 25kpc from the galactic centre are lower
+than expected.
 
-Sciama
+
+Denis Sciama
 ======
 
 .. math::
