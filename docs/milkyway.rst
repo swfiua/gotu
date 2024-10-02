@@ -15,6 +15,15 @@ Johnny Gill
 
 .. image:: images/johny.png
 
+https://github.com/swfiua
+
+https://gotu.readthedocs.org
+
+https://blume.readthedocs.org
+
+swfiua@gmail.com
+
+
 
 Thanks
 ======
@@ -81,6 +90,12 @@ Astroquery, tables
 wikipedia, open source, open data
 ---------------------------------
 
+Gaia
+
+Hubble
+
+JWST
+
 Astronomers
 -----------
 
@@ -104,6 +119,8 @@ and cameras.
 
 Personal toolkit for viewing things with matplotlib.
 
+A New Paradigm for the Universe
+
 .. image:: images/spanish2.png
 
 blume, 2019
@@ -120,21 +137,44 @@ gotu, 2021
 
 The Geometry of the Universe
 
-Fred, Colin and Copernicus
-==========================
-
-
-Fred Hoyle and Colin Rourke
----------------------------
-
+A geometric model for the universe with no need for dark matter or
+dark energy.
 
 .. image:: images/gotu.png
 
 
+What if the big bang did not happen?
+====================================
+
 Copernicus
-==========
+----------
+
+The Perfect Copernican Principle:
+
+There should be no special times or places in the Universe.
 
 .. image:: images/copernicus.png
+
+
+Fred Hoyle
+----------
+
+Fred Hoyle coined the term Big Bang.
+
+He believed in an essentially static universe.
+
+Suggested just one new atom appearing in each skyscraper sized volume
+of space per year would balance the expansion.
+
+.. image:: images/m31.png
+
+Colin Rourke
+------------
+
+Colin Rourke proposes de Sitter space as a space-time which exhibits
+redshift, but has no overall expansion.
+
+.. image:: images/cpr.jpg
 
 Spanish Dancer
 ==============
@@ -169,13 +209,21 @@ Tangential velocities beyond 25kpc from the galactic centre are lower
 than expected.
 
 
-Denis Sciama
-======
+Denis Sciama, 1953
+==================
+
+On the origin of inertia.
+
+The Sciama Principle.  A mass M, with angular velocity \omega induces
+a rotation of:
 
 .. math::
 
    M \omega / r
-   
+
+at a distance r from the centre of the mass.
+
+.. image:: images/dennis_sciama.png
 
 
 Sagittarius A*
