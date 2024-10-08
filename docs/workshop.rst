@@ -34,11 +34,37 @@ explore the ideas and data sets for themselves.
 Introduction
 ============
 
+Goals
+-----
+
+blume
+
+gotu
+
+Help me and others understand the ideas in the book.
+
+Visualise space time, understand curvature.
+
+Visualise data to see if it supports the theory.
+
+Gain insight into cosmological mysteries
+----------------------------------------
+
+Hubble Tension
+
+Dark Matter
+
+Dark Energy
+
+Gravitational Waves
+
+Dark Energy
+
 Johnny Gill
-===========
+-----------
 
 Flash Warnings
-==============
+--------------
 
 Lots of axes flying around.
 

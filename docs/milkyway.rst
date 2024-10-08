@@ -13,6 +13,9 @@ A time and a place when everything started?
 Johnny Gill
 ===========
 
+Exploring the Geometry of the Universe.
+
+
 .. image:: images/johny.png
 
 https://github.com/swfiua
@@ -34,6 +37,10 @@ Thanks
 
 python
 ------
+
+
+
+PyCon
 
 PyCon Ireland
 
@@ -153,6 +160,10 @@ The Perfect Copernican Principle:
 
 There should be no special times or places in the Universe.
 
+A story with no beginning
+
+A time and a place when everything started?
+
 .. image:: images/copernicus.png
 
 
@@ -171,8 +182,17 @@ of space per year would balance the expansion.
 Colin Rourke
 ------------
 
+Emeritus Professor of Mathematics at Warwick University.
+
+Good news: No need for dark matter.
+
+Bad news: Sagittarius A* is too small to drive the Milky Way.
+
 Colin Rourke proposes de Sitter space as a space-time which exhibits
 redshift, but has no overall expansion.
+
+Shows that the Sciama Principle can explain galactici rotation curves
+without need for dark matter.
 
 .. image:: images/cpr.jpg
 
@@ -187,10 +207,11 @@ mixing download and viewing
 
 blume.train
 
-**Alternate between python and cosmology, code and maths.**
-
 Milky Way
 =========
+
+.. image:: images/milkyway_gaia.png
+
 
 Gaia and wits
 =============
@@ -208,20 +229,39 @@ Xaowei paper.
 Tangential velocities beyond 25kpc from the galactic centre are lower
 than expected.
 
+.. image:: images/milkyway_rotation.png
 
-Denis Sciama, 1953
-==================
+
+Sciama Principle, Denis Sciama, 1953
+====================================
 
 On the origin of inertia.
 
-The Sciama Principle.  A mass M, with angular velocity \omega induces
-a rotation of:
+A mass
+
+.. math::
+
+   M
+
+with angular velocity
+
+.. math::
+
+   \omega
+
+induces a rotation of:
 
 .. math::
 
    M \omega / r
 
-at a distance r from the centre of the mass.
+at a distance
+
+.. math::
+
+   r
+
+from the centre of the mass.
 
 .. image:: images/dennis_sciama.png
 

@@ -188,6 +188,14 @@ class Milky(Ball):
             yname='tangential velocity (km/s)'
         )
 
+        self.galaxy_image = magic.TableCounts(
+            minx=0., maxx=360.,
+            miny=-15., maxy=+15.,
+            title='Gaia view of the Milky Way',
+            xname='Galactic Longitude',
+            yname='Galactic Latitude'
+        )
+
         path = Path(path)
         for bunch in path.glob('bunch*.fits.gz'):
             if bunch.exists():
@@ -303,11 +311,20 @@ class Milky(Ball):
 
         await self.tablecounts.show()
 
-
+        gi = self.galaxy_image
+        pi = math.pi
+        gi.update((table['l'] + 180.) % 360.,
+                  table['b'],
+                  weight=1)
+                  #weight=vtans)
         ax = await self.get()
-        ax.scatter(ra, dec, c=vtans)
+        ax.projection('mollweide')
+        width, height = gi.grid.shape
+        lat = np.linspace(-pi/2, pi/2, width)
+        lon = np.linspace(-pi, pi, height)
+        lons, lats = np.meshgrid(lon, lat)
+        ax.pcolormesh(lons, lats, gi.grid)
         ax.show()
-
 
     async def spirals(self):
 
