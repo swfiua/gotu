@@ -92,7 +92,7 @@ import math
 import random
 from pathlib import Path
 
-from blume import magic
+from blume import magic, hp
 
 from blume import farm as fm
 
@@ -188,13 +188,7 @@ class Milky(Ball):
             yname='tangential velocity (km/s)'
         )
 
-        self.galaxy_image = magic.TableCounts(
-            minx=0., maxx=360.,
-            miny=-15., maxy=+15.,
-            title='Gaia view of the Milky Way',
-            xname='Galactic Longitude',
-            yname='Galactic Latitude'
-        )
+        self.galaxy_image = hp.PixelCounter()
 
         path = Path(path)
         for bunch in path.glob('bunch*.fits.gz'):
@@ -310,21 +304,21 @@ class Milky(Ball):
         self.tablecounts.update(rr, vv)
 
         await self.tablecounts.show()
+        await self.gimage(table)
 
+    async def gimage(self, table):
         gi = self.galaxy_image
         pi = math.pi
-        gi.update((table['l'] + 180.) % 360.,
-                  table['b'],
-                  weight=1)
-                  #weight=vtans)
-        ax = await self.get()
-        ax.projection('mollweide')
-        width, height = gi.grid.shape
-        lat = np.linspace(-pi/2, pi/2, width)
-        lon = np.linspace(-pi, pi, height)
-        lons, lats = np.meshgrid(lon, lat)
-        ax.pcolormesh(lons, lats, gi.grid)
-        ax.show()
+
+        sid = 'source_id'
+        if sid not in table.colnames:
+            sid = sid.upper()
+        pixels = [gi.ix2pixel(xx >> 35) for xx in table[sid]]
+        #gi.update(pixels,
+        #          weight=table['radial_velocity'])
+        gi.update(pixels)
+
+        await gi.run()
 
     async def spirals(self):
 

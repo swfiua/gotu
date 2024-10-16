@@ -49,9 +49,7 @@ Europython 2022, Dublin
 +++++++++++++++++++++++
 
 The first pictures from James Webb arrived during the conference, good
-times ahead for cosmologists.
-
-The first picture I saw of M74.
+times ahead for cosmologists.  The first picture I saw of M74.
 
 A *Gilectomy* keynote.  No longer does python without the GIL slow
 down.  A delightful talk on the problem of tracking references in a
@@ -137,7 +135,25 @@ Better Looking Universal Matplotlib Engine
 
 A quest for a universal table
 
+
 .. image:: images/spanish1.png
+
+Principles
+++++++++++
+
+Do not re-invent the wheel
+
+No module should exceed 1000 lines
+
+Fix it upstream
+
+Is there anything better than a folder full of 100 line python
+scripts?
+
+There is nothing a layer of abstraction cannot fix.  Can it be done
+without adding complexity?
+
+It is impossible to do anything if I obey all the principles.
 
 gotu, 2021
 ----------
@@ -152,6 +168,14 @@ dark energy.
 
 What if the big bang did not happen?
 ====================================
+
+Bayes Theorem
+-------------
+
+.. math::
+
+   P(A|B) = P(B|A)P(A) / P(B)
+
 
 Copernicus
 ----------
@@ -276,21 +300,10 @@ Most observed black hole.
 
 Black Holes
 
+Introduction to the Geometry of the Universe
+============================================
 
-   
-distance and redshift
-=====================
-
-.. image:: images/zvr.png
-
-
-
-
-
-           
-
-Workshop
-========
+It's a big subject ;)
 
 priors for astronomical data analysis
 
@@ -307,6 +320,18 @@ gaia
 spiral
 
 skymap
+
+   
+distance and redshift
+---------------------
+
+.. image:: images/zvr.png
+
+
+
+
+
+           
 
 
 
