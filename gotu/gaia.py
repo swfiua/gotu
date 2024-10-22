@@ -81,7 +81,7 @@ from collections import deque
 
 from astropy.table import Table, vstack
 from astropy import coordinates
-from astropy import units as u
+from astropy import units as u, constants as c
 
 from astroquery.gaia import Gaia
 
@@ -95,6 +95,8 @@ from pathlib import Path
 from blume import magic, hp
 
 from blume import farm as fm
+
+from gotu import spiral
 
 TABLE = 'gaiadr3.gaia_source'
 TABLE_SIZE=1811709771
@@ -165,18 +167,17 @@ def get_samples(n=1000, columns=None, table=None):
 
 class Milky(Ball):
 
-    def __init__(self, bunch=1, topn=1, path='.'): 
+    def __init__(self, bunch=1, path='.'): 
 
         super().__init__()
 
         self.bunches = deque()
         self.nbunch = bunch
-        self.bix = 0
-        self.topn = topn
         self.runs = 0
         self.clip = 25  # either side
         self.fudge = 2.
         self.keys = deque(('parallax', 'radial_velocity'))
+
 
         title = 'Milky Way rotation curve'
         self.tablecounts = magic.TableCounts(
@@ -197,6 +198,11 @@ class Milky(Ball):
 
             if len(self.bunches) == self.nbunch:
                 break
+
+        # for simulating the Milky Way, use a spiral.Spiral
+        self.milkyway = spiral.Spiral()
+        self.window = 1000.
+
 
     def add_bunch(self):
 
@@ -276,12 +282,6 @@ class Milky(Ball):
         xs, ys, zs = galcen.x.to(u.kpc), galcen.y.to(u.kpc), galcen.z.to(u.kpc)
         vxs, vys, vzs = galcen.v_x, galcen.v_y, galcen.v_z
 
-        # centre view on sun
-        X_GC_sun_kpc = self.X_GC_sun_kpc
-        Z_GC_sun_kpc = self.Z_GC_sun_kpc
-        
-        xmin, ymin = -1 * X_GC_sun_kpc, -1 * Z_GC_sun_kpc
-
         d2d = np.nan_to_num(np.sqrt(xs.value ** 2 + ys.value ** 2))
         xperps = ys.value / d2d
         yperps = -xs.value / d2d
@@ -323,8 +323,9 @@ class Milky(Ball):
     async def spirals(self):
 
         table = self.add_bunch()
-        
 
+        mw = self.milkyway
+        
         ra = table['ra']
         dec = table['dec']
         pmra = table['pmra']
@@ -332,10 +333,51 @@ class Milky(Ball):
         radial_velocity = table['radial_velocity']
         dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
 
-        # get galactocentric coords
-        galcen = self.to_galactocentric()
+        # get the subset we want
+        gc = self.to_galactocentric()
 
+        rmin = mw.rmin * u.lyr
+        rwin = self.window * u.lyr
+        d2d = ((gc.x ** 2) + (gc.y ** 2))**0.5
+        velocity = ((gc.v_x ** 2) + (gc.v_y ** 2) + (gc.v_z ** 2)) ** 0.5
+        mask = (d2d > rmin)
+        mask = mask & (d2d < rmin + rwin)
+        mask = mask & ~np.isnan(dist)
+
+        velocity = velocity[mask]
+        d2d = d2d[mask]
+        gc = gc[mask]
+
+        xperps = gc.x / d2d
+        yperps = -gc.y / d2d
+        vtans = (xperps * gc.v_x) + (yperps * gc.v_y)
+
+        rrr = np.linspace(0., mw.rmax-mw.rmin, 1000)
         
+        for ix, star in enumerate(gc):
+            
+            vel =  (velocity[ix] / c.c).value
+            print(vel, d2d[ix], vtans[ix])
+            rstart = (d2d[ix] << u.lyr).value
+
+            
+
+            mw.find_cc((vtans[ix] / c.c))
+            print(mw.CC)
+
+            rvals = rstart + rrr
+            mw.EE = 0.0
+            ee = mw.energy(rvals[:1])[0]
+            print(f'initial velocity {vel} {math.sqrt(2. * ee)}')
+
+            mw.EE = -ee
+
+            vv = mw.v(rvals)
+            self.tablecounts.update(
+                ((rvals * u.lyr) << u.kpc).value,
+                vv)
+            await self.tablecounts.show()
+            
     
 
 async def run(args):
@@ -349,7 +391,7 @@ async def run(args):
         get_samples(args.bunch, columns=columns, table=args.table)
         return
 
-    milky = Milky(args.bunch, args.topn)
+    milky = Milky(args.bunch)
 
     farm = fm.Farm()
     farm.add(milky)

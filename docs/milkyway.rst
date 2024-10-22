@@ -26,6 +26,20 @@ https://blume.readthedocs.org
 
 swfiua@gmail.com
 
+Workshop: Introduction to the Geometry of the Universe
+======================================================
+
+Learn how to download JWST and other astronomical data.
+
+Provide a guide to the key ideas in the Geometry of the Universe.
+
+Explore gotu.gaia and healpy to visualise the Milky Way.
+
+Cringe in horror at gotu.jwst
+
+blume.table and how to make the magic carpet magic
+
+Explore gotu using blume.
 
 
 Thanks
@@ -169,6 +183,8 @@ dark energy.
 What if the big bang did not happen?
 ====================================
 
+What if galaxies are very much older than 13.7 billion years?
+
 Bayes Theorem
 -------------
 
@@ -210,13 +226,13 @@ Emeritus Professor of Mathematics at Warwick University.
 
 Good news: No need for dark matter.
 
-Bad news: Sagittarius A* is too small to drive the Milky Way.
+Bad news: Sagittarius A* is too small to drive the Milky Way!
+
+Shows that the Sciama Principle can explain galactic rotation curves
+without need for dark matter.
 
 Colin Rourke proposes de Sitter space as a space-time which exhibits
 redshift, but has no overall expansion.
-
-Shows that the Sciama Principle can explain galactici rotation curves
-without need for dark matter.
 
 .. image:: images/cpr.jpg
 
@@ -327,8 +343,16 @@ distance and redshift
 
 .. image:: images/zvr.png
 
+Dark Energy Survey
+------------------
+
+.. image:: images/supernova.png
 
 
+Lanikae Supercluster
+--------------------
+
+.. image:: images/laniakea.png
 
 
            
