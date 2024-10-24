@@ -142,3 +142,18 @@ The Wiener Filter
 
 Combining Sciama and de Sitter
 ==============================
+
+
+Build your own blume.train
+==========================
+
+Never have to write code to view data again.
+
+Find away to work with the magic carpet, feed it tables of meta data,
+attach it to axes and then put them into queues based on the meta
+data, which must be hashable.
+
+meta data
+---------
+
+And the matplotlib.subplot_mosaic

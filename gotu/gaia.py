@@ -43,7 +43,8 @@ https://doi.org/10.1093/mnras/stae034 used Gaia and other data sources
 to calculate a galactic rotation curve for the Milk Way.
 
 The finding was that the galaxy had a typical rotation curve, rising
-linearly to 200km/s, remaining at that velocity out to 25kpc.
+linearly to 200km/s, remaining at that velocity out to 25kpc.  After
+that point the found a steady drop in tangential velocity.
 
 Xiaowei was kind enough to provide code
 (https://github.com/aceilers/spectroscopic_parallax) which shows how
@@ -74,6 +75,19 @@ needed to get a good qualitative feel for what is going on.
 Please be nice to the Gaia servers.  TODO: look into options for
 sharing tables on Gaia servers.  Also, how to summarise the data?  Bin
 counts?
+
+At the console prmompt enter::
+
+   magic.show()
+
+
+Milky Way Rotation Curve
+------------------------
+The bottom 35 bits of the Gaia *source_id* encodes the Healpix pixel
+number that the source lies in.
+
+Currently going through gymnastics to get all this working nicely, it
+opens up lots of interresting ideas for simulation.
 
 """
 import argparse
@@ -356,26 +370,30 @@ class Milky(Ball):
         
         for ix, star in enumerate(gc):
             
-            vel =  (velocity[ix] / c.c).value
+            vel =  ((velocity[ix] / c.c).decompose()).value
             print(vel, d2d[ix], vtans[ix])
             rstart = (d2d[ix] << u.lyr).value
 
-            
-
             mw.find_cc((vtans[ix] / c.c))
-            print(mw.CC)
+
+            #print(mw.CC)
 
             rvals = rstart + rrr
             mw.EE = 0.0
             ee = mw.energy(rvals[:1])[0]
+
             print(f'initial velocity {vel} {math.sqrt(2. * ee)}')
 
-            mw.EE = -ee
+            # want (vel ** 2)/2.  to be
+            mw.EE = (vel ** 2.0 / 2.0) - ee
+            print('EE CC', mw.EE, mw.CC)
 
-            vv = mw.v(rvals)
+            vv = ((mw.v(rvals) * c.c) << u.km/u.s).value
+            
             self.tablecounts.update(
                 ((rvals * u.lyr) << u.kpc).value,
                 vv)
+
             await self.tablecounts.show()
             
     

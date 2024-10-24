@@ -1414,19 +1414,6 @@ class Spiral(magic.Ball):
         print('A/K', self.A / self.K)
         print('rmin_check', self.rmin_check())
     
-    def find_cc(self, tangential_velocity):
-
-        # constant, can be read from tangential velocity for small r
-        A, K, r = self.A, self.K, self.rmin
-
-        print(r, K, r/K)
-        
-        tv = (2 * A) - (2 * A *K) * math.log((r/K) + 1)
-
-        self.CC = tangential_velocity - tv
-        print('tv', tangential_velocity, self.CC, tv)
-
-        return self.CC
 
     def rmin_check(self):
         """ The length of the roots of the spirals 
@@ -1443,6 +1430,21 @@ class Spiral(magic.Ball):
 
         """
         return self.A / self.B
+
+
+    def find_cc(self, tangential_velocity, r=None):
+
+        # constant, can be read from tangential velocity for small r
+        r = r or self.rmin
+        self.CC = 0
+
+        vtan = self.v(r)
+
+        ccoverr = tangential_velocity - vtan
+
+        self.CC = ccoverr * r
+
+        return self.CC
 
 
     def v(self, r):
