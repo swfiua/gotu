@@ -1376,8 +1376,8 @@ class Spiral(magic.Ball):
     def galaxy(self):
         """ Set parameters for a galaxy """
         # A = K * \omega_0.  K = M for Sciama principle
-        # note 2 * A is the asymptotic tangential velocity
-        self.A = 0.0005
+        # note A is half the asymptotic tangential velocity.
+        self.A = (110 * u.km/u.s / c.c).decompose().value
 
         # Apparent rate of precession of the roots of the spiral.
         self.B = 0.00000015
@@ -1405,7 +1405,6 @@ class Spiral(magic.Ball):
         self.K = self.Mcent
         self.omega0 = self.A / self.K   # angular velocity in radians per year
 
-        # FIXME: should find self.CC
 
     def print_parms(self):
         

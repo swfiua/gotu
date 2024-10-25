@@ -99,6 +99,8 @@ from astropy import units as u, constants as c
 
 from astroquery.gaia import Gaia
 
+from scipy import integrate
+
 from blume.magic import Ball
 
 import numpy as np
@@ -215,7 +217,9 @@ class Milky(Ball):
 
         # for simulating the Milky Way, use a spiral.Spiral
         self.milkyway = spiral.Spiral()
+        self.milkyway.rmax = (self.tablecounts.maxx * u.kpc / u.lyr).decompose()
         self.window = 1000.
+        self.speed_factor = 1000.
 
 
     def add_bunch(self):
@@ -308,12 +312,8 @@ class Milky(Ball):
         mask = ((np.abs(table['b']) < 15.) &
                 (d2d>rmin) & (d2d < rmax))
 
-        phi = np.arctan2(xs.value, -(ys.value)) - (np.pi / 3)
-        phi[phi < math.pi] += 2 * math.pi
-
         rr = d2d[mask]
         vv = vtans[mask]
-        pp = phi[mask]
 
         self.tablecounts.update(rr, vv)
 
@@ -321,6 +321,7 @@ class Milky(Ball):
         await self.gimage(table)
 
     async def gimage(self, table):
+        """ Show mollweide view of galaxy """
         gi = self.galaxy_image
         pi = math.pi
 
@@ -328,14 +329,28 @@ class Milky(Ball):
         if sid not in table.colnames:
             sid = sid.upper()
         pixels = [gi.ix2pixel(xx >> 35) for xx in table[sid]]
-        #gi.update(pixels,
-        #          weight=table['radial_velocity'])
+        gi.update(pixels,
+                  weight=table['radial_velocity'])
         gi.update(pixels)
 
         await gi.run()
 
     async def spirals(self):
+        """Use Gaia data to simulate the Milky Way rotation curve
 
+        Take a sample from the table and simulate the rotation
+        curve for the sample.
+
+        The idea is to use a gotu.Spiral() object.
+
+        This has a central mass, Mcent, in light years, and has
+        methods to calculate the tangential velocity for a given list
+        of distances from the galactic centre.
+
+        For each Gaia observation, we know it's initial tangential
+        velocity and use this to initialise integration constants.
+
+        """
         table = self.add_bunch()
 
         mw = self.milkyway
@@ -371,32 +386,63 @@ class Milky(Ball):
         for ix, star in enumerate(gc):
             
             vel =  ((velocity[ix] / c.c).decompose()).value
-            print(vel, d2d[ix], vtans[ix])
+
             rstart = (d2d[ix] << u.lyr).value
 
             mw.find_cc((vtans[ix] / c.c))
 
-            #print(mw.CC)
-
             rvals = rstart + rrr
+
+            # set mw.EE based on energy at start
             mw.EE = 0.0
             ee = mw.energy(rvals[:1])[0]
-
-            print(f'initial velocity {vel} {math.sqrt(2. * ee)}')
-
             # want (vel ** 2)/2.  to be
             mw.EE = (vel ** 2.0 / 2.0) - ee
-            print('EE CC', mw.EE, mw.CC)
 
+            
             vv = ((mw.v(rvals) * c.c) << u.km/u.s).value
             
+            # calculate rdot and tvalues
+            rdot = np.array([(2 * mw.energy(rval))**0.5 for rval in rvals])
+
+            tvalues = integrate.cumtrapz(1/rdot, rvals, initial=0)
+
+            # add a random term based on time and an acceleration too
+            fudges = np.nan_to_num(self.foft(tvalues, vv))
+            ax = await self.get()
+            ax.plot(fudges, tvalues)
+            ax.show()
+            vv += fudges
+
             self.tablecounts.update(
                 ((rvals * u.lyr) << u.kpc).value,
                 vv)
 
             await self.tablecounts.show()
             
-    
+    def foft(self, tvalues, vtans):
+        """ Model factors not modelled in spirals.
+
+        Each star is subject to random motions as it moves outward
+        along the spiral arms.
+
+        Each star feels the curvature of space time.
+        """
+        norms = np.random.normal(len(tvalues)) * tvalues
+        
+        last = 0.
+        distance = [0.]
+        delta_v = []
+        for tt, vtan in zip(tvalues, vtans):
+            delta_t = tt - last
+            dist = delta_t * vtan * u.km * u.yr/u.s
+            delta_v.append((dist * self.milkyway.cosmo.H0 << u.km/u.s).value)
+
+            last = tt
+            
+        print(max(delta_v) * self.speed_factor)
+        
+        return norms + np.array(delta_v) * self.speed_factor
 
 async def run(args):
 
