@@ -92,6 +92,7 @@ opens up lots of interresting ideas for simulation.
 """
 import argparse
 from collections import deque
+import time
 
 from astropy.table import Table, vstack
 from astropy import coordinates
@@ -219,7 +220,8 @@ class Milky(Ball):
         self.milkyway = spiral.Spiral()
         self.milkyway.rmax = (self.tablecounts.maxx * u.kpc / u.lyr).decompose()
         self.window = 1000.
-        self.speed_factor = 1000.
+        self.stepsize = 1000
+        self.speed_factor = 1.
 
 
     def add_bunch(self):
@@ -381,44 +383,63 @@ class Milky(Ball):
         yperps = -gc.y / d2d
         vtans = (xperps * gc.v_x) + (yperps * gc.v_y)
 
-        rrr = np.linspace(0., mw.rmax-mw.rmin, 1000)
-        
+        tt = 0.
         for ix, star in enumerate(gc):
+            # simulate in steps of 1000 lightyears
+            stepsize = self.stepsize
+            nsteps = int((mw.rmax - mw.rmin) / stepsize)
+
+            for step in range(nsteps):
+                t1 = time.time()
+                rstart = step * stepsize
+                rend = rstart + stepsize
+
+                rrr = np.linspace(rstart, rend, 100)
+                
             
-            vel =  ((velocity[ix] / c.c).decompose()).value
+                vel =  ((velocity[ix] / c.c).decompose()).value
 
-            rstart = (d2d[ix] << u.lyr).value
+                myrstart = (d2d[ix] << u.lyr).value
 
-            mw.find_cc((vtans[ix] / c.c))
+                mw.find_cc((vtans[ix] / c.c))
 
-            rvals = rstart + rrr
+                rvals = myrstart + rrr
 
-            # set mw.EE based on energy at start
-            mw.EE = 0.0
-            ee = mw.energy(rvals[:1])[0]
-            # want (vel ** 2)/2.  to be
-            mw.EE = (vel ** 2.0 / 2.0) - ee
+                # set mw.EE based on energy at start
+                mw.EE = 0.0
+                ee = mw.energy(rvals[:1])[0]
+                # want (vel ** 2)/2.  to be
+                mw.EE = ((vel ** 2.0) / 2.0) - ee
 
             
-            vv = ((mw.v(rvals) * c.c) << u.km/u.s).value
+                vv = ((mw.v(rvals) * c.c) << u.km/u.s).value
             
-            # calculate rdot and tvalues
-            rdot = np.array([(2 * mw.energy(rval))**0.5 for rval in rvals])
+                # calculate rdot and tvalues
+                rdot = np.array([(2 * mw.energy(rval))**0.5 for rval in rvals])
 
-            tvalues = integrate.cumtrapz(1/rdot, rvals, initial=0)
+                tvalues = integrate.cumtrapz(1/rdot, rvals, initial=0)
 
-            # add a random term based on time and an acceleration too
-            fudges = np.nan_to_num(self.foft(tvalues, vv))
-            ax = await self.get()
-            ax.plot(fudges, tvalues)
-            ax.show()
-            vv += fudges
+                # add a random term based on time and an acceleration too
+                fudge = np.nan_to_num(self.foft(tvalues, vv))
 
-            self.tablecounts.update(
-                ((rvals * u.lyr) << u.kpc).value,
-                vv)
+                vv[-1] += fudge
+                d2d[ix] += stepsize * u.lyr
 
-            await self.tablecounts.show()
+                vtans[ix] = vv[-1] * u.km / u.s
+
+                self.tablecounts.update(
+                    ((rvals * u.lyr) << u.kpc).value,
+                    vv)
+
+                t2 = time.time()
+                tt += t2-t1
+                if tt > self.sleep:
+                    tt = 0.
+                    await self.tablecounts.show()
+                else:
+                    await magic.sleep(0)
+                    
+        await self.tablecounts.show()
             
     def foft(self, tvalues, vtans):
         """ Model factors not modelled in spirals.
@@ -428,21 +449,15 @@ class Milky(Ball):
 
         Each star feels the curvature of space time.
         """
-        norms = np.random.normal(len(tvalues)) * tvalues
-        
-        last = 0.
-        distance = [0.]
-        delta_v = []
-        for tt, vtan in zip(tvalues, vtans):
-            delta_t = tt - last
-            dist = delta_t * vtan * u.km * u.yr/u.s
-            delta_v.append((dist * self.milkyway.cosmo.H0 << u.km/u.s).value)
+        delta_t = tvalues[-1] - tvalues[0]
+        vtan = np.mean(vtans)
+        distance = abs(vtan) * delta_t
+        curve = self.milkyway.cosmo.H0 * distance * u.km << u.km/u.s
 
-            last = tt
-            
-        print(max(delta_v) * self.speed_factor)
-        
-        return norms + np.array(delta_v) * self.speed_factor
+        rand = np.random.normal() * delta_t * self.speed_factor
+        #print('tvdh', delta_t, vtan, distance, curve, rand)
+        return curve.value + rand
+
 
 async def run(args):
 
