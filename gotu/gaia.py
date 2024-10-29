@@ -90,6 +90,7 @@ Currently going through gymnastics to get all this working nicely, it
 opens up lots of interresting ideas for simulation.
 
 """
+from math import *
 import argparse
 from collections import deque
 import time
@@ -105,7 +106,6 @@ from scipy import integrate
 from blume.magic import Ball
 
 import numpy as np
-import math
 import random
 from pathlib import Path
 
@@ -220,8 +220,8 @@ class Milky(Ball):
         self.milkyway = spiral.Spiral()
         self.milkyway.rmax = (self.tablecounts.maxx * u.kpc / u.lyr).decompose()
         self.milkyway.rmin = 10000.
-        self.window = 5000.
-        self.stepsize = 100000
+        self.window = 10000.
+        self.stepsize = 50000
         self.stepsamples = 1000
         self.addfoft = True
         self.speed_factor = 1.
@@ -309,6 +309,7 @@ class Milky(Ball):
         xperps = ys.value / d2d
         yperps = -xs.value / d2d
         vtans = np.nan_to_num((xperps * vxs.value) + (yperps * vys.value))
+        vrads = np.nan_to_num((yperps * vxs.value) + (-xperps * vys.value))
 
         print(f'observations: {len(ra)}')
         cdata = table['radial_velocity']
@@ -320,15 +321,21 @@ class Milky(Ball):
         rr = d2d[mask]
         vv = vtans[mask]
 
-        self.tablecounts.update(rr, vv)
+        print(vv[:10])
+        self.gimage(table)
+
+        #self.tablecounts.update(rr, vv)
+        self.tablecounts.update(rr, vrads[mask])
 
         await self.tablecounts.show()
-        await self.gimage(table)
+        #await self.galaxy_image.run()
 
-    async def gimage(self, table):
+
+    def gimage(self, table=None):
         """ Show mollweide view of galaxy """
         gi = self.galaxy_image
-        pi = math.pi
+
+        table = table or self.table
 
         sid = 'source_id'
         if sid not in table.colnames:
@@ -338,7 +345,6 @@ class Milky(Ball):
                   weight=table['radial_velocity'])
         gi.update(pixels)
 
-        await gi.run()
 
     async def spirals(self):
         """Use Gaia data to simulate the Milky Way rotation curve
@@ -373,11 +379,6 @@ class Milky(Ball):
         rmin = mw.rmin * u.lyr
         rwin = self.window * u.lyr
 
-        # simulate in radial steps of stepsize lightyears
-        stepsize = self.stepsize
-
-        # use mw rmax and rmin to get the stepsize
-        nsteps = int((mw.rmax - mw.rmin) / stepsize)
 
         # Find the stars in the window to use as a sample
         d2d = ((gc.x ** 2) + (gc.y ** 2))**0.5
@@ -385,97 +386,136 @@ class Milky(Ball):
         mask = mask & (d2d < rmin + rwin)
         mask = mask & ~np.isnan(dist)
 
+        print(len(gc))
         gc = gc[mask]
-
-
-        tt = 0.
-
-        rrr = np.linspace(0, stepsize, self.stepsamples)
-        ttt = np.linspace(0, stepsize, self.stepsamples)
+        await self.spiral_gcs(gc)
         
+    async def spiral_gcs(self, gc):
+
+        mw = self.milkyway
+        # simulate in radial steps of stepsize lightyears
+        stepsize = self.stepsize
+
+        # use mw rmax and rmin to get the stepsize
+        nsteps = 10
+
         # loop round the stars in gc
+        tot=0.
         for ix in range(len(gc)):
 
             # get the star at this index
             star = gc[ix]
-
+            print(star)
+            print('vx vy x y', star.v_x, star.v_y, star.x, star.y)
             for step in range(nsteps):
-
+                print('STEP', step)
                 t1 = time.time()
-
+        
                 velocity = ((star.v_x ** 2) + (star.v_y ** 2)) ** 0.5
                 d2d = ((star.x ** 2) + (star.y ** 2))**0.5
-                xperp = star.x / d2d
-                yperp = -star.y / d2d
-                vtan = (xperp * star.v_x) + (yperp * star.v_y)
-                # vradial = (yperp * star.v_x) + (xperp * star.v_y) # ??
-                
-                vel =  ((velocity / c.c).decompose()).value
+                xperp = (star.y / d2d).value
+                yperp = (-star.x / d2d).value
+            
+                vtan =  (xperp * star.v_x) + (yperp * star.v_y)
 
+                vrad = (yperp * star.v_x) + (-xperp * star.v_y)
+
+                print('vx vy x y',
+                      star.v_x, star.v_y, star.x, star.y, d2d, vtan, vrad)
+
+            
                 myrstart = (d2d << u.lyr).value
+
                 # set CC value of mw object
-                mw.find_cc((vtan / c.c))
+                tv = (vtan / c.c).decompose().value
+                mw.find_cc(tv, r=myrstart)
 
-                # use my starting radius to get rvals to evaluate
-                rvals = myrstart + rrr
-
+                if np.isnan(mw.CC):
+                    print('NOCC low energy???')
+                    break
                 # set mw.EE based on energy at start
                 mw.EE = 0.0
-                ee = mw.energy(rvals[:1])
+                ee = mw.energy(myrstart)
 
-                # want (vel ** 2)/2.  to be energy, so set EE to make this happen
-                mw.EE = ((vel ** 2.0) / 2.0) - ee
+                # want (vradial ** 2)/2.  to be energy, so set EE to make this happen
+                vradial = (vrad / c.c).decompose().value
+                mw.EE = ((vradial ** 2.0) / 2.0) - ee
 
-                # tangential velocity from mw
-                vv = ((mw.v(rvals) * c.c) << u.km/u.s).value
+                print('Initial energy', ee, (2.0 * mw.energy(myrstart))**0.5, vradial)
+
+                # calculate rvals for times we require
+                rvals = [0.]
+                t0 = 0
+                rval = 0.
+                ttt = np.linspace(0, self.stepsize, 100)
+                for last, tt in zip(ttt[:-1], ttt[1:]):
+                    delta_t = tt - last
+                    rval += vradial * delta_t
+                    energy = mw.energy(rval + myrstart)
+                    if energy < 0:
+                        print('negative energy',
+                              len(rvals), rval, rvals[-3:])
+                        break
+                    vradial = sqrt(2.*energy)
+                    rvals.append(rval)
+
 
                 # add a random term based on time and an acceleration too
                 fudge = 0.
                 if not self.addfoft:
                     # calculate rdot and tvalues
-                    rdots = np.array([2 * (mw.energy(rval)**0.5) for rval in rvals])
-                    tvalues = integrate.cumtrapz(1/rdots, rvals, initial=0) 
-                    print(rvals)
-                    print(rdots)
-                    print(tvalues)
+                    rdots = np.array([((2 * mw.energy(rval)) **0.5) for rval in rvals])
+                    tvalues = integrate.cumtrapz(1/rdots, rvals, initial=0)
+                    #tvalues = ttt
+
                     fudge = np.nan_to_num(self.foft(tvalues, vv))
-                    
+
+                rvals = np.linspace(0, self.stepsize, 1000)
+                #print('rvals', myrstart+min(rvals), myrstart+max(rvals))
+                vv = mw.v(myrstart+rvals) 
+                #print('vtans', np.mean(vv), np.std(vv))
                 self.tablecounts.update(
-                    ((rvals * u.lyr) << u.kpc).value,
-                    vv + fudge)
+                    (((myrstart + rvals) * u.lyr) << u.kpc).value,
+                     ((vv + fudge) * c.c << u.km/u.s).value)
 
                 # update the star position and velocity to that
                 # at the end of the steps
 
                 # get final rdot, needed for updating star
-                rfinal = rvals[-1]
-                rdot = 2 * (mw.energy(rvals[-1]))**0.5
+                rfinal = rvals[-1] + myrstart
 
-                gc.data.x[ix] = rfinal * u.lyr
-                gc.data.y[ix] = 0. * u.lyr
+                efinal = mw.energy(rfinal)
 
-                gc.v_y[ix] = (vv[-1] * c.c) << u.km/u.s
-                gc.v_x[ix] = (rdot * c.c)
-
-                # we are changing gc in place so
-                # this voodoo is needed to pick up new values
-                # properly -- hope it works!
-                gc.cache.clear()
-
-                # update star
-                star = gc[ix]
+                #efinal -= ((star.v_z/c.c) ** 2.)/2.
+                rdot = efinal ** 0.5
+                if np.isnan(rdot):
+                    print('efinal/rfinal/vtfinal', efinal, rfinal, vv[-1])
+                    rdot = 0.
+                    break
                 
+                print('Final energy/rdot',  efinal, rdot)
+
+                # update star -- 
+                star = magic.Ball(
+                    x=rfinal * u.lyr,
+                    y=0. * u.lyr,
+                    z=0. * u.lyr,
+                    v_x = rdot * c.c << u.km/u.s,
+                    v_y = vv[-1] * c.c << u.km/u.s,
+                    v_z=star.v_z)
+            
+                #print('KKKK', star.v_x, rdot * c.c << u.km/u.s, star.v_y)
                 # check radii make sense
                 newd2d = ((star.x ** 2) + (star.y ** 2))**0.5
-
+                #print('d2d', d2d, newd2d)
                 t2 = time.time()
-                tt += t2-t1
-                if tt > self.sleep:
-                    tt = 0.
+                tot += t2-t1
+                if tot > self.sleep:
+                    tot = 0.
                     await self.tablecounts.show()
                 else:
                     await magic.sleep(0)
-                    
+                
         await self.tablecounts.show()
             
     def foft(self, tvalues, vtans):
@@ -508,6 +548,44 @@ class Milky(Ball):
         #print('tvdh', delta_t, vtan, distance, curve, rand)
         return curve.value + rand
 
+    async def circle(self):
+
+        ax = await self.get()
+        vx, vy = (np.random.random(2) - 0.5) * 2.
+        #vx, vy = .5, -.5
+        ax = await self.get()
+        
+        for theta in np.linspace(0.001, 2*pi, 16):
+
+            x, y = cos(theta), sin(theta)
+
+            # tangential velocity
+            vtan = vx * y - vy * x
+
+            # radial velocity
+            radial = vx * x + vy * y
+
+            print('vcheck', (vtan ** 2) + (radial ** 2), vx ** 2 + vy ** 2)
+
+            lines = [
+                [[0, x * 0.9], [0, y * 0.9]],
+                [[x, x+vx], [y, y+vy]],
+                [[x, x+(y*vtan)], [y, y-(x*vtan)]],
+                [[x, x+(x*radial)], [y, y+(y*radial)]],
+                ]
+
+            names = ['', 'velocity', 'vtan', 'vradial']
+            modes = ['--k', '-r', '-b', '-g']
+
+            ax.plot(x, y, 'ro')
+
+            for name, line, mode in zip(names, lines, modes):
+                xx, yy = line
+                ax.plot(xx, yy, mode, label=name)
+
+        #ax.legend()
+        ax.grid(True)
+        ax.show()
 
 async def run(args):
 
