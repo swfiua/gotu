@@ -181,7 +181,136 @@ def get_samples(n=1000, columns=None, table=None):
             output_file=str(path),
             dump_to_file=True)
 
+class Star(Ball):
 
+    def d2d(self):
+        """  Distance from origin in x/y plane """
+        return ((self.x ** 2) + (self.y ** 2))**0.5
+
+    def vtan(self):
+        """ Tangential Velocity """
+        d2d = self.d2d()
+        
+        xperp = self.y / d2d
+        yperp = -self.x / d2d
+        
+        return (xperp * self.v_x) + (yperp * self.v_y)
+
+    def rdot(self):
+        """ Radial Velocity """
+        d2d = self.d2d()
+        
+        xperp = self.x / d2d
+        yperp = self.y / d2d
+
+        return (xperp * self.v_x) + (yperp * self.v_y)
+
+    def speed(self):
+
+        return ((self.v_x ** 2) + (self.v_y ** 2))**0.5
+
+    def step(self, galaxy, deltat=1e6):
+        """ Step the star forward detat
+
+        deltat:  number of years
+
+        galaxy: spiral.Spiral() at centre of the galaxy.
+        """
+        r = (self.d2d() << u.lyr).value
+        vtan = (self.vtan() / c.c).decompose().value
+
+
+        # set galaxy CC value based on current tangential velocity
+        cc = galaxy.find_cc(vtan, r)
+
+        #if hasattr(self, 'cc'):
+        #    # print some info if this is an update -- see how it is changing
+        #    print('cc delta_cc', self.cc, self.cc - cc)
+        #else:
+        #    print('CC', cc, galaxy.v(r), vtan)
+            
+
+        self.cc = cc
+
+
+        # set galaxy EE value based on rdot
+        galaxy.EE = 0.
+        ee = galaxy.energy(r)
+        # want energy == (self.rdot ** 2)/2., so set EE so it is so
+        # if rdot is negative, then want energy negative
+        rdot = (self.rdot() / c.c).decompose()
+        energy = (rdot*rdot)/2
+        if rdot < 0:
+            energy *= -1
+        galaxy.EE = energy - ee
+
+        #if hasattr(self, 'ee'):
+        #    print('ee delta_ee', self.ee, self.ee - galaxy.EE)
+
+        self.ee = galaxy.EE
+        
+        # change in radius if rdot were constant. FIXME take account of rdoubledot
+        vinert = galaxy.vinert(r, vtan)
+        rdoubledot = galaxy.rdoubledot(r, vinert)
+        delta_rdot = rdoubledot * deltat
+        #print('delta_rdot', delta_rdot, (self.rdot()/c.c).decompose())
+
+        # mean rdot
+        mean_rdot = (self.rdot()/c.c).decompose().value + (delta_rdot/2.)
+
+        dr = (mean_rdot * deltat).value
+
+        # set x to radius, y to zero
+        self.x = (r + dr) * u.lyr
+        self.y = 0. * u.lyr
+
+        energy = galaxy.energy(r+dr)
+        self.v_x = (((2.0 * abs(energy))**0.5) * c.c) << u.km/u.s
+        if energy < 0.0:
+            self.v_x *= -1
+        self.v_y = -(galaxy.v(r+dr) * c.c) << u.km/u.s
+ 
+        #self.vx = 0.0001
+        #print('r dr', r, dr)
+        vtan1 = galaxy.v(r + dr)
+        vtan0 = galaxy.v(r)
+        #print('vtan 0 1 2', vtan, vtan0, vtan1)
+        energy = galaxy.energy(r + dr)
+        energy = galaxy.energy(r)
+        #if energy > 0.0:
+        #    print('energy v_x compare', sqrt(energy) * c.c << u.km/u.s, self.v_x)
+        #print('vtan delta-vtan', -vtan, vtan1, vtan1+vtan)
+        #print()
+        
+    async def show(self):
+
+        ax = await self.get()
+
+        distance = self.d2d().value
+        speed = self.speed().value
+        x = self.x.value / distance
+        y = self.y.value / distance
+        vx = self.v_x.value / speed
+        vy = self.v_y.value / speed
+        rdot = self.rdot().value / speed
+        vtan = self.vtan().value / speed
+        
+        #ax.arrow(0, 0, x/distance, y/distance, linestyle=':')
+        ax.arrow(0, 0, x, y, linestyle='dotted')
+
+        ax.arrow(x, y,
+                 vx, vy, color='r')
+        ax.arrow(x, y,
+                 y * vtan,
+                 -x * vtan, color='g')
+        ax.arrow(x, y,
+                 x * rdot,
+                 y * rdot, color='b')
+        ax.show()
+
+
+
+    
 class Milky(Ball):
 
     def __init__(self, bunch=1, path='.'): 
@@ -194,7 +323,7 @@ class Milky(Ball):
         self.clip = 25  # either side
         self.fudge = 2.
         self.keys = deque(('parallax', 'radial_velocity'))
-
+        self.sleep = 1.
 
         title = 'Milky Way rotation curve'
         self.tablecounts = magic.TableCounts(
@@ -220,9 +349,12 @@ class Milky(Ball):
         self.milkyway = spiral.Spiral()
         self.milkyway.rmax = (self.tablecounts.maxx * u.kpc / u.lyr).decompose()
         self.milkyway.rmin = 10000.
-        self.window = 10000.
-        self.stepsize = 50000
-        self.stepsamples = 1000
+        self.window = 25000.
+        self.stepsize = 1e6
+        self.accelerationx = 5e-9
+        self.accelerationy = 5e-9
+        self.stepsamples = 10000
+        self.nsteps = 500
         self.addfoft = True
         self.speed_factor = 1.
 
@@ -400,123 +532,47 @@ class Milky(Ball):
         nsteps = 10
 
         # loop round the stars in gc
-        tot=0.
-        for ix in range(len(gc)):
+        tot=self.sleep
 
-            # get the star at this index
-            star = gc[ix]
-            print(star)
-            print('vx vy x y', star.v_x, star.v_y, star.x, star.y)
-            for step in range(nsteps):
-                print('STEP', step)
-                t1 = time.time()
+        self.stars = deque()
+        for star in gc:
+            self.stars.append(
+                Star(x=star.x,
+                     y=star.y,
+                     z=star.z,
+                     v_x=star.v_x,
+                     v_y=star.v_y,
+                     v_z=star.v_z))
+
+        ax = await self.get()
+        ax.hist([star.d2d().value for star in self.stars], bins=40)
+        ax.show()
         
-                velocity = ((star.v_x ** 2) + (star.v_y ** 2)) ** 0.5
-                d2d = ((star.x ** 2) + (star.y ** 2))**0.5
-                xperp = (star.y / d2d).value
-                yperp = (-star.x / d2d).value
-            
-                vtan =  (xperp * star.v_x) + (yperp * star.v_y)
+        for star in self.stars:
+            for step in range(nsteps):
+                t1 = time.time()
 
-                vrad = (yperp * star.v_x) + (-xperp * star.v_y)
-
-                print('vx vy x y',
-                      star.v_x, star.v_y, star.x, star.y, d2d, vtan, vrad)
-
-            
-                myrstart = (d2d << u.lyr).value
-
-                # set CC value of mw object
-                tv = (vtan / c.c).decompose().value
-                mw.find_cc(tv, r=myrstart)
-
-                if np.isnan(mw.CC):
-                    print('NOCC low energy???')
-                    break
-                # set mw.EE based on energy at start
-                mw.EE = 0.0
-                ee = mw.energy(myrstart)
-
-                # want (vradial ** 2)/2.  to be energy, so set EE to make this happen
-                vradial = (vrad / c.c).decompose().value
-                mw.EE = ((vradial ** 2.0) / 2.0) - ee
-
-                print('Initial energy', ee, (2.0 * mw.energy(myrstart))**0.5, vradial)
-
-                # calculate rvals for times we require
-                rvals = [0.]
-                t0 = 0
-                rval = 0.
-                ttt = np.linspace(0, self.stepsize, 100)
-                for last, tt in zip(ttt[:-1], ttt[1:]):
-                    delta_t = tt - last
-                    rval += vradial * delta_t
-                    energy = mw.energy(rval + myrstart)
-                    if energy < 0:
-                        print('negative energy',
-                              len(rvals), rval, rvals[-3:])
-                        break
-                    vradial = sqrt(2.*energy)
-                    rvals.append(rval)
-
-
-                # add a random term based on time and an acceleration too
-                fudge = 0.
-                if not self.addfoft:
-                    # calculate rdot and tvalues
-                    rdots = np.array([((2 * mw.energy(rval)) **0.5) for rval in rvals])
-                    tvalues = integrate.cumtrapz(1/rdots, rvals, initial=0)
-                    #tvalues = ttt
-
-                    fudge = np.nan_to_num(self.foft(tvalues, vv))
-
-                rvals = np.linspace(0, self.stepsize, 1000)
-                #print('rvals', myrstart+min(rvals), myrstart+max(rvals))
-                vv = mw.v(myrstart+rvals) 
-                #print('vtans', np.mean(vv), np.std(vv))
                 self.tablecounts.update(
-                    (((myrstart + rvals) * u.lyr) << u.kpc).value,
-                     ((vv + fudge) * c.c << u.km/u.s).value)
+                    [(star.d2d() << u.kpc).value],
+                    [(star.vtan() << u.km/u.s).value])
 
-                # update the star position and velocity to that
-                # at the end of the steps
 
-                # get final rdot, needed for updating star
-                rfinal = rvals[-1] + myrstart
+                star.step(self.milkyway, self.stepsize)
 
-                efinal = mw.energy(rfinal)
+                # add acceleratin along the spiral
+                star.v_x += (self.stepsize * self.accelerationx * c.c) << u.km/u.s
+                star.v_y -= (self.stepsize * self.accelerationy * c.c) << u.km/u.s
 
-                #efinal -= ((star.v_z/c.c) ** 2.)/2.
-                rdot = efinal ** 0.5
-                if np.isnan(rdot):
-                    print('efinal/rfinal/vtfinal', efinal, rfinal, vv[-1])
-                    rdot = 0.
-                    break
-                
-                print('Final energy/rdot',  efinal, rdot)
-
-                # update star -- 
-                star = magic.Ball(
-                    x=rfinal * u.lyr,
-                    y=0. * u.lyr,
-                    z=0. * u.lyr,
-                    v_x = rdot * c.c << u.km/u.s,
-                    v_y = vv[-1] * c.c << u.km/u.s,
-                    v_z=star.v_z)
-            
-                #print('KKKK', star.v_x, rdot * c.c << u.km/u.s, star.v_y)
-                # check radii make sense
-                newd2d = ((star.x ** 2) + (star.y ** 2))**0.5
-                #print('d2d', d2d, newd2d)
                 t2 = time.time()
-                tot += t2-t1
+                tot += t2 - t1
+
                 if tot > self.sleep:
-                    tot = 0.
                     await self.tablecounts.show()
+                    tot=0.
                 else:
                     await magic.sleep(0)
-                
-        await self.tablecounts.show()
+
+        return
             
     def foft(self, tvalues, vtans):
         """ Model factors not modelled in spirals.
