@@ -350,11 +350,11 @@ class Milky(Ball):
         self.milkyway.rmax = (self.tablecounts.maxx * u.kpc / u.lyr).decompose()
         self.milkyway.rmin = 10000.
         self.window = 25000.
-        self.stepsize = 1e6
+        self.stepsize = 1e5
         self.accelerationx = 5e-9
-        self.accelerationy = 5e-9
+        self.accelerationy = 0.
         self.stepsamples = 10000
-        self.nsteps = 500
+        self.nsteps = 50
         self.addfoft = True
         self.speed_factor = 1.
 
@@ -456,8 +456,8 @@ class Milky(Ball):
         print(vv[:10])
         self.gimage(table)
 
-        #self.tablecounts.update(rr, vv)
-        self.tablecounts.update(rr, vrads[mask])
+        self.tablecounts.update(rr, vv)
+        #self.tablecounts.update(rr, vrads[mask])
 
         await self.tablecounts.show()
         #await self.galaxy_image.run()
@@ -559,7 +559,11 @@ class Milky(Ball):
 
                 star.step(self.milkyway, self.stepsize)
 
-                # add acceleratin along the spiral
+                self.tablecounts.update(
+                    [(star.d2d() << u.kpc).value],
+                    [(star.vtan() << u.km/u.s).value])
+
+                # add acceleration along the spiral
                 star.v_x += (self.stepsize * self.accelerationx * c.c) << u.km/u.s
                 star.v_y -= (self.stepsize * self.accelerationy * c.c) << u.km/u.s
 
