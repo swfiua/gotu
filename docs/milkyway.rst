@@ -138,7 +138,7 @@ and cameras.
 
 Personal toolkit for viewing things with matplotlib.
 
-A New Paradigm for the Universe
+2017, A New Paradigm for the Universe
 
 .. image:: images/spanish2.png
 
@@ -236,6 +236,16 @@ redshift, but has no overall expansion.
 
 .. image:: images/cpr.jpg
 
+Sagittarius A*
+==============
+
+.. image:: images/sgrastar.png
+
+
+Most observed black hole.
+
+Black Holes: gotu.spiral.Spiral()
+
 Spanish Dancer
 ==============
 
@@ -305,16 +315,12 @@ from the centre of the mass.
 
 .. image:: images/dennis_sciama.png
 
-
-Sagittarius A*
-==============
-
-.. image:: images/sgrastar.png
+Simulation using Gaia data
+==========================
 
 
-Most observed black hole.
+.. image:: images/simumosaic.png
 
-Black Holes
 
 Introduction to the Geometry of the Universe
 ============================================
@@ -349,8 +355,8 @@ Dark Energy Survey
 .. image:: images/supernova.png
 
 
-Lanikae Supercluster
---------------------
+Laniakae Supercluster
+---------------------
 
 .. image:: images/laniakea.png
 

@@ -1,5 +1,4 @@
-"""
-=================
+"""=================
 Where Is The Sun?
 =================
 
@@ -45,7 +44,8 @@ The GCRS reference introduces different ways to measure time: the
 earth's rotation versus the vibration of an atomic clock.
 
 If we ignore time, briefly, GCRS introduces a geocentric coordinate
-system for space.  There is a related reference system called ICRS, which is centred 
+system for space.  There is a related reference system called ICRS,
+which is centred on the Sun.
 
 The positions of a catalogue of distant fixed stars is used to define
 a fixed frame in space, centered on earth at a point in time.
@@ -77,6 +77,8 @@ import math
 from collections import deque
 
 from astropy import coordinates, constants, time
+
+from astropy import units as u
 
 from datetime import datetime, timedelta
 
@@ -157,15 +159,16 @@ class SolarSystem(magic.Ball):
 
         self.now = time.Time(datetime.now())
 
+    def planet_names(self):
+
+        return 'mercury venus mars jupiter saturn'.split()
+
     async def run(self):
         """ Create a plot based on current time """
 
-        names = 'sun earth moon'.split()
+        names = 'sun moon earth'.split()
 
-        planets = 'mercury venus mars jupiter saturn'.split()
-
-        if self.planets:
-            names += planets
+        names += self.planet_names()
 
         mode = self.modes[0]
         view = self.views[0]
@@ -227,6 +230,37 @@ class SolarSystem(magic.Ball):
             self.now += timedelta(seconds=self.inc or 0)
 
 
+    async def solar_rotaion_curve(self):
+
+        planets = ['earth'] + self.planet_names()
+        delta_t = timedelta(days=1)
+        
+        ax = await self.get()
+
+        sun = get_body('sun')
+        points = []
+        for planet in planets:
+
+            now = get_body(planet, self.now)
+            then = get_body(planet, self.now + delta_t)
+
+            print(planet, now.separation_3d(then), now.separation_3d(sun))
+
+            distance = now.separation_3d(sun).value
+            velocity = (now.separation_3d(then) / (24 * 3600 * u.s) << u.km/u.s).value
+            ax.plot(distance, velocity,                    
+                    'o', label=planet)
+
+            points.append((distance, velocity))
+
+        points.sort()
+        ax.plot([x[0] for x in points], [x[1] for x in points])
+        ax.set_xlabel('Distance from Sun (AU)')
+        ax.set_ylabel('Velocity (km/s)')
+        ax.legend()
+        ax.show()
+
+        
 if __name__ == '__main__':
 
     ss = SolarSystem(get_args())
