@@ -90,7 +90,7 @@ from blume import magic, farm
 
 
 
-def get_args():
+def get_args(cmdline=None):
     """ A parser for command line arguments
 
     
@@ -104,7 +104,7 @@ def get_args():
     parser.add_argument('--log', action='store_true')
     parser.add_argument('--rotate', action='store_true')
 
-    return parser.parse_args()
+    return parser.parse_args(cmdline)
 
 def get_body(name, at=None):
     """ astropy helper function to get a body.
@@ -135,16 +135,16 @@ class SolarSystem(magic.Ball):
 
     """
 
-    def __init__(self, args=None):
+    def __init__(self, args=None, cmdline=None):
 
         super().__init__()
 
-        self.__dict__.update(vars(args or get_args()).items())
+        self.__dict__.update(vars(args or get_args(cmdline)).items())
 
         self.now = time.Time(datetime.now())
 
-        self.modes = deque(['icrs', 'gcrs'])
-        self.views = deque(['mollweide', 'polar'])
+        self.modes = deque(['gcrs', 'icrs'])
+        self.views = deque(['polar', 'mollweide'])
 
         sun = get_body('sun', self.now)
 

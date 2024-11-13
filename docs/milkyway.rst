@@ -15,8 +15,7 @@ Johnny Gill
 
 Exploring the Geometry of the Universe.
 
-
-.. image:: images/johny.png
+.. image:: images/johnny.png
 
 https://github.com/swfiua
 
@@ -35,12 +34,11 @@ Provide a guide to the key ideas in the Geometry of the Universe.
 
 Explore gotu.gaia and healpy to visualise the Milky Way.
 
-Cringe in horror at gotu.jwst
-
 blume.table and how to make the magic carpet magic
 
 Explore gotu using blume.
 
+.. image:: images/cartwheel.png
 
 Thanks
 ======
@@ -52,11 +50,10 @@ Thanks
 python
 ------
 
-
-
 PyCon
 
 PyCon Ireland
+
 
 
 Europython 2022, Dublin
@@ -93,42 +90,23 @@ Dublin, 2003
 astropy
 -------
 
-Cosmology
-
 Units
 
 Constants
 
 Coordinates
 
-Astroquery, tables
+Cosmology
 
-.. image:: images/carina.png
+astroquery, tables
 
-
-wikipedia, open source, open data
----------------------------------
-
-Gaia
-
-Hubble
-
-JWST
-
-Astronomers
------------
-
-Space telescopes
-
-Gravitational Wave Detectors
-
-Pulsar Timing Array
-
-Event Horizon Telescope
-
+.. image:: images/jodrell.png
 
 Personal Projects
 =================
+
+.. image:: images/carina.png
+
 
 karmapi, 2016
 -------------
@@ -152,22 +130,6 @@ A quest for a universal table
 
 .. image:: images/spanish1.png
 
-Principles
-++++++++++
-
-Do not re-invent the wheel
-
-No module should exceed 1000 lines
-
-Fix it upstream
-
-Is there anything better than a folder full of 100 line python
-scripts?
-
-There is nothing a layer of abstraction cannot fix.  Can it be done
-without adding complexity?
-
-It is impossible to do anything if I obey all the principles.
 
 gotu, 2021
 ----------
@@ -184,13 +146,6 @@ What if the big bang did not happen?
 ====================================
 
 What if galaxies are very much older than 13.7 billion years?
-
-Bayes Theorem
--------------
-
-.. math::
-
-   P(A|B) = P(B|A)P(A) / P(B)
 
 
 Copernicus
@@ -212,9 +167,9 @@ Fred Hoyle
 
 Fred Hoyle coined the term Big Bang.
 
-He believed in an essentially static universe.
+Believed in an essentially static universe.
 
-Suggested just one new atom appearing in each skyscraper sized volume
+One atom appearing in each skyscraper sized volume
 of space per year would balance the expansion.
 
 .. image:: images/m31.png
@@ -224,18 +179,27 @@ Colin Rourke
 
 Emeritus Professor of Mathematics at Warwick University.
 
-Good news: No need for dark matter.
+No need for dark matter.
 
-Bad news: Sagittarius A* is too small to drive the Milky Way!
+Sagittarius A* is too small to drive the Milky Way!
 
-Shows that the Sciama Principle can explain galactic rotation curves
+The Sciama Principle can explain galactic rotation curves
 without need for dark matter.
 
-Colin Rourke proposes de Sitter space as a space-time which exhibits
-redshift, but has no overall expansion.
+de Sitter space is a space-time which exhibits redshift, but has no
+overall expansion.
 
 .. image:: images/cpr.jpg
 
+Bayes Theorem
+-------------
+
+.. math::
+
+   P(A|B) = P(B|A)P(A) / P(B)
+
+.. image:: images/pillars.png
+           
 Sagittarius A*
 ==============
 
@@ -244,24 +208,9 @@ Sagittarius A*
 
 Most observed black hole.
 
+4.2 million solar masses.
+
 Black Holes: gotu.spiral.Spiral()
-
-Spanish Dancer
-==============
-
-NGC 1566
-
-.. image:: images/spanish3.png
-
-mixing download and viewing
-
-blume.train
-
-Milky Way
-=========
-
-.. image:: images/milkyway_gaia.png
-
 
 Gaia and wits
 =============
@@ -270,16 +219,38 @@ Where is the Sun?
 
 Can Gaia help answer this question?
 
+.. image:: images/wits.png
+
+
+Spanish Dancer
+==============
+
+.. image:: images/spanish3.png
+
+
+Solar System Rotation Curve
+===========================
+
+.. image:: images/solar_system.png
+
 
 Galactic Rotation Curves
 ========================
 
-Xaowei paper.
+Xaowei Ou paper.
 
 Tangential velocities beyond 25kpc from the galactic centre are lower
 than expected.
 
+.. image:: images/ou.png
+
+           
+Milky Way
+=========
+
 .. image:: images/milkyway_rotation.png
+
+.. image:: images/mwgaiasgra.png       
 
 
 Sciama Principle, Denis Sciama, 1953
@@ -318,8 +289,7 @@ from the centre of the mass.
 Simulation using Gaia data
 ==========================
 
-
-.. image:: images/simumosaic.png
+.. image:: images/paradigm.png
 
 
 Introduction to the Geometry of the Universe
@@ -327,32 +297,26 @@ Introduction to the Geometry of the Universe
 
 It's a big subject ;)
 
-priors for astronomical data analysis
-
-advert for workshop
-
-What does a de Sitter/Sciama prior look like?
-
-Simulate 10^7 galaxies of mass 10^15
-
 blume
 
-gaia
+gotu.jwst
 
-spiral
+gotu.gaia
 
-skymap
+gotu.spiral
 
-   
-distance and redshift
----------------------
-
-.. image:: images/zvr.png
 
 Dark Energy Survey
 ------------------
 
 .. image:: images/supernova.png
+
+
+distance and redshift, Hubble Tension
+-------------------------------------
+
+.. image:: images/zvr.png
+
 
 
 Laniakae Supercluster

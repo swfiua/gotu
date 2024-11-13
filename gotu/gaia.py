@@ -443,7 +443,6 @@ class Milky(Ball):
         vtans = np.nan_to_num((xperps * vxs.value) + (yperps * vys.value))
         vrads = np.nan_to_num((yperps * vxs.value) + (-xperps * vys.value))
 
-        print(f'observations: {len(ra)}')
         cdata = table['radial_velocity']
 
         rmin, rmax = self.tablecounts.minx, self.tablecounts.maxx
@@ -453,14 +452,12 @@ class Milky(Ball):
         rr = d2d[mask]
         vv = vtans[mask]
 
-        print(vv[:10])
         self.gimage(table)
 
         self.tablecounts.update(rr, vv)
-        #self.tablecounts.update(rr, vrads[mask])
 
         await self.tablecounts.show()
-        #await self.galaxy_image.run()
+
 
 
     def gimage(self, table=None):
@@ -476,6 +473,11 @@ class Milky(Ball):
         gi.update(pixels,
                   weight=table['radial_velocity'])
         gi.update(pixels)
+
+
+    async def show_hp_image(self):
+
+        await self.galaxy_image.run()
 
 
     async def spirals(self):

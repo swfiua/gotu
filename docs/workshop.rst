@@ -34,6 +34,9 @@ explore the ideas and data sets for themselves.
 Introduction
 ============
 
+Johnny Gill
+-----------
+
 Goals
 -----
 
@@ -43,7 +46,7 @@ gotu
 
 Help me and others understand the ideas in the book.
 
-Visualise space time, understand curvature.
+Visualise space-time, understand curvature.
 
 Visualise data to see if it supports the theory.
 
@@ -60,13 +63,39 @@ Gravitational Waves
 
 Dark Energy
 
-Johnny Gill
------------
 
 Flash Warnings
 --------------
 
 Lots of axes flying around.
+
+Install the software
+====================
+
+Create Virtual Environment
+--------------------------
+
+mkdir workshop
+
+python3 -m venv gotuenv
+
+Install blume
+-------------
+
+git clone https://github.com/swfiua/blume
+
+cd blume
+
+python3 -m pip install -e .
+
+Install gotu
+------------
+
+git clone https://github.com/swfiua/gotu
+
+cd gotu
+
+python3 -m pip install -e .
 
 
 Blume
@@ -74,6 +103,22 @@ Blume
 
 Is there anything better than an editor, a console and a bunch of 100
 line python scripts?
+
+Principles
+----------
+
+No module should exceed 1000 lines
+
+Fix it upstream
+
+Is there anything better than a folder full of 100 line python
+scripts?
+
+There is nothing a layer of abstraction cannot fix.  Can it be done
+without adding complexity?
+
+It is impossible to do anything if I obey all the principles?
+
 
 Patterns
 ========
@@ -84,6 +129,32 @@ add complexity while figuring out how things work.
 
 no problem a layer of indirection cannot solve
 
+Blume Magic Module
+==================
+
+blume.magic.RoundAbout
+
+blume.magic.Carpet
+
+blume.TableCounts
+
+Gotu Modules
+============
+
+gotu.jwst
+---------
+
+astroquery and mast
++++++++++++++++++++
+
+gotu.wits
+---------
+
+gotu.spiral
+-----------
+
+gotu.gaia
+---------
 
 Observations
 ============
@@ -104,8 +175,6 @@ JWST
 Gaia
 ====
 
-astroquery and mast
--------------------
 
 The Milky Way Rotation Curve
 ============================
