@@ -28,7 +28,7 @@ Introduction
 Johnny Gill
 -----------
 
-.. image:: images/spanish2.png
+.. image:: images/johnny.png
 
 Goals
 -----
@@ -48,6 +48,8 @@ Your Goals
 
 What do you want?
 
+.. image:: images/milkyway_rotation.png
+
 Gain insight into cosmological mysteries
 ----------------------------------------
 
@@ -61,14 +63,19 @@ Gravitational Waves
 
 Dark Energy
 
+.. image:: images/spanish2.png
 
 Flash Warnings
 --------------
 
 Lots of axes flying around.
 
+.. image:: images/simumosaic.png
+
 Install the software
 ====================
+
+.. image:: images/cartwheel.png
 
 Create Virtual Environment
 --------------------------
@@ -102,6 +109,8 @@ Blume
 Is there anything better than an editor, a console and a bunch of 100
 line python scripts?
 
+.. image:: images/pillars.png
+
 Principles
 ----------
 
@@ -117,6 +126,7 @@ without adding complexity?
 
 It is impossible to do anything if I obey all the principles?
 
+.. image:: images/spanish1.png
 
 Patterns
 ========
@@ -128,6 +138,8 @@ add complexity while figuring out how things work.
 no problem a layer of indirection cannot solve
 
 Not sure what value to use: use random module.
+
+.. image:: images/jodrell.png
 
 Blume Magic Module
 ==================
@@ -209,6 +221,8 @@ Closer to home
 
 The Laniakea supercluster of galaxies
 =====================================
+
+.. image:: images/laniakea.png
 
 Priors
 ------

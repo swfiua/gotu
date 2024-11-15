@@ -296,6 +296,7 @@ Simulation using Gaia data
 
 .. image:: images/paradigm.png
 
+.. image:: images/mwsim.png
 
 Introduction to the Geometry of the Universe
 ============================================

@@ -531,7 +531,7 @@ class Milky(Ball):
         stepsize = self.stepsize
 
         # use mw rmax and rmin to get the stepsize
-        nsteps = 10
+        nsteps = self.nsteps
 
         # loop round the stars in gc
         tot=self.sleep
