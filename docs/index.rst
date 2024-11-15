@@ -65,8 +65,6 @@ A module for each chapter
 
    jwst
 
-   tttotu
-
 Cast of Characters
 ==================
 
@@ -95,6 +93,7 @@ Talks
 =====
 
 .. toctree::
+   :maxdepth: 2
 
    talks
 

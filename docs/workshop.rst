@@ -2,12 +2,7 @@
  Introduction to The Geometry of the Universe
 ==============================================
 
-The workshop will feature modules from my gotu project, exploring the
-geometry of the universe.
-
-It will cover downloading and visualising data from the James Webb
-Space Telescope and the Gaia mission to visualise the rotation curve
-for the Milky Way.
+Download and visualise data from the James Webb Space Telescope
 
 Simulate the Milky Way's rotation curve assuming the Sciama Principle::
 
@@ -16,39 +11,42 @@ Simulate the Milky Way's rotation curve assuming the Sciama Principle::
    proportional to the 
 
            
-Compare to the Gaia image.
+Introduction to de Sitter Space
 
+Download and visualise the supernovae data from the Dark Energy Survey
 
-Introduction to de Sitter Space.  This will use matplotlib to
-visualise geodesics in de Sitter Space, allowing us to explore the
-subtle relation between redshift and distance.
+.. image:: images/workshop.jpeg
 
-Downloading and visualising the supernovae data and testing whether it
-is consistent with de Sitter Space.
-
-Since gotu uses blume, the workshop will begin with an introduction to blume.
-
-The goal is for attendees to have at least half the workshop time to
-explore the ideas and data sets for themselves.
+           
 
 Introduction
 ============
 
+.. image:: images/gotu.png
+
+
 Johnny Gill
 -----------
+
+.. image:: images/spanish2.png
 
 Goals
 -----
 
-blume
+.. image:: images/zvr.png
 
-gotu
-
-Help me and others understand the ideas in the book.
+Document my explorations of The Geometry of the Universe (gotu)
 
 Visualise space-time, understand curvature.
 
 Visualise data to see if it supports the theory.
+
+Help others understand the ideas.
+
+Your Goals
+----------
+
+What do you want?
 
 Gain insight into cosmological mysteries
 ----------------------------------------
@@ -129,6 +127,8 @@ add complexity while figuring out how things work.
 
 no problem a layer of indirection cannot solve
 
+Not sure what value to use: use random module.
+
 Blume Magic Module
 ==================
 
@@ -137,6 +137,13 @@ blume.magic.RoundAbout
 blume.magic.Carpet
 
 blume.TableCounts
+
+blume.console
+-------------
+
+single character commands
+
+.blume_history
 
 Gotu Modules
 ============

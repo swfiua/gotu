@@ -79,16 +79,16 @@ giving us.
 .. image:: images/m74.png
            
 
-Thank you: matplotlib
----------------------
+matplotlib
+----------
 
 Dublin, 2003
 
 .. image:: images/table_demo.png
 
 
-Special thank you:  astropy
----------------------------
+astropy
+-------
 
 Units
 
