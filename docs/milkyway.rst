@@ -79,16 +79,16 @@ giving us.
 .. image:: images/m74.png
            
 
-matplotlib
-----------
+Thank you: matplotlib
+---------------------
 
 Dublin, 2003
 
 .. image:: images/table_demo.png
 
 
-astropy
--------
+Special thank you:  astropy
+---------------------------
 
 Units
 
@@ -198,6 +198,9 @@ Bayes Theorem
 
    P(A|B) = P(B|A)P(A) / P(B)
 
+
+What are your priors ignoring?
+
 .. image:: images/pillars.png
            
 Sagittarius A*
@@ -219,6 +222,8 @@ Where is the Sun?
 
 Can Gaia help answer this question?
 
+What does the Milky Way rotation curve look like?
+
 .. image:: images/wits.png
 
 
@@ -234,8 +239,8 @@ Solar System Rotation Curve
 .. image:: images/solar_system.png
 
 
-Galactic Rotation Curves
-========================
+Milky Way Rotation Curves
+=========================
 
 Xaowei Ou paper.
 

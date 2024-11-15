@@ -91,12 +91,12 @@ Latest News
    news
 
 
-Talk
-====
+Talks
+=====
 
 .. toctree::
 
-   talk
+   talks
 
 Interactive Examples thanks to pyscript
 =======================================
