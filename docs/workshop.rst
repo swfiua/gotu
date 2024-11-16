@@ -24,14 +24,22 @@ Introduction
 
 .. image:: images/gotu.png
 
+Flash Warnings
+==============
+
+Lots of axes flying around.
+
+.. image:: images/simumosaic.png
+
+           
 
 Johnny Gill
------------
+===========
 
 .. image:: images/johnny.png
 
 Goals
------
+=====
 
 .. image:: images/zvr.png
 
@@ -44,14 +52,14 @@ Visualise data to see if it supports the theory.
 Help others understand the ideas.
 
 Your Goals
-----------
+==========
 
-What do you want?
+What do you want from the workshop?
 
 .. image:: images/milkyway_rotation.png
 
 Gain insight into cosmological mysteries
-----------------------------------------
+========================================
 
 Hubble Tension
 
@@ -64,13 +72,6 @@ Gravitational Waves
 Dark Energy
 
 .. image:: images/spanish2.png
-
-Flash Warnings
---------------
-
-Lots of axes flying around.
-
-.. image:: images/simumosaic.png
 
 Install the software
 ====================
@@ -148,7 +149,7 @@ blume.magic.RoundAbout
 
 blume.magic.Carpet
 
-blume.TableCounts
+blume.magic.TableCounts
 
 blume.console
 -------------

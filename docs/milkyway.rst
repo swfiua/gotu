@@ -226,6 +226,8 @@ What does the Milky Way rotation curve look like?
 
 .. image:: images/wits.png
 
+.. image:: images/gaia_radial.png
+
 
 Spanish Dancer
 ==============
@@ -250,8 +252,8 @@ than expected.
 .. image:: images/ou.png
 
            
-Milky Way
-=========
+Milky Way Rotation Curve from Gaia
+==================================
 
 .. image:: images/milkyway_rotation.png
 
