@@ -500,19 +500,11 @@ class Milky(Ball):
 
         mw = self.milkyway
         
-        ra = table['ra']
-        dec = table['dec']
-        pmra = table['pmra']
-        pmdec = table['pmdec']
-        radial_velocity = table['radial_velocity']
-        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
-
         # get the subset we want
         gc = self.to_galactocentric()
 
         rmin = mw.rmin * u.lyr
         rwin = self.window * u.lyr
-
 
         # Find the stars in the window to use as a sample
         d2d = ((gc.x ** 2) + (gc.y ** 2))**0.5
