@@ -480,6 +480,60 @@ class Milky(Ball):
         await self.galaxy_image.run()
 
 
+    async def stats(self):
+        """Use Gaia data to calculate velocity ellipsoids at different radii
+
+        """
+        table = self.add_bunch()
+        gc = self.to_galactocentric()
+
+        # Find the stars in the window to use as a sample
+        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
+        d2d = ((gc.x ** 2) + (gc.y ** 2))**0.5
+        #mask = (d2d > rmin)
+        #mask = mask & (d2d < rmin + rwin)
+        mask = ~np.isnan(dist)
+
+        print(len(gc))
+        gc = gc[mask]
+        await self.do_stats(gc)
+
+    async def do_stats(self, gc):
+
+        self.stars = deque()
+
+        tot = self.sleep
+        for star in gc:
+            t1 = time.time()
+            star = Star(x=star.x,
+                        y=star.y,
+                        z=star.z,
+                        v_x=star.v_x,
+                        v_y=star.v_y,
+                        v_z=star.v_z)
+
+            rdot = star.rdot()
+            self.tablecounts.update(
+                [(star.d2d() << u.kpc).value],
+                [(star.vtan() << u.km/u.s).value],
+                weight=rdot.value
+            )
+
+            t2 = time.time()
+            tot += t2 - t1
+
+            if tot > self.sleep:
+                await self.tablecounts.show()
+                await self.tablecounts.stats()
+                tot=0.
+            else:
+                await magic.sleep(0)
+
+        await self.tablecounts.show()                
+                                          
+        return
+
+
     async def spirals(self):
         """Use Gaia data to simulate the Milky Way rotation curve
 
@@ -507,15 +561,17 @@ class Milky(Ball):
         rwin = self.window * u.lyr
 
         # Find the stars in the window to use as a sample
+        dist = table['parallax'].to(u.parsec, equivalencies=u.parallax())
         d2d = ((gc.x ** 2) + (gc.y ** 2))**0.5
         mask = (d2d > rmin)
         mask = mask & (d2d < rmin + rwin)
         mask = mask & ~np.isnan(dist)
-
+        
         print(len(gc))
         gc = gc[mask]
         await self.spiral_gcs(gc)
         
+
     async def spiral_gcs(self, gc):
 
         mw = self.milkyway
