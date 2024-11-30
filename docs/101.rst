@@ -1,0 +1,259 @@
+===============
+ Cosmology 101
+===============
+
+::
+   
+   Cosmology is the study of the universe's evolution. It's the
+   narrative of the creation of the smallest particles and atoms that
+   make up our own bodies and the unseen forces that govern our
+   existence. It's the tale of black holes and dark matter, of
+   spectacular explosions, and of the quiet, growing dark.
+
+   Join Katie Mack, Perimeter Institute’s Hawking Chair in Cosmology
+   and Science Communication, on an incredible journey through the
+   cosmos in our new series, Cosmology 101.
+
+
+This presents an excellent opportunity to outline how the ideas in The
+Geometry of the Universe contrast to those of modern cosmology.
+
+There are just two ideas: Sciama Principle and de Sitter Space.
+
+Underlying everything: The Perfect Coperncian Principle.
+
+Introducing: Cosmology 101
+==========================
+
+::
+   ... it is easy to feel that stars and galaxies and the cosmos itself
+   are eternal and un-changing, just fixtures of nature that have
+   always been and always will be ...
+
+The field of cosmology is defined as a study of evolution and change.
+The field, apparently, does not consider the possibity that the
+universe, like de Sitter Space, has the Perfect Copernican Principle,
+that it has looked pretty much the same for a very long time indeed.
+
+The belief in a truly ancient universe was shared by Einstein and many
+other astrophysicists of his era.  It was one reason for his
+introduction of the cosmological constant.
+
+When the Universe was seen to be expanding, he withdrew his
+cosmological constant.
+
+In contrast, de Sitter's solution removes the mass term from
+Einstein's equation, leaving just the lambda term.
+
+The lack of matter perterbed Einstein, as he had hoped his General
+Relativity equation would embody Mach's Principle, providing an
+explanation for inertial frames.
+
+In what follows, Dennis Sciama comes to the rescue, with an additional
+assumption to General Relativity that re-instates matter, in
+particular the distant stars, as the origin of inertia.  More on this
+later.
+
+
+Expansion of the Universe Explained
+===================================
+
+The Universe is uniformly, negatively curved.  The geometry of our
+universe is non-Euclidean, we live in a Poincare disk world.
+
+In a curved spacetime, each galaxy that enters our visible universe
+bursts on the scene highly blue-shifted, before accelerating away and
+showing the familiar redshift.
+
+As noted by Robert MacKay, "We see every galaxy redshifted for all but
+a small finite part of the infinite time we see it".
+
+In short, red-shift is an extreme example of an observer selection bias.
+
+How do we know it is expanding?
+-------------------------------
+
+Distant galaxies all appear to be moving away from us.
+
+Redshift is introduced with the familiar ambulance siren, dropping in
+pitch as it passes by.
+
+Note that, an amulanec travelling an appreciable percentage of the
+speed of sound, bursts on the scene with a high pitch, but the
+high-pitched period does not last long compared to the time we hear it
+low-pitched as it travels away from us.
+
+The relationship between distance and redshift is noted to be so exact
+that we use redshift synominously with distance and time.
+
+In short, the blue shift observations, in the form of gamma-ray bursts
+are being ignored, or rather mis-interpretted as the result of
+dramatic events such as neutron star colloisions.
+
+
+And where is all that space going?
+----------------------------------
+
+It is not going anywhere, there is no overall expansion.
+
+
+Cosmic Microwave Background
+===========================
+
+States that any time we look out into the Cosmos, we are looking into
+the past.
+
+With the Perfect Copernican Principle, we should expect the past to
+look like the present.
+
+Can we see the primordial fire of the Big Bang?
+
+The answer is no, the Big Bang did not happen.
+
+The Cosmic Microwave Background is thermalised radiation from stars in
+the universe.
+Note that in an ancient universe there has been plenty of time for
+regions to communicate, so no problem with the uniformity we see.
+
+Why is it the temperature it is?
+--------------------------------
+
+The gravitational waves which create the curvature of the universe
+also mean that there is a limit to how far light can get from its
+source before it is comprehensibly scattered in both intensity and
+direction.
+
+The same scattering also limits the total energy of gamma-ray bursts
+and takes some of the intensity out of them.
+
+Based on the temperature of the CMB this distance is likely a handful
+of Hubble distances, say six or seven.
+
+
+What about the harmonics?
+-------------------------
+
+Maps of local (<500 million light years) show structure on that scale,
+likely due to giant elliptical galaxies with central black holes 10^15
+solar masses or more, with around 10^5 galaxies in the local cosmic
+web.
+
+The Sciama Principle implies that any two bodies should move towards
+harmony, subject to the distance between them.  So galaxies 500
+million years apart can follow the same 500 million year oscillation.
+
+
+Stellar Evolution
+=================
+
+The central black holes of active galaxies eject streams of plasma in
+jets from the galactic centre.
+
+As the jets travel from the centre, they cool and condense into
+population II stars of very low metallicity.
+
+These are short lived and stars forming further out have higher
+metallicity.
+
+Note that mature galaxies are could be orders of magnitude older than
+the 13.7 billion years of the big bang.  This gives plenty of time for
+heavy elements to accumulate in the proportions that we observe.
+
+
+Galaxy Formation
+================
+
+Galaxies grow very slowly over time by acretion of matter by its
+central black hole.
+
+Quasars are baby galaxies, often ejected from a parent galaxy.
+
+Note that without the 13.7 billion year time limit, galaxy formation
+is much easier to explain.
+
+JWST pictures are mentioned.  Note that the observations were exactly
+what is expected in a de Sitter Universe: galaxies as far as you can
+see, like the ones nearby to the Milky Way.
+
+Note that looking out into a negatively curved universe is like
+wearing glasses to correct short-sightedness: objects appear nearer
+and smaller than they actually are.
+
+In the Big Bang theory, this is modelled by the cosmic scale factor,
+giving the size of the universe at a given redshift.
+
+In a de-Sitter Universe, it is simply what it is like to live inside a
+Poincare disk.
+
+Cosmic Web explained
+====================
+
+Copernican Principle: extend to Perfect Cosmological Principle by
+including time.
+
+Cosmic web: it is old, together with the Sciama Principle.
+
+Dark matter is back: rotating masses to the rescue.
+
+
+Cosmic Inflation
+================
+
+No big bang, no cosmic inflation.
+
+Also no problem to explain uniformity of the CMB.
+
+Dark Matter Explained
+=====================
+
+Sciama Principle.
+
+Galactic rotation curves without need for dark matter.
+
+Assume the rotation of a black hole at the centre of a galaxy causes
+the space time around it to rotate.
+
+10^10 or more solar masses required.
+
+Note that Sciama Principle is too weak to affect wide binaries of
+stellar mass.
+
+Also Sgr A* is too small to drive a galaxy the size of the Milky Way.
+It is suggested that it is a moderate sized quasar, roughly on line to
+the centre of the galactic bulge, but not actually the centre, with
+the true centre likely twice as far away.
+
+Dark Energy
+===========
+
+The evidence for dark energy is the following plot from the Dark
+Energy Survey:
+
+image:: images/supernova.png
+
+The observation is that there are some distant galaxies that are not
+as redshifted as they should be given their distance.
+
+The conclusion is that the expansion rate of the universe has
+increased.
+
+What we appear to be seeing is just what we might expect in a de
+Sitter model: the redshift v distance relationship is an asymptotic
+relationship, but there are many galaxies that have not yet reached
+that asymptote.
+
+image:: images/zvd.png
+
+The End of the Universe
+=======================
+
+is likely a very, very long way away.
+
+The Future of Cosmology
+=======================
+
+Re-define the subject to admit the possibility that the Universe is
+essentially static, but does not appear to be so.
+
+Embrace non-Euclidean geometry and a model that does not have all the
+problems outlined in this series.
