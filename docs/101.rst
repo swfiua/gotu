@@ -2,6 +2,9 @@
  Cosmology 101
 ===============
 
+Katie Mack has produced an excellent series of short videos explaining
+the current cosmological beliefs.
+
 ::
    
    Cosmology is the study of the universe's evolution. It's the
@@ -15,8 +18,9 @@
    cosmos in our new series, Cosmology 101.
 
 
-This presents an excellent opportunity to outline how the ideas in The
-Geometry of the Universe contrast to those of modern cosmology.
+This presents an excellent opportunity to outline how the ideas in
+Professor Colin Rourke's, The Geometry of the Universe, contrast to
+those of modern cosmology.
 
 There are just two ideas: Sciama Principle and de Sitter Space.
 
@@ -31,7 +35,7 @@ Introducing: Cosmology 101
    always been and always will be ...
 
 The field of cosmology is defined as a study of evolution and change.
-The field, apparently, does not consider the possibity that the
+The field, apparently, does not consider the possibility that the
 universe, like de Sitter Space, has the Perfect Copernican Principle,
 that it has looked pretty much the same for a very long time indeed.
 
@@ -78,7 +82,7 @@ Distant galaxies all appear to be moving away from us.
 Redshift is introduced with the familiar ambulance siren, dropping in
 pitch as it passes by.
 
-Note that, an amulanec travelling an appreciable percentage of the
+Note that, an amulance travelling an appreciable percentage of the
 speed of sound, bursts on the scene with a high pitch, but the
 high-pitched period does not last long compared to the time we hear it
 low-pitched as it travels away from us.
@@ -86,9 +90,9 @@ low-pitched as it travels away from us.
 The relationship between distance and redshift is noted to be so exact
 that we use redshift synominously with distance and time.
 
-In short, the blue shift observations, in the form of gamma-ray bursts
-are being ignored, or rather mis-interpretted as the result of
-dramatic events such as neutron star colloisions.
+The blue shift observations, in the form of gamma-ray bursts are being
+ignored, or rather mis-interpretted as the result of dramatic events
+such as neutron star colloisions.
 
 
 And where is all that space going?
@@ -112,8 +116,10 @@ The answer is no, the Big Bang did not happen.
 
 The Cosmic Microwave Background is thermalised radiation from stars in
 the universe.
+
 Note that in an ancient universe there has been plenty of time for
-regions to communicate, so no problem with the uniformity we see.
+very distant regions to communicate, so no problem with the uniformity
+we see.
 
 Why is it the temperature it is?
 --------------------------------
@@ -213,7 +219,7 @@ Galactic rotation curves without need for dark matter.
 Assume the rotation of a black hole at the centre of a galaxy causes
 the space time around it to rotate.
 
-10^10 or more solar masses required.
+10^10 or more solar masses required for a typical galaxy.
 
 Note that Sciama Principle is too weak to affect wide binaries of
 stellar mass.
