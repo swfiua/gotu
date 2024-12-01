@@ -161,7 +161,8 @@ Stellar Evolution
 =================
 
 The central black holes of active galaxies eject streams of plasma in
-jets from the galactic centre.
+jets from the galactic centre.  The conditions at galactic centres are
+very similar to those of the early stages of the Big Bang.
 
 As the jets travel from the centre, they cool and condense into
 population II stars of very low metallicity.
@@ -173,6 +174,9 @@ Note that mature galaxies are could be orders of magnitude older than
 the 13.7 billion years of the big bang.  This gives plenty of time for
 heavy elements to accumulate in the proportions that we observe.
 
+It also gives time for black holes the size of Sgr A* to form by
+accretion from the surrounding medium.
+
 
 Galaxy Formation
 ================
@@ -181,6 +185,8 @@ Galaxies grow very slowly over time by acretion of matter by its
 central black hole.
 
 Quasars are baby galaxies, often ejected from a parent galaxy.
+Perhaps Sagittarius A* will one day be ejected from the Milky Way and
+form a baby galaxy.
 
 Note that without the 13.7 billion year time limit, galaxy formation
 is much easier to explain.
@@ -189,15 +195,16 @@ JWST pictures are mentioned.  Note that the observations were exactly
 what is expected in a de Sitter Universe: galaxies as far as you can
 see, like the ones nearby to the Milky Way.
 
-Note that looking out into a negatively curved universe is like
-wearing glasses to correct short-sightedness: objects appear nearer
-and smaller than they actually are.
+Looking out into a negatively curved universe is like wearing glasses
+to correct short-sightedness: objects appear nearer and smaller than
+they actually are.
 
 In the Big Bang theory, this is modelled by the cosmic scale factor,
 giving the size of the universe at a given redshift.
 
 In a de-Sitter Universe, it is simply what it is like to live inside a
-Poincare disk.
+Poincare disk.  A galaxy at 7 Hubble distances only appears to be 7/8
+of the Hubble distance away.
 
 The Big Bang model, argues that galaxies grow through mergers in the
 early universe.
@@ -205,6 +212,15 @@ early universe.
 It should be noted that the Sciama Principle makes galaxy mergers and
 mergers of black holes highly unlikely.  It is like expecting two
 Atlantic hurricanes to merge into one storm, it just does not happen.
+
+The Sciama Principle is what is used to explain galactic rotation
+curves without the need for dark matter, so it is important to
+understand all the consequences.
+
+As two rotating masses approach each other the Sciama Principle adds
+to their rotation about each other, the system is stable with feedback
+that prevents in-spiral.
+
 
 What abouth the waves LIGO is detecting?
 ----------------------------------------
@@ -220,6 +236,12 @@ The reason we do not see a gamama-ray burst every time we detect a
 wave is because the small quasars, with fast rotating black holes, are
 radio sources and the attenuation of the radio signal is not
 sufficient to generate a gamma-ray burst.
+
+One thing on the to-do list is to estimate the paramaters of each
+gravitational detection, with a quasar arrival model, and see how the
+parameters are distributed.  With the O4 run having several detections
+per week there is now a good data sample to investigate.
+
 
 Cosmic Web explained
 ====================
