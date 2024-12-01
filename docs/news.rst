@@ -5,6 +5,18 @@
 I will try to give updates from time to time as to what is happening
 here.
 
+2024/11/30
+==========
+
+I very much enjoyed PyCon Ireland and super grateful for the
+opportunity to talk about the Geometry of the Universe.
+
+I have done significant work on the :module:`gotu.gaia`, visualising the
+Milky Way's rotation curve.
+
+The module 
+
+
 2024/8/28
 =========
 

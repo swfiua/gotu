@@ -17,6 +17,10 @@ the current cosmological beliefs.
    and Science Communication, on an incredible journey through the
    cosmos in our new series, Cosmology 101.
 
+You can find the series here:
+   
+https://youtu.be/gB6GPdkyBx8?si=98fG1RmT1Dsg8zwQ
+
 
 This presents an excellent opportunity to outline how the ideas in
 Professor Colin Rourke's, The Geometry of the Universe, contrast to
@@ -30,6 +34,7 @@ Introducing: Cosmology 101
 ==========================
 
 ::
+   
    ... it is easy to feel that stars and galaxies and the cosmos itself
    are eternal and un-changing, just fixtures of nature that have
    always been and always will be ...
@@ -72,7 +77,10 @@ showing the familiar redshift.
 As noted by Robert MacKay, "We see every galaxy redshifted for all but
 a small finite part of the infinite time we see it".
 
-In short, red-shift is an extreme example of an observer selection bias.
+In short, red-shift is an extreme example of an observer selection
+bias.
+
+
 
 How do we know it is expanding?
 -------------------------------
@@ -191,6 +199,28 @@ giving the size of the universe at a given redshift.
 In a de-Sitter Universe, it is simply what it is like to live inside a
 Poincare disk.
 
+The Big Bang model, argues that galaxies grow through mergers in the
+early universe.
+
+It should be noted that the Sciama Principle makes galaxy mergers and
+mergers of black holes highly unlikely.  It is like expecting two
+Atlantic hurricanes to merge into one storm, it just does not happen.
+
+What abouth the waves LIGO is detecting?
+----------------------------------------
+
+It is suggested that the waves we are seeing are the gravitational
+analogue of gamma-ray bursts: new quasars entering our visible
+universe.
+
+Just as curvature boosts the light into the gamma-ray range, it also
+boosts the waves emitted by the rotation of the central black holes.
+
+The reason we do not see a gamama-ray burst every time we detect a
+wave is because the small quasars, with fast rotating black holes, are
+radio sources and the attenuation of the radio signal is not
+sufficient to generate a gamma-ray burst.
+
 Cosmic Web explained
 ====================
 
@@ -235,7 +265,7 @@ Dark Energy
 The evidence for dark energy is the following plot from the Dark
 Energy Survey:
 
-image:: images/supernova.png
+.. image:: images/supernova.png
 
 The observation is that there are some distant galaxies that are not
 as redshifted as they should be given their distance.
@@ -248,7 +278,7 @@ Sitter model: the redshift v distance relationship is an asymptotic
 relationship, but there are many galaxies that have not yet reached
 that asymptote.
 
-image:: images/zvd.png
+.. image:: images/zvr.png
 
 The End of the Universe
 =======================
