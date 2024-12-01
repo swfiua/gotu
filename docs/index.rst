@@ -80,7 +80,6 @@ About the Author
 
    cpr
 
-   
 Latest News
 ===========
 
@@ -98,6 +97,9 @@ Talks
    talks
 
    101
+
+   johnny
+
 
 Interactive Examples thanks to pyscript
 =======================================
@@ -118,7 +120,6 @@ Gallery
 .. toctree::
 
    gallery
-
 
 Indices and tables
 ==================
