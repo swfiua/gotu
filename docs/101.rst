@@ -102,18 +102,26 @@ The blue shift observations, in the form of gamma-ray bursts are being
 ignored, or rather mis-interpretted as the result of dramatic events
 such as neutron star colloisions.
 
+Another thing to note from the ambulance anology, whilst the fact that
+it is moving away from us means we were closer in the past, it does
+not mean that we were at the same point some time in the past, rather
+it means there was a point of closest approach.
+
 
 And where is all that space going?
 ----------------------------------
 
 It is not going anywhere, there is no overall expansion.
 
+The expansion we see is exactly balanced by new, blue-shifted arrivals
+in our visible universe.
+
 
 Cosmic Microwave Background
 ===========================
 
-States that any time we look out into the Cosmos, we are looking into
-the past.
+Cosmology 101 states that any time we look out into the Cosmos, we are
+looking into the past.
 
 With the Perfect Copernican Principle, we should expect the past to
 look like the present.
@@ -122,8 +130,8 @@ Can we see the primordial fire of the Big Bang?
 
 The answer is no, the Big Bang did not happen.
 
-The Cosmic Microwave Background is thermalised radiation from stars in
-the universe.
+The Cosmic Microwave Background is thermalised radiation from distant
+galaxies in the universe.
 
 Note that in an ancient universe there has been plenty of time for
 very distant regions to communicate, so no problem with the uniformity
@@ -142,6 +150,9 @@ and takes some of the intensity out of them.
 
 Based on the temperature of the CMB this distance is likely a handful
 of Hubble distances, say six or seven.
+
+Note there should be balance between the energy of the CMB and the
+energy of the gravitational waves.
 
 
 What about the harmonics?
@@ -222,8 +233,8 @@ to their rotation about each other, the system is stable with feedback
 that prevents in-spiral.
 
 
-What abouth the waves LIGO is detecting?
-----------------------------------------
+What abouth the waves LIGO et al are detecting?
+-----------------------------------------------
 
 It is suggested that the waves we are seeing are the gravitational
 analogue of gamma-ray bursts: new quasars entering our visible
