@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'gotu'
-copyright = '2021, Johnny Gill'
+copyright = '2024, Johnny Gill'
 author = 'Johnny Gill'
 
 # The full version, including alpha/beta/rc tags
@@ -87,4 +87,25 @@ collections = {
             },
         ],
     },
+}
+
+
+intersphinx_mapping = {
+    'Pillow': ('https://pillow.readthedocs.io/en/stable/', None),
+    'matplotlib': ('https://matplotlib.org/matplotlib/', None),
+    'cycler': ('https://matplotlib.org/cycler/', None),
+    'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
+    'ipykernel': ('https://ipykernel.readthedocs.io/en/latest/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
+    'pytest': ('https://pytest.org/en/stable/', None),
+    'python': ('https://docs.python.org/3/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'tornado': ('https://www.tornadoweb.org/en/stable/', None),
+    'xarray': ('https://docs.xarray.dev/en/stable/', None),
+    'meson-python': ('https://meson-python.readthedocs.io/en/stable/', None),
+    'blume': ('https://blume.readthedocs.io/en/latest/', None),
+    'astropy': ('https://astropy.readthedocs.io/en/stable/', None),
+    'healpy': ('https://healpy.readthedocs.io/en/stable/', None),
+    'pip': ('https://pip.pypa.io/en/stable/', None),
 }

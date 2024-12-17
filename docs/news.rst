@@ -8,10 +8,10 @@ here
 2024/12/04
 ==========
 
-I very much enjoyed PyCon Ireland and super grateful for the
+I very much enjoyed PyCon Ireland and am super grateful for the
 opportunity to talk about the Geometry of the Universe.
 
-I have done significant work on the :module:`gotu.gaia`, visualising the
+I have done significant work on the :ref:`gaia`, visualising the
 Milky Way's rotation curve, using data from the European Space
 Agency's Gaia satellite.
 
@@ -90,11 +90,11 @@ Today's date, 4**3 = 64.
 
 It has been a busy winter of explorations.
 
-The main module is the `gotu.spiral` module which is an evolving
+The main module is the :ref:`spiral` module which is an evolving
 galactic and galaxy simulation.
 
 It contains most implementations of most of the key formulae from
-`gotu`_.
+:ref:`gotu`.
 
 The module now include a simulation of new galaxies arriving in a de
 Sitter Space universe. It produces plots of blue/red-shift against
@@ -123,12 +123,12 @@ When a new galaxy appears it is at the Hubble distance.  This is due
 to the curvature of the universe.  For a galaxy beyond the Hubble
 distance, most of its light bends before it reaches us.
 
-See recent commits to the `gotu.spiral` module for more on this.
+See recent commits to the :ref:`spiral` module for more on this.
 
 Gaia and the galactic centre
 ----------------------------
 
-The `gotu.gaia` module can now download data from the ESA's Gaia
+The :ref:`gaia` module can now download data from the ESA's Gaia
 program and create plots showing the Galactic rotation curve.
 
 .. image:: images/gaia.png
@@ -148,7 +148,7 @@ you move out from the galactic centre, so the counts were then
 normalised by dividing the count in each bin by the sum for all bins
 with the same distance from the galactic centre.
 
-The resulting grid is then plotted with matplotlib, which maps the
+The resulting grid is then plotted with :ref:`matplotlib`, which maps the
 counts, now in the range [0, 1], to colours based on a colormap.
 
 The image is stunning, a real example of how the Gaia mission creates
@@ -159,7 +159,7 @@ twice as far away as Sgr A*, which in this image is around 8kpc from
 the origin, where we see the most common tangential velocity is close
 to zero.
 
-See the `gotu.gaia` module for more on this. 
+See the :ref:`gaia` module for more on this. 
 
 2023/12/7
 =========
@@ -173,7 +173,7 @@ detect ripples in space time with a period measured in years and an
 amplitude of just 10m.
 
 These low level gravitational waves are a prediction of the theory
-presented in `gotu`_.
+presented in :ref:`gotu`.
 
 As a result I have been using the software here to explore data
 relating to the the theory.
@@ -202,13 +202,13 @@ In a cosmology with the Perfect Copernican Principle,  these functions
 all return the value for the current time, since it is assumed these
 values are constant through time.
 
-The `gotu.spiral.Cosmo` class is the beginnings of an attempt to build
+The :ref:`spiral.Cosmo` class is the beginnings of an attempt to build
 cosmology objects for a de Sitter universe.  The default object takes
-the current default cosmology from `astropy` to initialise the values
+the current default cosmology from :ref:`astropy` to initialise the values
 for the current time and sets up functions that return the same value
 regardless of the $z$.
 
-The `gotu.spiral.SkyMap` uses this cosmology to estimate the mass of
+The :ref:`spiral.SkyMap` uses this cosmology to estimate the mass of
 the universe relative to the observed stellar mass.  It uses the
 *heasarc* catalogue to get estimates of stellar mass for local
 galaxies. 
@@ -235,13 +235,13 @@ the step size.  So the software let's you set the factor to scale
 things up by, as well as other parameters.
 
 If you are having trouble getting things running then take a look at
-the `blume` project, which is something I wrote to help me using
-`matplotlib`.
+the :ref:`blume` project, which is something I wrote to help me using
+:ref:`matplotlib`.
 
 2023/1/9
 ========
 
-Time for a new year review of how the models presented in `gotu`_ are
+Time for a new year review of how the models presented in :ref:`gotu` are
 faring under the scrutiny of the new space telescope.
 
 
@@ -270,7 +270,7 @@ There is a lot of freedom in the big bang model, but parameters will
 need to be tuned.
 
 The observations are entirely consistent with the model proposed in
-`gotu`_.
+:ref:`gotu`.
 
 There was no big bang, the universe is essentially static, it is
 galaxies as far as we can see.
@@ -297,7 +297,7 @@ almost 10% higher.
 This is the so-called Hubble tension, an indication there's something
 amiss.
 
-The `gotu`_ explanation for the CMB is that it is the thermalised
+The :ref:`gotu` explanation for the CMB is that it is the thermalised
 radiation of all the galaxies back-lighting our view of the universe.
 
 It is complicated by the curvature of the universe, that has a
@@ -312,7 +312,7 @@ Sgr A*
 We already have excellent observations of this central black hole.  It
 is one of the most observed objects in the Universe.  
 
-According to `gotu`_, it is a baby quasar, in the general direction of
+According to :ref:`gotu`, it is a baby quasar, in the general direction of
 the centre of our galaxy, but not actually at the centre.
 
 I think in time JWST will allow us to see analogues in other
@@ -326,7 +326,7 @@ Gamma-Ray Bursts
 These are assumed to result from cataclysmic events, such as the
 collision of neutron stars.
 
-`gotu`_ gamma-ray bursts could herald the arrival of a distant galaxy
+:ref:`gotu` gamma-ray bursts could herald the arrival of a distant galaxy
 in our visible universe.
 
 We see it's infinite past in a very short period of our time, before
@@ -365,7 +365,7 @@ the particular study that proposed the observation.   By making the
 data available it increases its value as more theories can be tested
 with a single observation.
 
-There is now a `gotu.jwst` module that can be used to download and
+There is now a :ref:`jwst` module that can be used to download and
 view JWST data and images.
 
 You can pass it the name of your favourite target using the --location
@@ -391,7 +391,7 @@ Here is a one of NGC 1566, also known as the Spanish Dancer.
 .. image:: images/ngc1566.png
 
 
-Recently, I have been focussing on the `gotu.dss` module, trying to
+Recently, I have been focussing on the `dss` module, trying to
 get a natural understanding of Minkowski and de Sitter space, as this
 is the key to the explanation of why an essentially static universe
 appears to be expanding.
@@ -442,3 +442,5 @@ me to zoom in on a particular part of the data.
 .. _sphinx: https://sphinx.readthedocs.io
 
 .. _blume:  https://github.com/swfiua/blume
+
+.. _matplotlib: https://matplotlib.org

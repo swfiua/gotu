@@ -81,7 +81,7 @@ It is only page 8 before we are introduced to some geometry, but it is
 perfectly possible to skip the proofs and follow the narrative of the
 book.
 
-The first two chapters of the book introduce a `cast`_ of some 20 or
+The first two chapters of the book introduce a :ref:`cast` of some 20 or
 more key characters in the story as we are taken on a journey, from
 the Greeks to Einstein.  Some familiar names: Kepler, Newton,
 Einstein, but also some less well known, who played key parts in the
@@ -136,7 +136,7 @@ creates a fascinating twist in the story.
 A key observation is that modern cosmology is in fact ignoring
 precisely half[1] of de Sitter space.
 
-[1] Or rather, mapping half the universe onto a subspace of `dss`_, a
+[1] Or rather, mapping half the universe onto a subspace of :ref:`dss`, a
 space which had a common origin a mere 13.7 billion years ago.
 
 `The Geometry of the Universe`_ tells a compelling tale explaining how
@@ -240,7 +240,7 @@ The large scale harmonics in the cosmic microwave background are much
 less of a puzzle if the universe has had rather more time than 13.7
 billion years for the harmonics to emerge.
 
-The radiation we see as the `cmb`_?   It is the thermalised radiation
+The radiation we see as the :ref:`cmb`?   It is the thermalised radiation
 from the missing parts of de Sitter Space.
 
 

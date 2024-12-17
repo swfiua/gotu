@@ -1,5 +1,13 @@
 .. include:: ../README.rst
 
+Latest News
+===========
+
+.. toctree::
+
+   news
+             
+
 The Geometry of the Universe
 ============================
 
@@ -80,12 +88,6 @@ About the Author
 
    cpr
 
-Latest News
-===========
-
-.. toctree::
-
-   news
 
 
 Talks
