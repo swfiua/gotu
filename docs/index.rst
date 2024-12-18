@@ -73,6 +73,8 @@ A module for each chapter
 
    jwst
 
+   birch
+
 Cast of Characters
 ==================
 
