@@ -90,3 +90,16 @@ large, cooler galaxies that are more distant.
 Now how to show this in code?  
 
 """
+
+
+def mtod(m, M):
+    """ Relationship between magnitude and distance.
+
+    m - M = -5 + 5 * log(d)
+
+    m apparent magnitude
+    d distance
+    """
+    pass
+
+
