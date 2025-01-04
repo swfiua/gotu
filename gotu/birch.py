@@ -122,11 +122,26 @@ The star forming sequence includes galaxies who's size has been
 over-estimated.  Correcting this will move them to the right in the
 picture.
 
-The end result?  A slope of a large green mountain.
+The end result?  A slope of a large rainbow mountain.
 
-Now how to show this in code?
+I should add there is a good way to test this theory.  The supernovae
+data, from the dark energy feature a growing set of galaxies for which
+we have good evidence their true distance: supernovae have very
+consistent brightness.
+
+I wonder what the colour-magnitude diagram for this set of galaxies
+looks like?
+
+And how to show this in code?
 
 """
+# never import *, except ...
+from math import *
+
+import random
+
+from blume import magic, farm
+np = magic.np
 
 from . import spiral
 
@@ -136,8 +151,89 @@ def mtod(m, M):
     m - M = -5 + 5 * log(d)
 
     m apparent magnitude
-    d distance
+    d distance in parsecs
     """
-    pass
+    M = m + 5 - (5 * log10(d))
+
+def apparent_magnitude(absmag, distance):
+    """ Give apparent magnitude give absolute magnitude and distance
+
+    NB need distance in mega-parsecs.
+    """
+    return absmag - 5 + (5 * log10(dist))
+
+def is_visible(magnitude, distance, zmax=0.22, minmag=-24, maxmag=-17):
+    """ Can we see this magnitude at this distance?
+
+    The Salim paper was up to z = 0.22 and
+    magnitude in the range -24 to -17
+
+    Assume magnitude -24 is just visible at z=0.22
+    magnitude -17 visible at small z.
+    """
+
+    slope = zmax / (minmag - maxmag)
+
+    visible = magnitude < maxmag + (distance * slope)
+    
+    return visible
 
 
+class RandomSize:
+    """ Return magnitude of galaxy chosen at random
+    """
+    def __init__(self, mins=-24, maxs=-17, bins=1000):
+        self.mins = mins
+        self.maxs = maxs
+        self.bins = np.zeros(bins)
+        
+        
+    def __call__(self):
+        """ Return a random galaxy from our distribution """
+        random(choice(list(range(len(self.bins))), weights=self.bins))
+
+
+
+class Fortune(spiral.SkyMap):
+
+    def __init__(self):
+
+        super().__init__()
+
+        self.sky = spiral.SkyMap()
+        self.random_magnitude = RandomSize()
+
+    async def run(self):
+
+        # get a new sample
+        self.sky.create_sample()
+
+        for ball in self.sky.balls:
+            ball.magnitude = self.random_magnitude()
+
+            # get redshift and distance for ball
+            zz, xx = ball.zandx()
+
+            if not is_visible(ball.magnitude, xx): continue
+
+            wavelength = self.nuvr(ball.magnitude)
+
+            # now calculate magnitude assuming zz is distance
+            
+
+    def nuvr(self, mag):
+        """ return nuv-r value for given magnitude
+
+        Assume a straight line relationship
+        """
+        minmag = -24
+        wavelength = 6.3 - ((mag-minmag) * 5.3/magrange)
+        return wavelength
+        
+
+if __name__ == '__main__':
+
+    
+    land = farm.Farm()
+    land.add(Fortune())
+    farm.run(land)

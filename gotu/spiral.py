@@ -340,6 +340,20 @@ class Cosmo:
     Instead assume this turns up as black holes in
     the centre of galaxies.
 
+    In the default astopy cosmology, many functions take a redshift
+    parameter or z value as a parameter.  In FLRW, big bang,
+    cosmologies, an exact Hubble-law is assumed, so a corresponds
+    to a time and a distance as well as just redshift.
+
+    In a Sciama-DeSitter universe there is only an asymptotic relation
+    between distance and redshift, for each emitter an observer sees.
+
+    There is also an asymptotic relation in backwards time, with
+    emitters arriving highly blue shifted in our visible universe.
+
+    Where z is in effect a time, we return the value for z=0.
+
+    
     """
 
     def __init__(self, cosmo=None):
@@ -351,13 +365,31 @@ class Cosmo:
         # Code below is magic to set up these functions
         for attr in dir(cosmo):
             if attr.endswith('0'):
+
+                # don't over-ride anything se set below
+                if hasattr(self, attr):
+                    continue
                 def f(z, attr=attr):
                     return getattr(self, attr)
-
+                
                 setattr(self, attr, getattr(cosmo, attr))
                 setattr(self, attr[:-1], f)
-                
+
+        # scale factor for z is useful in de Sitter
+        # due to curvature things appear nearer and
+        # smaller than they actually are.
+        # In FLRW, scale_factor gives the relative size at a given z.
+        # as 1/(z+1)
+        # In a de Sitter model this is the factor you have to apply
+        # to convert an actual distance to an apparent distance.
+        # due to curvature, everything we see appears to be
+        # within the hubble_distance.
         self.scale_factor = cosmo.scale_factor
+
+        # turn dark matter and dark energy into matter
+        self.Ob0 += self.Ode0 + self.Odm0
+        self.Ode0 = 0.
+        self.Odm0 = 0.
 
     @property
     def hubble_distance(self):
