@@ -1,13 +1,14 @@
-"""================
-The Green Valley
-================
+"""================================================
+Is the green valley a rainbow mountain in disguise?
+===================================================
 
 There's a hill with a green chair, lined by birch, a green valley, if
 you will.
 
 It's a place I have spent much time musing about space and time.
 
-This module is about a new mountain, where the jackets are green.
+This module is about a new mountain, where the jackets are all colours
+of the rainbow.
 
 It asks if there is in fact no valley at all, but an illusion of such
 due to the assumption that redshift and distance follow an exact
@@ -46,7 +47,7 @@ Once we have the distance, we can translate the apparent magnitude into
 an absolute magnitude.
 
 The curious observation is that across a wide range of magnitudes we
-see many  red galaxies and many blue galaxies, but far fewer in the
+see many red galaxies and many blue galaxies, but far fewer in the
 green region, a green valley if you will.
 
 The conclusion is that there are two classes of galaxies.  Ones that
