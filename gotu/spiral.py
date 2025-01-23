@@ -845,6 +845,10 @@ class SkyMap(magic.Ball):
                 if z > 0 and x > self.tablecounts.maxy:
                     break
 
+                if z < 0:
+                    z = z/(1+z)
+                    #x = x/(1+x)
+
                 #weight = 1/(x*x)
                 weight = 1
                 self.tablecounts.update([z], [x], weight)

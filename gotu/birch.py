@@ -1,4 +1,5 @@
-"""================================================
+"""
+===================================================
 Is the green valley a rainbow mountain in disguise?
 ===================================================
 
@@ -16,14 +17,14 @@ Hubble law.
 
 ::
 
-The *green valley* is a wide region separating the blue and red peaks
-in the ultraviolet optical color magnitude diagram, first revealed
-using GALEX UV photometry.
+   The *green valley* is a wide region separating the blue and red
+   peaks in the ultraviolet optical color magnitude diagram, first
+   revealed using GALEX UV photometry.
 
 This is how the green valley galaxies are described by the 2014 paper
 of Samir Salim: https://arxiv.org/pdf/1501.01963
 
-Here is an image and caption from that paper:
+Here is an image and caption from the paper:
 
 .. image:: images/samir.png
 
@@ -65,14 +66,14 @@ In de Sitter Space the relationship only holds asymptotically.
 There are galaxies both sides of the asymptote.  Here is an image that
 attempts to show the relationship:
 
-Let us also assume that star forming rate has a linear relation with
-galaxy size.
-
 .. image:: images/zvr.png
 
+Let us also assume that younger, smaller galaxies have a higher star
+forming rate than larger, mature galaxies.
+
 At any particular redshift we see galaxies over a wide range of
-distances.  At z=0, the most likely distance is actually at z=2, in a
-Universe with an exact Hubble law.
+distances.  For galaxies with no redshift (z=0) it turns out that they
+are most likely to be at 2/3 of the Hubble distance.
 
 de Sitter Space is a space-time which has the Perfect Copernican
 Principle: there are no special places or times in the universe.
@@ -204,7 +205,7 @@ class Fortune(spiral.SkyMap):
         self.sky = spiral.SkyMap()
         self.random_magnitude = RandomSize()
 
-    async def run(self):
+    async def xrun(self):
 
         # get a new sample
         self.sky.create_sample()
@@ -231,6 +232,63 @@ class Fortune(spiral.SkyMap):
         wavelength = 6.3 - ((mag-minmag) * 5.3/magrange)
         return wavelength
         
+    async def run(self):
+
+        self.create_sample()
+        maxtheta = self.maxtheta
+        mintheta = self.mintheta
+
+        tt = 0.
+
+        xname, yname = 'z', 'r'
+        for ball in self.balls:
+            t1 = time.time()
+            if maxtheta or mintheta:
+                maxcos, mincos = cos(maxtheta), cos(mintheta)
+                # need uniform numbers in range [maxcos, mincos]
+                if maxcos < mincos:
+                    maxcos, mincos = mincos, maxcos
+                rand = (random.random() * (maxcos-mincos)) + mincos
+                ball.theta = math.acos(rand)
+        
+            t = ball.tstar() + self.toff
+
+            if self.tborigin:
+                t += ball.tb()
+
+            while True:
+                z, x = ball.zandx(t)
+
+                # adjust distance for scale factor, adjust z too...
+                # ie repace x by x/1+x, ditto z.
+                if self.scale_for_curvature:
+                    xname, yname = 'z/(1+z)', 'r/(1+r)'
+                    x *= self.cosmo.scale_factor(x)
+                    z *= self.cosmo.scale_factor(z)
+
+                if z > self.tablecounts.maxx:
+                    break
+                if z > 0 and x > self.tablecounts.maxy:
+                    break
+
+                if z < 0:
+                    z = z/(1+z)
+                    #x = x/(1+x)
+
+                #weight = 1/(x*x)
+                weight = 1
+                self.tablecounts.update([z], [x], weight)
+                t += self.delta_t
+
+            #print(f'{t:8.2f} {ball.theta:6.3f} {ball.phi:6.2f} {z:6.2f} {x:6.2f}')
+            t2 = time.time()
+            tt += t2-t1
+            if tt > self.sleep:
+                await self.tablecounts.show(xname=xname, yname=yname)
+                tt = 0.
+
+        # one last show
+        await self.tablecounts.show(xname=xname, yname=yname)
 
 if __name__ == '__main__':
 
