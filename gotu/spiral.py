@@ -840,14 +840,15 @@ class SkyMap(magic.Ball):
                     x *= self.cosmo.scale_factor(x)
                     z *= self.cosmo.scale_factor(z)
 
+                if z < 0:
+                    z = z/(1+z)
+
+                x = x/(1+x)
+
                 if z > self.tablecounts.maxx:
                     break
                 if z > 0 and x > self.tablecounts.maxy:
                     break
-
-                if z < 0:
-                    z = z/(1+z)
-                    #x = x/(1+x)
 
                 #weight = 1/(x*x)
                 weight = 1
