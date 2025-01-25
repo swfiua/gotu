@@ -1,5 +1,4 @@
-"""
-===================================================
+"""===================================================
 Is the green valley a rainbow mountain in disguise?
 ===================================================
 
@@ -53,13 +52,17 @@ green region, a green valley if you will.
 
 The conclusion is that there are two classes of galaxies.  Ones that
 are actively forming stars and ones that are less active in forming
-stars.
+stars.  It is also assumed the transition from active to quiescent
+galaxies happens rapidly, hence we see fewer galaxies in this stage.
 
 Explaining the Green Valley
 ---------------------------
 
 What if the relationship between redshift and distance is not in fact
 exact?
+
+There is good evidence for this from the Dark Energy Survey, based on
+observations of supernovae.
 
 In de Sitter Space the relationship only holds asymptotically.
 
@@ -135,6 +138,40 @@ I wonder what the colour-magnitude diagram for this set of galaxies
 looks like?
 
 And how to show this in code?
+
+Update 2025/1/25
+================
+
+To get a better feel for the redshift distance relationship in de
+Sitter Space, I made a modification to the :ref:`spiral` module,
+specifically to the code that creates plots of z v r, redshift against
+distance, for a random sample of galaxies in de Sitter space.
+
+The modification maps z to zdash = z / (1+z), if z < 0, zdash = z if z>=0
+
+The idea here is that z=-1 corresponds to an infinite blue shift, so
+this modification stretches the values less than zero out in the same
+way that it stretches out in the same way redshift tends to infinity.
+
+I have been experimenting with different windows of zdash.
+
+Here is what a -10,10 zdash window looks like:
+
+.. image:: images/trex.png
+
+I am calling this a t-rex plot.
+
+Zooming in to a smaller range of redshift, such as mod(zdash) < 0.22,
+we see that the picture can look very different.
+
+It then becomes very apparent why there is Hubble tension.
+
+One bit remaining to be modelled is the visibility, or apparent
+magnitude of each source.  In particular, there needs to be a factor
+of 1/(z*z) applied to the magnitude to account for reduction in power
+resulting from redshift.  The energy of each photon is proportional to
+its frequency, as are the number arriving per unit time, resulting in
+a reduction of 1/(z*z) in the magnitude of a source.
 
 """
 # never import *, except ...
