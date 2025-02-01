@@ -388,6 +388,7 @@ class Cosmo:
 
         # turn dark matter and dark energy into matter
         self.Ob0 += self.Ode0 + self.Odm0
+        self.Obh0 = self.Ode0 + self.Odm0   # mass of central black holes
         self.Ode0 = 0.
         self.Odm0 = 0.
 
@@ -479,7 +480,7 @@ class SkyMap(magic.Ball):
         # galactic black holes.
         # more conservative, just use the dark matter.
         # self.m_bh = (cosmo.Ode0 + cosmo.Odm0) / cosmo.Ob0
-        self.m_bh = (cosmo.Odm0 + cosmo.Ode0) / cosmo.Ob0
+        self.m_bh = cosmo.Obh0
 
         # the CMB is 45 times brighter than you would expect based
         # on size of visible universe.  Hitchhikers should note

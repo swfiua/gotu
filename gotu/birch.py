@@ -30,21 +30,29 @@ Here is an image and caption from the paper:
 It is based on observations of distant galaxies in the ultra-violet
 spectrum, specifically what is referred to as the NUV-r range.
 
-NUV stands for Near Ultraviolet and -r, I presume, is an indication that
-the frequencies have been shifted to make it look like the familiar
-red to blue range in light.
+NUV stands for Near Ultraviolet and -r, I presume, is an indication
+that the frequencies have been shifted to make it look like the
+familiar red to blue range in light.  update: it appears in the
+literature that NUV-r is taken as a good indicator of star formation
+rate.
 
 In effect, the telescopes making the observations are taking the
 temperature of the galaxy being observed, the hotter it is, the bluer
-the result.  
+the result.
 
 It is also possible to measure the red-shift, with good precision, of
 each galaxy that is observed.
 
 Assuming an exact Hubble law, we can translate redshift into distance.
 
+If it is also assumed that there was a big bang, redshift is used to
+estimate the age of the galaxy.  
+
 Once we have the distance, we can translate the apparent magnitude into
 an absolute magnitude.
+
+Combining this with the age of the galaxy we get an estimate of star
+formation rate.
 
 The curious observation is that across a wide range of magnitudes we
 see many red galaxies and many blue galaxies, but far fewer in the
@@ -63,6 +71,8 @@ exact?
 
 There is good evidence for this from the Dark Energy Survey, based on
 observations of supernovae.
+
+.. image:: images/supernovae.png
 
 In de Sitter Space the relationship only holds asymptotically.
 
@@ -164,7 +174,13 @@ I am calling this a t-rex plot.
 Zooming in to a smaller range of redshift, such as mod(zdash) < 0.22,
 we see that the picture can look very different.
 
-It then becomes very apparent why there is Hubble tension.
+It then becomes very apparent why there is Hubble tension, the image
+can look very different based on which range of redshifts and
+distances you look at.
+
+Here is the image for abs(zdash) < 1.
+
+.. image:: images/zdash.png
 
 One bit remaining to be modelled is the visibility, or apparent
 magnitude of each source.  In particular, there needs to be a factor
@@ -173,18 +189,44 @@ resulting from redshift.  The energy of each photon is proportional to
 its frequency, as are the number arriving per unit time, resulting in
 a reduction of 1/(z*z) in the magnitude of a source.
 
+The pieces are coming together to model the green valley.
+
+2025/2/1
+========
+
+The Fortune object here is now at the point of creating interesting pictures.
+
+It is also at the point of showing that things are of course a little
+more complicated.
+
+There is another factor that needs to be moddled: gravitational redshift.
+
+As always all this is covered in :ref:`The Geometry of the Universe`.
+
+There is a quasar-galaxy spectrum, defined by the size of the object's
+central black hole.
+
+Quasars typically exhibit gravitational redshift.  The Eddington
+sphere, is the place where the outward radiation pressure matches the
+inward gravitational pull.   :ref:`gotu.Spiral.eddington`.
+
+What is needed here is a full model for quasars evolving into galaxies.
+
 """
 # never import *, except ...
 from math import *
 
 import random
+import time
+
+from astropy import units as u
 
 from blume import magic, farm
 np = magic.np
 
 from . import spiral
 
-def mtod(m, M):
+def mdtoM(m, d):
     """ Relationship between magnitude and distance.
 
     m - M = -5 + 5 * log(d)
@@ -193,13 +235,14 @@ def mtod(m, M):
     d distance in parsecs
     """
     M = m + 5 - (5 * log10(d))
+    return M
 
 def apparent_magnitude(absmag, distance):
     """ Give apparent magnitude give absolute magnitude and distance
 
     NB need distance in mega-parsecs.
     """
-    return absmag - 5 + (5 * log10(dist))
+    return absmag - 5 + (5 * log10(distance))
 
 def is_visible(magnitude, distance, zmax=0.22, minmag=-24, maxmag=-17):
     """ Can we see this magnitude at this distance?
@@ -217,20 +260,12 @@ def is_visible(magnitude, distance, zmax=0.22, minmag=-24, maxmag=-17):
     
     return visible
 
+def magnitude(self):
+    """ Return estimate of magnitude based on mass """
+    suns = (self.lightyear_to_kg() << u.M_sun).value
 
-class RandomSize:
-    """ Return magnitude of galaxy chosen at random
-    """
-    def __init__(self, mins=-24, maxs=-17, bins=1000):
-        self.mins = mins
-        self.maxs = maxs
-        self.bins = np.zeros(bins)
-        
-        
-    def __call__(self):
-        """ Return a random galaxy from our distribution """
-        random(choice(list(range(len(self.bins))), weights=self.bins))
-
+    mag = (5 * log10(1 / suns) / 2.)
+    return mag
 
 
 class Fortune(spiral.SkyMap):
@@ -240,38 +275,30 @@ class Fortune(spiral.SkyMap):
         super().__init__()
 
         self.sky = spiral.SkyMap()
-        self.random_magnitude = RandomSize()
+        self.green = magic.TableCounts(
+            xname='magnitude', yname='NUV-r',
+            minx=-24, maxx=-18, maxy=10.)
+        self.tablecounts.maxx = 0.22
+        self.tablecounts.maxy = 1.
 
-    async def xrun(self):
-
-        # get a new sample
-        self.sky.create_sample()
-
-        for ball in self.sky.balls:
-            ball.magnitude = self.random_magnitude()
-
-            # get redshift and distance for ball
-            zz, xx = ball.zandx()
-
-            if not is_visible(ball.magnitude, xx): continue
-
-            wavelength = self.nuvr(ball.magnitude)
-
-            # now calculate magnitude assuming zz is distance
-            
 
     def nuvr(self, mag):
         """ return nuv-r value for given magnitude
 
-        Assume a straight line relationship
+        Assume a straight line relationship.
         """
-        minmag = -24
+        minmag = -24.
+        magrange = 6.
         wavelength = 6.3 - ((mag-minmag) * 5.3/magrange)
         return wavelength
         
     async def run(self):
 
         self.create_sample()
+
+        # reset Mstellar values, using our own favourite distribution
+        self.set_mstellar(self.balls)
+
         maxtheta = self.maxtheta
         mintheta = self.mintheta
 
@@ -310,7 +337,9 @@ class Fortune(spiral.SkyMap):
 
                 if z < 0:
                     z = z/(1+z)
-                    #x = x/(1+x)
+                x = x/(1+x)
+
+                await self.green_valley(ball, z, x)
 
                 #weight = 1/(x*x)
                 weight = 1
@@ -322,10 +351,73 @@ class Fortune(spiral.SkyMap):
             tt += t2-t1
             if tt > self.sleep:
                 await self.tablecounts.show(xname=xname, yname=yname)
+                await self.green.show()
                 tt = 0.
 
         # one last show
         await self.tablecounts.show(xname=xname, yname=yname)
+        await self.green.show()
+
+    def set_mstellar(self, balls=None):
+
+        balls = balls or self.balls
+
+        for ball in balls:
+            ball.Mstellar = self.random_mstellar()
+
+    def random_mstellar(self):
+        """Want distribution of galaxies by stellar mass
+
+        There should be good values from local data.
+
+        The gotu.spiral module uses a lognormal distribution.
+
+        This models things well for high stellar masses, but it feels
+        like it very much underestimates the numbers of smaller
+        objects, below 10^9 stellar masses.
+
+        The problem here is that biggest surveys are affected by the
+        very same problem, the assumption of an exact Hubble law.
+
+        There should however be a large enough sample of local galaxies to
+        get a better estimate of the distribution.
+
+        """
+        return magic.random.expovariate(1/1e6)
+        
+
+    async def green_valley(self, ball, z, x):
+        """ Create colour magnitude diagram
+
+        Each ball is a galaxy, redshift z and distance x.
+
+        Use self.nuvr() to calculate colour given magnitude
+        and use self.green to make some counts.
+        """
+        mag = magnitude(ball)
+        col = self.nuvr(mag)
+
+        # add some random noise to col
+        rcol = magic.random.gauss(col, col/10.)
+
+        # distance in mega-parsec
+        scale = (self.cosmo.hubble_distance << u.parsec).value
+
+        dist = x * scale
+
+        # calculate the apparent magnitude
+        amag = apparent_magnitude(mag, dist)
+
+        # skip stuff too small to see
+        if amag > 25.:
+            print(amag, dist, mag)
+            return
+        
+        # use this amag to calculate the magnitude assuming distance is z
+        magz = mdtoM(amag, z * scale)
+
+        print(col, rcol, mag, magz, z-x)
+        self.green.update([magz], [rcol])
 
 if __name__ == '__main__':
 
