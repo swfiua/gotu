@@ -199,18 +199,34 @@ The Fortune object here is now at the point of creating interesting pictures.
 It is also at the point of showing that things are of course a little
 more complicated.
 
-There is another factor that needs to be moddled: gravitational redshift.
+There is another factor that needs a model: gravitational redshift.
 
 As always all this is covered in :ref:`The Geometry of the Universe`.
 
 There is a quasar-galaxy spectrum, defined by the size of the object's
 central black hole.
 
-Quasars typically exhibit gravitational redshift.  The Eddington
-sphere, is the place where the outward radiation pressure matches the
-inward gravitational pull.   :ref:`gotu.Spiral.eddington`.
+These black holes, grow slowly acreting matter over time, so larger
+black holes may well be much older.  The :ref:`gotu.spiral.Spiral`
+module has all the key pieces, it is just necessary to put the puzzle
+together.
+
+Quasars typically exhibit gravitational redshift.
+
+The Eddington sphere, is the place where the outward
+radiation pressure matches the inward gravitational pull.
+:ref:`gotu.Spiral.eddington`.
 
 What is needed here is a full model for quasars evolving into galaxies.
+
+Some general observations:
+
+* Small quasars have gravitational redshift, the Eddington sphere is
+  close to the Schwartzchild radius.
+
+* 
+
+.. image:: images/
 
 """
 # never import *, except ...
@@ -219,7 +235,7 @@ from math import *
 import random
 import time
 
-from astropy import units as u
+from astropy import units as u, constants as c
 
 from blume import magic, farm
 np = magic.np
@@ -267,6 +283,18 @@ def magnitude(self):
     mag = (5 * log10(1 / suns) / 2.)
     return mag
 
+def gravitational_redshift(self):
+
+    # density based on Schwartzchild radius
+    dens = (self.density() / c.m_p) << 1/(u.m**3)
+
+    # density in protons per m*3
+    n = self.n
+
+    print(dens), n)
+
+    return dens
+
 
 class Fortune(spiral.SkyMap):
 
@@ -279,7 +307,9 @@ class Fortune(spiral.SkyMap):
             xname='magnitude', yname='NUV-r',
             minx=-24, maxx=-18, maxy=10.)
         self.tablecounts.maxx = 0.22
+        self.tablecounts.minx = -0.75
         self.tablecounts.maxy = 1.
+        self.tborigin = False
 
 
     def nuvr(self, mag):
@@ -339,7 +369,8 @@ class Fortune(spiral.SkyMap):
                     z = z/(1+z)
                 x = x/(1+x)
 
-                await self.green_valley(ball, z, x)
+                gz = gravitational_redshift(ball)
+                await self.green_valley(ball, z, x, gz)
 
                 #weight = 1/(x*x)
                 weight = 1
@@ -386,7 +417,7 @@ class Fortune(spiral.SkyMap):
         return magic.random.expovariate(1/1e6)
         
 
-    async def green_valley(self, ball, z, x):
+    async def green_valley(self, ball, z, x, gz=0.):
         """ Create colour magnitude diagram
 
         Each ball is a galaxy, redshift z and distance x.
@@ -412,11 +443,19 @@ class Fortune(spiral.SkyMap):
         if amag > 25.:
             print(amag, dist, mag)
             return
-        
-        # use this amag to calculate the magnitude assuming distance is z
-        magz = mdtoM(amag, z * scale)
 
-        print(col, rcol, mag, magz, z-x)
+        zsum = z + gz
+        # use this amag to calculate the magnitude assuming distance is zsum
+        # FIXME, should divide by 1/(z*z), but magnitude is log, so maybe -2z?
+
+
+        try:
+            magz = mdtoM(amag, zsum * scale)
+        except ValueError:
+            print("negative distance ie z", zsum)
+            return
+
+        print(rcol, mag, magz, z-x)
         self.green.update([magz], [rcol])
 
 if __name__ == '__main__':
