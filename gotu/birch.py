@@ -291,7 +291,7 @@ def gravitational_redshift(self):
     # density in protons per m*3
     n = self.n
 
-    print(dens), n)
+    print(dens, n)
 
     return dens
 
