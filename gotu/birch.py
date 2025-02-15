@@ -32,9 +32,9 @@ spectrum, specifically what is referred to as the NUV-r range.
 
 NUV stands for Near Ultraviolet and -r, I presume, is an indication
 that the frequencies have been shifted to make it look like the
-familiar red to blue range in light.  update: it appears in the
-literature that NUV-r is taken as a good indicator of star formation
-rate.
+familiar red to blue frequency range in light.  update: it appears in
+the literature that NUV-r is taken as a good indicator of star
+formation rate.
 
 In effect, the telescopes making the observations are taking the
 temperature of the galaxy being observed, the hotter it is, the bluer
@@ -226,7 +226,7 @@ Some general observations:
 
 * 
 
-.. image:: images/
+.. image:: images/blueshift
 
 """
 # never import *, except ...
