@@ -75,6 +75,8 @@ A module for each chapter
 
    birch
 
+   apersonalview
+
 
 Cast of Characters
 ==================

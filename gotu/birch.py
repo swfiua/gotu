@@ -70,11 +70,14 @@ What if the relationship between redshift and distance is not in fact
 exact?
 
 There is good evidence for this from the Dark Energy Survey, based on
-observations of supernovae.
+observations of supernovae, that the relation is not exact.
 
 .. image:: images/supernovae.png
 
-In de Sitter Space the relationship only holds asymptotically.
+This is a central theme of :ref:`gotu`.  de Sitter Space, a uniformly,
+negatively curved space-time, is suggested as a good model for what we see.
+
+In de Sitter Space, the Hubble law only holds asymptotically.
 
 There are galaxies both sides of the asymptote.  Here is an image that
 attempts to show the relationship:
@@ -99,6 +102,8 @@ There is an asymptotic relationship between z and d.
 Closer to home, there are galaxies bursting on the scene, at z=1.
 Half imediately recede, the other half zoom closer.  All eventually
 converge to the Hubble-law asymptote.
+
+.. image:: images/blueshift.png
 
 The Green Mountain
 ------------------
@@ -211,11 +216,20 @@ black holes may well be much older.  The :ref:`gotu.spiral.Spiral`
 module has all the key pieces, it is just necessary to put the puzzle
 together.
 
-Quasars typically exhibit gravitational redshift.
+Quasars typically exhibit gravitational redshift.  
 
-The Eddington sphere, is the place where the outward
-radiation pressure matches the inward gravitational pull.
-:ref:`gotu.Spiral.eddington`.
+The Eddington sphere, is the place where the outward radiation
+pressure matches the inward gravitational pull.
+:ref:`gotu.Spiral.eddington`.  The radius of this sphere can be
+calculated, given the redshift.
+
+If we know the mass of the black hole and the temperature and density
+of the medium then we can calculate z, and hence the Eddington radius.
+
+The density must lie somewhere between the density of the black hole
+and the density of the universe.  The latter is between 100/cm3 and
+1e12/cm3.  Reasonable to assume it is lower than the density of the
+black hole.
 
 What is needed here is a full model for quasars evolving into galaxies.
 
@@ -224,7 +238,14 @@ Some general observations:
 * Small quasars have gravitational redshift, the Eddington sphere is
   close to the Schwartzchild radius.
 
-* 
+* Stars typically form further out from the Eddington sphere and hence
+  are subject to reduced redshift.
+
+* de Sitter Space exhibits blue shift as well as redshift.  We may be
+  seeing the dust of some galaxies and mistaking it for stars.
+
+If we assume that all redshift is cosmological, then the result is
+that the stars around small quasars will appear blue-shifted.
 
 .. image:: images/blueshift
 

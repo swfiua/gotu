@@ -76,12 +76,12 @@ assumed they represent some earlier stage of evolution of the
 universe.
 
 Fast forward to 2017 when I discovered, Professor Colin Rourke had
-a book out, with the title *A new paradigm for the Universe*.
+a written a book, with the title *A new paradigm for the Universe*.
 
-He was my tutor back in the day at Warwick.  He taught calculus with
-an approach he had developed for the Open University.  He also
-lectured on curves and spaces, a subject that is essential to an
-understanding of the equations of space-time.
+He was my tutor back in the day at Warwick University.  He taught
+calculus with an approach he had developed for the Open University.
+He also lectured on curves and spaces, a subject that is essential to
+an understanding of the equations of space-time.
 
 It has taken me many years to fully appreciate the ideas in the book.
 In which time it has been updated and republished, as *The Geometry of
@@ -90,7 +90,7 @@ the Universe*.
 It really does describe a paradigm shift, although much of the book is
 highly relevent to a Big Bang Universe too.
 
-The book introduces the main characters involved in building models
+It introduces the main characters involved in building models
 for Einstein's General Relativity.  There is a whole cast of
 characters.  There was much discusion of different models.
 
@@ -135,7 +135,7 @@ intertwine.
 Thus the Lorentz transform that takes a source's space-time
 coordinates and maps it to ours, shows the source's time dilating,
 relative to ours.  In other words, the redshift we observe is just a
-consequence of special relativity.
+consequence of special relativity and the curvature of space-time.
 
 Further note, that de Sitter Space produces exactly the right metrics
 to explore this model of the universe.
@@ -153,7 +153,7 @@ of our time.
 
 Rourke suggests that this is what gamma-ray bursts are. 
 
-It's long past time for me to get this working in the `dss`_ module.
+It's long past time for me to get this working in the :ref:`dss` module.
 
 A galaxy, newly visible to us, bursting on the scene and showing it's
 history in a burst of light, before receding rapidly into the
@@ -196,7 +196,7 @@ There's a transformation between the spaces that preserves distance.
 
 It is curious, since it is precisely when you take account of special
 relativity, that it is clear why we see redshift, as well as extreme
-blue shift.
+blue shift. [aside: curvature is also required, a hyperbolic sphere].
 
 With a big bang theory, a universal time is partially reinstated, yet
 due to relativity, two observers in relative motion, will still not
@@ -204,7 +204,6 @@ agree on the time and place of events.
 
 Regardless, the key point is that the redshift we observe is exactly
 what we would expect to see in a static universe as described above.
-
 
 What about quasars?
 -------------------
@@ -233,6 +232,23 @@ black hole.
 There is surely plenty of data from JWST that will allow fitting of
 models to observations of quasars associated with local galaxies.
 
+Redshift is complicated
+-----------------------
+
+In de Sitter Space there is also a large population of blue shifted
+galaxies.
+
+For a blue-shifted galaxy, the light from the dust may be mistaken for
+the light from its stars.
+
+So the redshift we see depends on:
+
+* the velocity the source is moving towards or away from us;
+
+* the source of the light: central black hole, stars or dust.
+
+* how close the source is to the central black hole.
+
 
 The Cosmic Microwave Background?
 --------------------------------
@@ -245,7 +261,8 @@ With an older universe, there is now no constraint on how long
 different parts of the universe have had to communicate and develop
 harmonics. 
 
-The universe isn't a vacuum, it is full of dust.  Suppose each particle of dust obeys the Sciama Principle? 
+The universe isn't a vacuum, it is full of dust.  Suppose each
+particle of dust obeys the Sciama Principle?
 
 
 No Dark Matter?

@@ -193,6 +193,8 @@ Here's just one that is involved in the story in many ways.
 
 Later I hope to have a full cast of characters to explore.
 
+.. _Christopher Zeeman:
+
 Christopher Zeeman
 ------------------
 
