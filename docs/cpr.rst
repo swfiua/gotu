@@ -79,7 +79,8 @@ valley, but subsequent experiments, see :ref:`birch`, have shown
 things are more complex.
 
 As always, Rourke provides the other key idea necessary to explain the
-green valley: the gravitational redshift of the quasar-galaxy spectrum.
+green valley: the gravitational redshift of the quasar-galaxy
+spectrum.
 
 It was with great sadness that I learnt that Professor Colin Rourke
 passed away on 18th December 2024.  The goals of this project remain
@@ -88,7 +89,6 @@ gets the credit he deserves for this remarkable work.
 
 It's a task which will be made all the more challenging without his
 guiding wisdom.
-
 
 
 References

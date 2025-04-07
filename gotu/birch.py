@@ -100,7 +100,7 @@ shift, but also blue shift in the form of gamma-ray bursts.
 There is an asymptotic relationship between z and d.
 
 Closer to home, there are galaxies bursting on the scene, at z=1.
-Half imediately recede, the other half zoom closer.  All eventually
+Half immediately recede, the other half zoom closer.  All eventually
 converge to the Hubble-law asymptote.
 
 .. image:: images/blueshift.png
@@ -132,7 +132,7 @@ quasar-galaxy spectrum, in which small quasars grow into large
 galaxies over a long period of time suggests there is a general
 evolution as the central black hole grows in size.
 
-Younger galaxies tend to be more vigorous in star formation.
+Younger galaxies tend to be more vigorous in star formation. 
 
 In the image of the green valley, the passive sequence includes
 galaxies whose size has been underestimated, they will move to the
@@ -204,7 +204,8 @@ The Fortune object here is now at the point of creating interesting pictures.
 It is also at the point of showing that things are of course a little
 more complicated.
 
-There is another factor that needs a model: gravitational redshift.
+There is other factors that needs a model: gravitational redshift and
+cosmological blueshift too.
 
 As always all this is covered in :ref:`The Geometry of the Universe`.
 
@@ -249,6 +250,62 @@ that the stars around small quasars will appear blue-shifted.
 
 .. image:: images/blueshift
 
+6/3/2025
+========
+
+Simulations of de Sitter Space show that redshift is only a weak
+indicator of distance, or rather asymptotically an indicator of
+distance.
+
+This applies to blueshift too, where, the higher the blueshift, the
+closer the source is to the Hubble radius. As with redshift, this
+is only an asymptotic relationship.
+
+The glowing dust of a high blueshift source may be mistaken for a
+redshifted view of the stars in a galaxy.
+
+Perhaps the green valley is in part due to whether we are seeing the
+dust or the stars of a galaxy.
+
+This is one area the JWST can contribute significantly.  Observations
+of nearby galaxies at different wavelengths should help us refine our
+classifications of galaxies.
+
+24/3/2025
+=========
+
+There is a new release of data from the Dark Energy Spectrographic Instrument (DESI).
+
+Observations are classified in various categories.
+
+ELG, LRG, BGS, QSO
+
+Emission Line Galaxy
+
+Luminous Red Galaxy
+
+Bright Galaxy Survey
+
+Quasar Stellar Objects
+
+DESI data release 2
+
+It is going to be very interesting to explore the DESI data sets with
+the perspective of the Geometry of the Universe.
+
+The central idea is that as the size of the central black hole grows,
+so does the ratio of the radius of the Eddington sphere to the
+Schwartzchild radius.
+
+So small quasars exhibit significant redshift.  Some of the luminous
+red galaxies are likely nearby quasars.
+
+When the light comes from the acretion disk it is harder to extract a
+detailed spectrum, in short spectral lines are blurred.
+
+See :ref:`gotu.desi` for tools to download DESI data.
+
+
 """
 # never import *, except ...
 from math import *
@@ -256,9 +313,9 @@ from math import *
 import random
 import time
 
-from astropy import units as u, constants as c
+from astropy import table, units as u, constants as c
 
-from blume import magic, farm
+from blume import magic, farm, train
 np = magic.np
 
 from . import spiral
@@ -479,9 +536,94 @@ class Fortune(spiral.SkyMap):
         print(rcol, mag, magz, z-x)
         self.green.update([magz], [rcol])
 
+
+def flux2mag(flux):
+
+    return 22.5 - (2.5 * log10(flux))
+        
+class View(train.Train):
+
+    def __init__(self):
+
+        super().__init__()
+        self.tablecounts = magic.TableCounts(
+            minx=-0.1, maxx=2.5,
+            miny=15, maxy=30,
+            width=200, height=200,
+            xname='redshift',
+            yname='flux magnitude'
+        )
+
+
+    def get_parser(self):
+
+        parser = super().get_parser()
+
+        parser.add_argument('--glob', default='**/*')
+
+        return parser
+
+    async def start(self):
+
+        self.runs = 0
+        
+        if not self.paths:
+            if self.path.is_file():
+                self.paths = [self.path]
+            else:
+                path = Path(self.path)
+                self.paths = list(path.glob(self.glob))
+        else:
+            self.paths = [magic.Path(path) for path in self.paths]
+        self.paths = magic.deque(sorted(self.paths))
+
+    def next_table(self):
+
+        self.table = table.Table.read(self.paths[0])
+        self.paths.rotate()
+
+        return self.table
+
+    def filter_table(self, table=None):
+
+        table = table or self.table
+
+        mask = table.field('ZWARN') == 0
+        mask = mask & (table.field('SPECTYPE') == 'GALAXY')
+        mask = mask & (table.field('FLUX_Z') > 0)
+        mask = mask & (table.field('elg') != 0)
+
+        return table[mask]
+
+    async def run(self):
+
+        tot = 0.0
+        while True:
+            self.runs += 1
+            t1 = time.time()
+        
+            table = self.next_table()
+
+            table = self.filter_table(table)
+
+            # filter table and update tablecounts
+            
+            mag = [flux2mag(x) for x in table.field('FLUX_Z')]
+        
+            self.tablecounts.update(
+                table.field('Z'),
+                mag)
+
+            tot += time.time() - t1
+            if tot > self.sleep:
+                await self.tablecounts.show()
+                tot = 0.0
+        
+        
 if __name__ == '__main__':
 
     
     land = farm.Farm()
     land.add(Fortune())
+    land.add(View())
     farm.run(land)
