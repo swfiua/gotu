@@ -553,7 +553,12 @@ class View(train.Train):
             xname='redshift',
             yname='flux magnitude'
         )
+        self.modes = magic.deque([
+            self.scan,
+            self.view])
 
+        self.tables = magic.deque()
+        self.fields = magic.deque((('elg', 1), ('PROGRAM', 'dark')))
 
     def get_parser(self):
 
@@ -564,6 +569,16 @@ class View(train.Train):
         return parser
 
     async def start(self):
+        """ FIXME: scan a table of what's here
+
+        generate meta data for carpet.
+        option to save meta data.
+
+        feels like next_table()
+        should just be a deque of tables
+
+        only if the deque is empty should it create a new one
+        """
 
         self.runs = 0
         
@@ -579,8 +594,11 @@ class View(train.Train):
 
     def next_table(self):
 
-        self.table = table.Table.read(self.paths[0])
-        self.paths.rotate()
+        if self.tables:
+            self.table = self.tables.pop()
+        else:
+            self.table = table.Table.read(self.paths[0])
+            self.paths.rotate()
 
         return self.table
 
@@ -591,9 +609,18 @@ class View(train.Train):
         mask = table.field('ZWARN') == 0
         mask = mask & (table.field('SPECTYPE') == 'GALAXY')
         mask = mask & (table.field('FLUX_Z') > 0)
-        mask = mask & (table.field('elg') != 0)
+        #mask = mask & (table.field('PROGRAM') == 'dark')
+
+        for field, value in self.fields:
+            mask = mask & (table.field(field) == value)
 
         return table[mask]
+
+    async def view(self):
+        pass
+    
+    async def scan(self):
+        pass
 
     async def run(self):
 
@@ -617,13 +644,55 @@ class View(train.Train):
             tot += time.time() - t1
             if tot > self.sleep:
                 await self.tablecounts.show()
+                await magic.sleep(self.sleep)
                 tot = 0.0
+            else:
+                await magic.sleep(0)
+
+
+def zsum(z1, z2):
+
+    return ((1 + z1) * (1 + z2)) - 1
+                
+class Zview(magic.Ball):
+
+    def __init__(self):
+
+        super().__init__()
+        self.tablecounts = magic.TableCounts(
+            minx=-0.9, maxx=0.9,
+            miny=-0.9, maxy=0.9,
+        )
+
         
-        
+    async def run(self):
+
+        #ax = await self.get()
+
+        np = magic.np
+        tc = self.tablecounts
+        xzz = np.linspace(tc.minx, tc.maxx, 500)
+        yzz = np.linspace(tc.miny, tc.maxy, 500)
+
+        image = np.zeros((500, 500))
+        for ix, x in enumerate(xzz):
+            for iy, y in enumerate(yzz):
+                zz = ((1 + x) * (1 + y)) - 1
+                tc.update([x], [y], zz)
+                image[ix][iy] = zz
+        tot = 0.0
+
+        #ax.imshow(image)
+        #ax.show()
+        await tc.show()
+        await magic.sleep(self.sleep)
+
+            
 if __name__ == '__main__':
 
     
     land = farm.Farm()
     land.add(Fortune())
     land.add(View())
+    land.add(Zview())
     farm.run(land)
