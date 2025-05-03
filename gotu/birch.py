@@ -72,10 +72,10 @@ exact?
 There is good evidence for this from the Dark Energy Survey, based on
 observations of supernovae, that the relation is not exact.
 
-.. image:: images/supernovae.png
+.. image:: images/supernova.png
 
 This is a central theme of :ref:`gotu`.  de Sitter Space, a uniformly,
-negatively curved space-time, is suggested as a good model for what we see.
+curved space-time, is suggested as a good model for what we see.
 
 In de Sitter Space, the Hubble law only holds asymptotically.
 
@@ -84,8 +84,9 @@ attempts to show the relationship:
 
 .. image:: images/zvr.png
 
-Let us also assume that younger, smaller galaxies have a higher star
-forming rate than larger, mature galaxies.
+The image was created using the :ref:`spiral` module, simulating many
+random galaxies arriving in our visible universe, noting the redshift
+and distance of the galaxy as it steps through our time.
 
 At any particular redshift we see galaxies over a wide range of
 distances.  For galaxies with no redshift (z=0) it turns out that they
@@ -95,9 +96,11 @@ de Sitter Space is a space-time which has the Perfect Copernican
 Principle: there are no special places or times in the universe.
 
 In such a universe, there is no overall expansion.  It exhibits red
-shift, but also blue shift in the form of gamma-ray bursts.
+shift, but also blue shift in the form of gamma-ray bursts, galaxies
+arriving at the edge our visible universe.
 
-There is an asymptotic relationship between z and d.
+There is an asymptotic relationship between z and d, both in forwards
+and backwards time.
 
 Closer to home, there are galaxies bursting on the scene, at z=1.
 Half immediately recede, the other half zoom closer.  All eventually
@@ -127,12 +130,10 @@ be a sample of large galaxies, that we mistakenly assume are small.
 The sample of galaxies that are nearer than we are assuming, will
 be a sample of small galaxies that we are assuming to be large.
 
-The galaxy model in the Geometry of the Universe proposes a
+The galaxy model in the Geometry of the Universe also proposes a
 quasar-galaxy spectrum, in which small quasars grow into large
-galaxies over a long period of time suggests there is a general
+galaxies over a long period of time. It suggests there is a general
 evolution as the central black hole grows in size.
-
-Younger galaxies tend to be more vigorous in star formation. 
 
 In the image of the green valley, the passive sequence includes
 galaxies whose size has been underestimated, they will move to the
@@ -142,7 +143,7 @@ The star forming sequence includes galaxies who's size has been
 over-estimated.  Correcting this will move them to the right in the
 picture.
 
-The end result?  A slope of a large rainbow mountain.
+The end result?  There is still a green valley.
 
 I should add there is a good way to test this theory.  The supernovae
 data, from the dark energy feature a growing set of galaxies for which
@@ -150,7 +151,8 @@ we have good evidence their true distance: supernovae have very
 consistent brightness.
 
 I wonder what the colour-magnitude diagram for this set of galaxies
-looks like?
+looks like?  My guess is that most supernovae we see are associated
+with large galaxies and will likely be in the green valley.
 
 And how to show this in code?
 
@@ -228,9 +230,11 @@ If we know the mass of the black hole and the temperature and density
 of the medium then we can calculate z, and hence the Eddington radius.
 
 The density must lie somewhere between the density of the black hole
-and the density of the universe.  The latter is between 100/cm3 and
-1e12/cm3.  Reasonable to assume it is lower than the density of the
-black hole.
+and the interstellar density.  The latter is between 100/cm3 and
+1e12/cm3.  
+
+Reasonable to assume it is lower or equal to the density of the black
+hole.
 
 What is needed here is a full model for quasars evolving into galaxies.
 
@@ -305,6 +309,40 @@ detailed spectrum, in short spectral lines are blurred.
 
 See :ref:`gotu.desi` for tools to download DESI data.
 
+2/5/25
+======
+
+I have been using the View object here to explore the DESI data, in
+particular the distribution of observations by redshift and magnitude.
+
+The pictures produced are fascinating.
+
+.. image:: images/bgs.png
+
+x-axis is the redshift, y-axis magnitude (FLUX_Z).
+
+Zooming out, and including Luminous Red Galaxies, we get this image:
+
+.. image:: images/bgslrg.png
+
+Here we see the green valley from another angle.  Most of the galaxies
+we see are either bright (=blue) and near, or more distant and red.
+
+There appears to have been a transition and there do not seem to be
+many in-between galaxies.
+
+There is another curiosity.  The DESI also includes emission line
+galaxies.  These are galaxies for which emission lines for various
+elements are clearly evident.
+
+Here is the image for emission line galaxies:
+
+.. image:: images/elg.png
+
+The curiosity here is that the vast majority of emission line galaxies
+are lower magnitude.
+
+
 
 """
 # never import *, except ...
@@ -361,17 +399,6 @@ def magnitude(self):
     mag = (5 * log10(1 / suns) / 2.)
     return mag
 
-def gravitational_redshift(self):
-
-    # density based on Schwartzchild radius
-    dens = (self.density() / c.m_p) << 1/(u.m**3)
-
-    # density in protons per m*3
-    n = self.n
-
-    print(dens, n)
-
-    return dens
 
 
 class Fortune(spiral.SkyMap):
@@ -384,8 +411,8 @@ class Fortune(spiral.SkyMap):
         self.green = magic.TableCounts(
             xname='magnitude', yname='NUV-r',
             minx=-24, maxx=-18, maxy=10.)
-        self.tablecounts.maxx = 0.22
-        self.tablecounts.minx = -0.75
+        self.tablecounts.maxx = 1.0
+        self.tablecounts.minx = -.5
         self.tablecounts.maxy = 1.
         self.tborigin = False
 
@@ -394,6 +421,10 @@ class Fortune(spiral.SkyMap):
         """ return nuv-r value for given magnitude
 
         Assume a straight line relationship.
+
+        hmm.. this is wrong,  
+
+        going to replace with selfcolour()
         """
         minmag = -24.
         magrange = 6.
@@ -404,8 +435,8 @@ class Fortune(spiral.SkyMap):
 
         self.create_sample()
 
-        # reset Mstellar values, using our own favourite distribution
-        self.set_mstellar(self.balls)
+        # reset Mcent values, using our own favourite distribution
+        self.set_mcents(self.balls)
 
         maxtheta = self.maxtheta
         mintheta = self.mintheta
@@ -429,7 +460,11 @@ class Fortune(spiral.SkyMap):
                 t += ball.tb()
 
             while True:
-                z, x = ball.zandx(t)
+                zcos, x = ball.zandx(t)
+
+                # get gravitational redshift and combine
+                zgrav = ball.z_calc()
+                z = ((1 + zcos) * (1 + zgrav)) - 1
 
                 # adjust distance for scale factor, adjust z too...
                 # ie repace x by x/1+x, ditto z.
@@ -443,12 +478,11 @@ class Fortune(spiral.SkyMap):
                 if z > 0 and x > self.tablecounts.maxy:
                     break
 
-                if z < 0:
-                    z = z/(1+z)
-                x = x/(1+x)
+                #if z < 0:
+                #    z = z/(1+z)
+                #x = x/(1+x)
 
-                gz = gravitational_redshift(ball)
-                await self.green_valley(ball, z, x, gz)
+                await self.green_valley(ball, z, x)
 
                 #weight = 1/(x*x)
                 weight = 1
@@ -467,12 +501,15 @@ class Fortune(spiral.SkyMap):
         await self.tablecounts.show(xname=xname, yname=yname)
         await self.green.show()
 
-    def set_mstellar(self, balls=None):
+    def set_mcents(self, balls=None):
 
         balls = balls or self.balls
 
         for ball in balls:
-            ball.Mstellar = self.random_mstellar()
+            self.mstellar = self.random_mstellar()  # stellar mass in suns
+            schwartzchild = self.mstellar * 3 * u.km << u.lyr
+
+            ball.Mcent = schwartzchild.value
 
     def random_mstellar(self):
         """Want distribution of galaxies by stellar mass
@@ -492,7 +529,7 @@ class Fortune(spiral.SkyMap):
         get a better estimate of the distribution.
 
         """
-        return magic.random.expovariate(1/1e6)
+        return magic.random.expovariate(1/1e9)
         
 
     async def green_valley(self, ball, z, x, gz=0.):
@@ -548,7 +585,7 @@ class View(train.Train):
         super().__init__()
         self.tablecounts = magic.TableCounts(
             minx=-0.1, maxx=2.5,
-            miny=15, maxy=30,
+            miny=15, maxy=23,
             width=200, height=200,
             xname='redshift',
             yname='flux magnitude'
@@ -559,6 +596,28 @@ class View(train.Train):
 
         self.tables = magic.deque()
         self.fields = magic.deque((('elg', 1), ('PROGRAM', 'dark')))
+
+    def bright(self):
+
+        self.fields = magic.deque([('PROGRAM', 'bright')])
+
+        tc = self.tablecounts
+
+        tc.maxx = 0.6
+        tc.maxy = 20.
+
+        tc.reset()
+        
+    def dark(self):
+
+        self.fields = magic.deque([('PROGRAM', 'dark')])
+
+        tc = self.tablecounts
+
+        tc.maxx = 1.8
+        tc.maxy = 25.
+
+        tc.reset()
 
     def get_parser(self):
 
@@ -635,11 +694,15 @@ class View(train.Train):
 
             # filter table and update tablecounts
             
-            mag = [flux2mag(x) for x in table.field('FLUX_Z')]
-        
+            mag = np.array([flux2mag(x) for x in table.field('FLUX_Z')])
+
+            xepsilon = 1e-9
+            rmag = np.array([flux2mag(max(x, xepsilon))  for x in table.field('FLUX_R')])
             self.tablecounts.update(
                 table.field('Z'),
-                mag)
+                mag,
+                weight=rmag/mag
+            )
 
             tot += time.time() - t1
             if tot > self.sleep:
@@ -664,7 +727,6 @@ class Zview(magic.Ball):
             miny=-0.9, maxy=0.9,
         )
 
-        
     async def run(self):
 
         #ax = await self.get()

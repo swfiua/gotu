@@ -5,6 +5,31 @@
 I will try to give updates from time to time as to what is happening
 here
 
+16/4/2025
+=========
+
+I have signed up to attend the 24th International Conference on
+General Relativity and Gravitation.
+
+https://iop.eventsair.com/gr24-amaldi16/
+
+There list of invited speakers is exciting and should be an enormous
+help to this project.
+
+https://iop.eventsair.com/gr24-amaldi16/speakers
+
+There is also a science and art exhibition for which submissions are
+invited, so it looks like I will be working on a poster.
+
+I have also been working on the green valley problem :ref:`birch`, in
+particular looking at the data from the Dark Energy Spectrographic
+Instrument (DESI).
+
+The data for data release 1 was recently released publicly.  The
+gotu.desi module downloads data and the :ref:`bitch` module has a
+viewer for the data.
+
+
 2024/12/04
 ==========
 
