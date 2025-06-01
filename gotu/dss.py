@@ -18,12 +18,11 @@ Each emitter arrives in our visible universe highly blue shifted, then
 becomes increasingly red-shifted as time goes by.
 
 The actual blue shift period and full details depend on two
-parameters, phi and theta.
-
-phi corresponds to the minimum distance between the receiver and
-emitter, in other words, the emitter's closest point of approach.
+parameters, theta and phi.
 
 theta measures the angle of approach.
+
+phi corresponds to the scale of the hyperbolic rotation.
 
 de Sitter Space and the Space Telescope
 =======================================
@@ -65,6 +64,11 @@ time.
 
 The result when you measure distance in this way is de Sitter Space.
 
+It requires one further ingredient, a constant curvature for
+spacetime.  The lambda in Einstein's General Relativity equation.
+
+A solution for a universe with no mass, but a constant curvature.
+
 It is the simplest possible model for a universe where special
 relativity holds, and it matches observations extraordinarily well.
 
@@ -73,7 +77,8 @@ in space-time as a result of special relativity.
 
 The space is highly symmetric, in time as well as space.
 
-Backwards in time, paths separate exponentially in time too.
+Backwards in time, paths separate exponentially, as well as in
+forwards time.
 
 Each galaxy that passes through our visible universe, arrives in a
 burst of blue shifted light, comes as near as it gets and then
@@ -92,11 +97,11 @@ it approaches and the angle of approach.
 With this model for a universe there is an explanation for the
 redshift that we see, whilst there being no overall expansion of
 space-time, as the redshift is exactly balanced by the blue shift
-period of a new arrival.
+period of a new arrival.   
 
-So when we observe through the JWST we may occassionally find
-galaxies, new arrivals that are not as redshifedt as they would be
-expected to be, given their distance.
+When we observe through the JWST we should also find galaxies, newer
+arrivals that are not as high redshift as they would be expected to
+be, given their distance.
 
 There is a further complication, with associating red-shift with
 distance.  If the light is coming from a place close to a
@@ -107,15 +112,16 @@ The current assumption is that light producing regions are far enough
 from any central mass for the gravitational redshift to be
 significant.
 
-Part of this belief comes from the theory of acretion models and
-over-coming the angular-momentum obstruction to acretion.
+Part of this belief comes from the theory of accretion models and
+over-coming the angular-momentum obstruction to accretion.
 
 According to Rourke, once you take account of the frame dragging due
 to the rotation of the central mass, the angular momentum problem goes
-away.
+away: the central black hole can absorb angular momentum of in-flowing
+particles.
 
-Some of the distant galaxies we are seeing may in fact be smaller
-quasars, closer to home.   That's a story for another module.
+Distant galaxies we are seeing may in fact be smaller quasars, closer
+to home. 
 
 JWST is also showing us how much dust is scattered across galaxies and,
 the beautiful dust spirals that emerge.
@@ -167,7 +173,7 @@ When you apply the Sciama Pricnciple to every celestial body, from the
 smallest grain of dust to the largest central mass in a galaxy, then I
 believe it will be clear why the Sciama Principle applies.
 
-Now let's see if we can simulate some of this.
+There is also a natural link between rotation and curvature.
 
 
 Hyperbolas
@@ -182,7 +188,8 @@ Conic sections, manifolds, matrices, rotations.  Four dimensional
 hyperbolic space.
 
 The key observation is that when you plot a distant galaxy's distance
-against time we get a rectangular hyperbola.
+against time we get a rectangular hyperbola.  A hyperbola that is
+embedded in curved space time.
 
 These hyperbolae arise from the Lorentz transformations of special
 relativity.

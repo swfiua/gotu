@@ -214,7 +214,7 @@ As always all this is covered in :ref:`The Geometry of the Universe`.
 There is a quasar-galaxy spectrum, defined by the size of the object's
 central black hole.
 
-These black holes, grow slowly acreting matter over time, so larger
+These black holes, grow slowly accreting matter over time, so larger
 black holes may well be much older.  The :ref:`gotu.spiral.Spiral`
 module has all the key pieces, it is just necessary to put the puzzle
 together.
@@ -269,7 +269,7 @@ The glowing dust of a high blueshift source may be mistaken for a
 redshifted view of the stars in a galaxy.
 
 Perhaps the green valley is in part due to whether we are seeing the
-dust or the stars of a galaxy.
+dust or the stars of a galaxy?
 
 This is one area the JWST can contribute significantly.  Observations
 of nearby galaxies at different wavelengths should help us refine our
@@ -304,7 +304,7 @@ Schwartzchild radius.
 So small quasars exhibit significant redshift.  Some of the luminous
 red galaxies are likely nearby quasars.
 
-When the light comes from the acretion disk it is harder to extract a
+When the light comes from the accretion disk it is harder to extract a
 detailed spectrum, in short spectral lines are blurred.
 
 See :ref:`gotu.desi` for tools to download DESI data.
@@ -314,6 +314,9 @@ See :ref:`gotu.desi` for tools to download DESI data.
 
 I have been using the View object here to explore the DESI data, in
 particular the distribution of observations by redshift and magnitude.
+
+The DESI data release 1 paper has been invaluable in understanding the
+data set:  https://arxiv.org/abs/2503.14745
 
 The pictures produced are fascinating.
 
@@ -342,7 +345,64 @@ Here is the image for emission line galaxies:
 The curiosity here is that the vast majority of emission line galaxies
 are lower magnitude.
 
+Rourke's quasar-galaxy model proposes that quasars are in fact baby
+galaxies and as their central black hole grows by slow accretion they
+become mature galaxies.
 
+Further, the model notes that the light from the central black hole
+can be arbitrarily close to the black hole, giving it arbitrarily
+large red-shift.
+
+The redshift at the Eddington sphere depends on the temperature and
+density of the medium.
+
+If we assume that the temperature and density of the medium is similar
+across the galaxy spectrum, then the gravitational redshift turns out
+to be inversely proportional to the central mass.
+
+Now think again about the DESI data.  Figure 1, from the DESI
+collaboration paper on data release 1 shows a stunning image of the
+various layers of the visible universe:
+
+.. image:: desifig1.png
+
+At low redshifts, we see the bright galaxies, around redshift 0.25 we
+move into a region of luminous red galaxies.  Then we reach the
+emission line galaxies at redshifts 1-1.8 and finally, quasars
+redshifts 2-4.
+
+Figure 7 from the same paper shows mean spectra at several redshifts:
+0.2, 0.7, 1.2, 1.5 and 2.65 across this range.
+
+.. image:: desifig7.png
+
+Working from the centre, with the bright galaxies, we see spectra with
+strong emission lines, generally not as strong and narrow as the
+emission line galaxies.  High flux sources and low redshift.
+
+Next, the luminous red galaxies.  Emission spectra are much harder to
+spot and broader.  Lower flux, with much of the energy at the red end.
+
+Quasars.  High redshift, with Lyman alpha forests visible for the
+higher redshift quasars and broad emission peaks.
+
+Rourke argues that light from quasars has gravitational redshift and
+that the Lyman alpha absorption is just to hydrogen absorption by
+hydrogen clouds between the central black hole and ourselves.
+
+Conventional cosmology believes the same, just that all the redshift
+is cosmological and the absorption is by clouds at different redshifts
+along the light's very long journey to us.
+
+In both cases, the width of the alpha forest reduces as the redshift
+reduces.
+
+
+
+Baryonic Acoustic Oscillations
+==============================
+
+Returning to quasars.
 
 """
 # never import *, except ...
@@ -482,10 +542,10 @@ class Fortune(spiral.SkyMap):
                 #    z = z/(1+z)
                 #x = x/(1+x)
 
-                await self.green_valley(ball, z, x)
+                #await self.green_valley(ball, z, x)
 
                 #weight = 1/(x*x)
-                weight = 1
+                weight = zgrav
                 self.tablecounts.update([z], [x], weight)
                 t += self.delta_t
 
@@ -494,7 +554,7 @@ class Fortune(spiral.SkyMap):
             tt += t2-t1
             if tt > self.sleep:
                 await self.tablecounts.show(xname=xname, yname=yname)
-                await self.green.show()
+                #await self.green.show()
                 tt = 0.
 
         # one last show
@@ -695,13 +755,16 @@ class View(train.Train):
             # filter table and update tablecounts
             
             mag = np.array([flux2mag(x) for x in table.field('FLUX_Z')])
-
+            
             xepsilon = 1e-9
             rmag = np.array([flux2mag(max(x, xepsilon))  for x in table.field('FLUX_R')])
+
+            weight = rmag/mag
+            weight = 1
             self.tablecounts.update(
                 table.field('Z'),
                 mag,
-                weight=rmag/mag
+                weight=weight
             )
 
             tot += time.time() - t1
