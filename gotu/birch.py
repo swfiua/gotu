@@ -413,7 +413,7 @@ import time
 
 from astropy import table, units as u, constants as c
 
-from blume import magic, farm, train
+from blume import magic, farm, train, hp
 np = magic.np
 
 from . import spiral
@@ -657,6 +657,8 @@ class View(train.Train):
         self.tables = magic.deque()
         self.fields = magic.deque((('elg', 1), ('PROGRAM', 'dark')))
 
+        self.image = hp.PixelCounter(nside=64)
+
     def bright(self):
 
         self.fields = magic.deque([('PROGRAM', 'bright')])
@@ -767,9 +769,21 @@ class View(train.Train):
                 weight=weight
             )
 
+            pixels = table.field('HEALPIX')
+            for pixel in pixels:
+                self.image.update(pixel)
+
             tot += time.time() - t1
             if tot > self.sleep:
                 await self.tablecounts.show()
+                #print('running pixelcount')
+                #await self.image.run()
+                #outfile = open('healpix.csv', 'w')
+                #for pix, count in enumerate(self.image.pixels):
+                #    if count:
+                #        print(pix, count, sep=',', file=outfile)
+                #outfile.close()
+                #print('done pixelcount')
                 await magic.sleep(self.sleep)
                 tot = 0.0
             else:

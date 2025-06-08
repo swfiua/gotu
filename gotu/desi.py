@@ -65,6 +65,62 @@ def expand_targets():
 
         # save modeified file
         zcat.write('target_' + path.name)
+
+
+class Zplotter:
+
+    def __init__(self,
+                 minwl=1000., maxwl=6000, deltawl=0.1,
+                 minz=0, maxz=4, deltaz=0.1):
+
+        self.minwl = minwl
+        self.maxwl = maxwl
+        self.deltawl = deltawl
+        self.minz = minz
+        self.maxz = maxz
+        self.deltaz = deltaz
+
+        self.reset()
+
+    def reset(self):
+        """ Call after setting parameters """
+        self.bands = int((self.maxz-self.minz) / self.deltaz)
+        self.wls = int((self.maxwl - self.minwl) / self.deltawl)
+        self.data = np.zeros((self.bands, self.wls))
+        self.counts = np.zeros((self.bands, self.wls))
+        deltawl2 = self.deltawl/2.
+        self.dwaves = np.linspace(self.minwl + deltawl2,
+                                  self.maxwl - deltawl2, len(self.data[0]))
+    def update(self, zz, xx, yy):
+        """ Update count
+
+        zz  redshift
+        xx  array of x values (wavelength)
+        xx  array of y values (flux)
+        """
+
+        deltaz2 = self.deltaz/2.
+
+        # adjust xx for zz
+        xxz = xx / (1+zz)
+        band = int((zz-self.minz)/ self.deltaz)
+        band = min(band, self.bands-1)
+        ix = int(max(xxz[0] - self.minwl, 0) / self.deltawl)
+        lix = int(min(xxz[-1] - self.minwl, self.maxwl-self.minwl) / self.deltawl) - 1
+
+        # range of wavelengths is xxz[0] - xxz[-1]
+        data = np.interp(self.dwaves[ix:lix+1], xxz, yy, 0., 0)
+
+        self.data[band][ix:lix+1] += data
+        self.counts[band][ix:lix+1] += 1
+
+    def show(self, ax):
+
+        for ix, row in enumerate(self.data):
+            ok = self.counts[ix] != 0
+            xx = self.dwaves[ok]
+            yy = (2*ix) + (row[ok]/(1+self.counts[ix][ok]))
+            ax.plot(xx, yy)
     
 def target_expand(zcat):
 
@@ -91,12 +147,14 @@ class DESI(train.Train):
         self.mode = magic.deque(['elg', 'bgs', 'lrg', 'qso'])
 
         self.tablecounts = magic.TableCounts(
-            minx=800, maxx=5000,
-            miny=-1, maxy=16.
+            minx=1000, maxx=6000,
+            miny=0, maxy=16.
         )
 
-        self.minz = None
-        self.maxz = None
+        self.minz = 0.5
+        self.maxz = 3.5
+
+        self.zplot = Zplotter(minz=self.minz, deltaz=0.25)
 
     def next_mode(self):
 
@@ -145,14 +203,16 @@ class DESI(train.Train):
         mags = self.fibermap['FLUX_G']
         ixes = np.arange(0, len(reds))
 
-        ok = [True] * len(ixes)
-        #ok = self.fibermap[self.mode[0]] == 1
+        #ok = [True] * len(ixes)
+        ok = self.fibermap[self.mode[0]] == 1
 
         if self.minz is not None:
             ok = ok & (reds > self.minz)
 
         if self.maxz is not None:
             ok = ok & (reds < self.maxz)
+
+        ok = ok & (mags >= 5.)
 
         ixes = ixes[ok]
         #self.sixes = magic.deque([x[1] for x in sorted(zip(reds[ok], ixes))])
@@ -182,7 +242,7 @@ class DESI(train.Train):
     def show_fibermap(self):
         """ Try show something interesting about current observation """
         tab = self.fibermap[self.sixes[0]]
-        rows = []
+        rows = [['Z', self.redrock['REDSHIFTS'].data['Z'][self.sixes[0]]]]
         brows = []
         for key, value in zip(tab.keys(), tab.values()):
 
@@ -219,7 +279,9 @@ class DESI(train.Train):
 
         reds = self.redrock['REDSHIFTS'].data['Z'][ix]
 
-        #ax.plot(xx[ok]/(1+reds), np.clip(gf(yy[ok]), vmin, vmax))
+        offset = int(reds/0.25)
+
+        if ax: ax.plot(xx[ok]/(1+reds), gf(yy[ok])+offset)
         
         mean = self.means.setdefault(band, yy)
         alpha = 0.95
@@ -232,48 +294,60 @@ class DESI(train.Train):
         #        np.clip(np.sqrt(1./tab[band + '_IVAR'].data[ix][ok]),
         #                vmin, vmax)+vmin)
 
-        offset = int(reds/0.25)
-        self.tablecounts.update(xx/(1+reds), yy[ok] + offset)
+        self.tablecounts.update(xx[ok]/(1+reds), yy[ok] + offset)
+
+        self.zplot.update(reds, xx[ok], yy[ok])
 
     async def run(self):
 
 
         tot = 0.0
+        ax = None
+
         while True:
             self.runs += 1
         
-            sixes = list(self.sixes)
-            self.sixes.clear()
-            for ix in sixes:
+            while self.sixes:
+                ix = self.sixes[0]
                 zwarn = self.redrock['REDSHIFTS'].data['ZWARN'][ix]
                 norm = self.fibermap['FLUX_Z'][ix]
 
                 if zwarn != 0 or norm ==  0.:
+                    self.sixes.popleft()
                     continue
-                self.sixes.append(ix)
-                ax = None
 
-            for six in range(len(self.sixes)):
                 t1 = time.time()
                 self.waveplot(ax, 'B')
                 self.waveplot(ax, 'R')
                 self.waveplot(ax, 'Z')
-
+                
                 tot += time.time() - t1
                 if tot > self.sleep:
 
-                    await self.tablecounts.show()
+                    axes = await self.tablecounts.show()
+
+                    ax = await self.get()
+                    self.zplot.show(ax)
+                    ax.show()
                     await magic.sleep(self.sleep)
                     tot = 0.0
+
+                    ax = axes['nonorm']
                 else:
+                    if ax:
+                        ax.show()
+                        self.show_fibermap()
+                    ax = None
                     await magic.sleep(0)
         
-                self.sixes.rotate()
+                self.sixes.popleft()
 
             self.paths.rotate()
             print('loading next table', self.paths[0])
             self.next_table()
 
+
+            
 if __name__ == '__main__':
 
     
