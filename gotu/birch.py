@@ -364,7 +364,7 @@ Now think again about the DESI data.  Figure 1, from the DESI
 collaboration paper on data release 1 shows a stunning image of the
 various layers of the visible universe:
 
-.. image:: desifig1.png
+.. image:: images/desifig1.png
 
 At low redshifts, we see the bright galaxies, around redshift 0.25 we
 move into a region of luminous red galaxies.  Then we reach the
@@ -374,7 +374,7 @@ redshifts 2-4.
 Figure 7 from the same paper shows mean spectra at several redshifts:
 0.2, 0.7, 1.2, 1.5 and 2.65 across this range.
 
-.. image:: desifig7.png
+.. image:: images/desifig7.png
 
 Working from the centre, with the bright galaxies, we see spectra with
 strong emission lines, generally not as strong and narrow as the
