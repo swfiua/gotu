@@ -397,12 +397,43 @@ along the light's very long journey to us.
 In both cases, the width of the alpha forest reduces as the redshift
 reduces.
 
-
+The amount of absorption also places constraints on the density of the
+medium.  Too much gas and no light gets through, too little and there
+is not enough absorption.
 
 Baryonic Acoustic Oscillations
 ==============================
 
-Returning to quasars.
+Returning to quasars.  DESI did some sophisticated analysis of the
+correlations between spectra for the Lyman-alpha forests of different
+quasars.
+
+The assumption is that these quasars are very distant and that the
+absorption is due to clouds of hydrogen gas along the billions of
+light-years the light has taken to reach us.
+
+In a big-bang model, the redshift also indicates the epoch and so the
+theory is that we are seeing the evolution of the density of the
+medium over time.
+
+In the Rourke model, the absorption is by the surrounding gas, which
+is presumably concentrated in spiral arms around the central hole.
+
+In both cases, it should be expected to have some random variation,
+but also correlation between objects of the same redshift.
+
+In the Rourke model, the correlation should be between quasars with
+the same *gravitational* redshift.
+
+It should also be noted that in the Rourke model quasars are small and
+of high absolute magnitude.
+
+As such, we cannot see them beyond a certain distance.
+
+DESI Spectra
+============
+
+The :ref:`desi` module can has tools to visualise spectra.
 
 """
 # never import *, except ...

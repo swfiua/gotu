@@ -151,8 +151,8 @@ class DESI(train.Train):
             miny=0, maxy=16.
         )
 
-        self.minz = 0.5
-        self.maxz = 3.5
+        self.minz = 0.0
+        self.maxz = 1.5
 
         self.zplot = Zplotter(minz=self.minz, deltaz=0.25)
 
