@@ -16,6 +16,7 @@ de Sitter begins with DESI
 
 """
 import time
+import math
 import fitsio
 from astropy.table import Table
 from astropy import io
@@ -66,7 +67,29 @@ def expand_targets():
         # save modeified file
         zcat.write('target_' + path.name)
 
+class Curve:
 
+    def __init__(self, size):
+
+        self.data = np.zeros(size)
+        self.count = np.zeros(size)
+        self.reds = 0.
+        self.n = 0
+
+def score(curve, data, sd, ix, lix):
+
+    total = 0.
+    sd[:] = 1.
+    for pos in range(ix, lix+1):
+        if curve.count[pos]:
+            total += ((data[pos-ix] - curve.data[pos]/curve.count[pos])/sd[pos]) ** 2
+
+    hits = sum(curve.count[ix:lix+1])
+    
+    if hits < 100: return 10.
+
+    return math.sqrt(total/(1+lix-ix))
+        
 class Zplotter:
 
     def __init__(self,
@@ -79,47 +102,91 @@ class Zplotter:
         self.minz = minz
         self.maxz = maxz
         self.deltaz = deltaz
-
+        self.thresh = .25
         self.reset()
 
     def reset(self):
         """ Call after setting parameters """
-        self.bands = int((self.maxz-self.minz) / self.deltaz)
+
         self.wls = int((self.maxwl - self.minwl) / self.deltawl)
-        self.data = np.zeros((self.bands, self.wls))
-        self.counts = np.zeros((self.bands, self.wls))
+        size = self.wls
+        self.curves = magic.deque()
+        self.square = np.zeros(size)
+        self.total = np.zeros(size)
+        self.count = np.zeros(size)
         deltawl2 = self.deltawl/2.
         self.dwaves = np.linspace(self.minwl + deltawl2,
-                                  self.maxwl - deltawl2, len(self.data[0]))
-    def update(self, zz, xx, yy):
+                                  self.maxwl - deltawl2, size)
+
+    def update(self, zz, xx, yy, scale=1.):
         """ Update count
 
         zz  redshift
         xx  array of x values (wavelength)
         xx  array of y values (flux)
+        scale factor applied to normalise
         """
 
         deltaz2 = self.deltaz/2.
 
         # adjust xx for zz
         xxz = xx / (1+zz)
-        band = int((zz-self.minz)/ self.deltaz)
-        band = min(band, self.bands-1)
         ix = int(max(xxz[0] - self.minwl, 0) / self.deltawl)
         lix = int(min(xxz[-1] - self.minwl, self.maxwl-self.minwl) / self.deltawl) - 1
 
         # range of wavelengths is xxz[0] - xxz[-1]
         data = np.interp(self.dwaves[ix:lix+1], xxz, yy, 0., 0)
 
-        self.data[band][ix:lix+1] += data
-        self.counts[band][ix:lix+1] += 1
+        self.count[ix:lix+1] += 1
+        self.total[ix:lix+1] += data
+        self.square[ix:lix+1] += data * data
+
+        scores = []
+        for cix, curve in enumerate(self.curves):
+            scores.append([score(curve, data, self.sd(), ix, lix), cix])
+
+        scores = list(sorted(scores))
+        #if scores:
+        #    print(scores[-4:])
+
+        if scores and scores[0][0] < self.thresh:
+            curve = self.curves[scores[0][1]]
+        else:
+            print([s[0] for s in scores])
+            curve = Curve(self.wls)
+            self.curves.append(curve)
+
+        curve.data[ix:lix+1] += data
+        curve.count[ix:lix+1] += 1
+        curve.reds += zz
+        curve.n += 1
+
+        return curve
+
+    def sd(self):
+
+        counts = self.count
+        zero = counts == 0
+        counts[zero] = 1
+        mean = self.total / counts
+        square = (self.square / counts) - (mean*mean)
+        zero = square == 0.
+        square[zero] = 1.
+        return np.sqrt(square)
+                  
 
     def show(self, ax):
 
-        for ix, row in enumerate(self.data):
-            ok = self.counts[ix] != 0
+        data = []
+        for ix, curve in enumerate(self.curves):
+            data.append([curve.reds/curve.n, ix])
+        data.sort()
+
+        for reds, ix in data:
+            curve = self.curves[ix]
+            ok = curve.count != 0
             xx = self.dwaves[ok]
-            yy = (2*ix) + (row[ok]/(1+self.counts[ix][ok]))
+            yy = (2*ix) + (curve.data[ok]/(1+curve.count[ok]))
             ax.plot(xx, yy)
     
 def target_expand(zcat):
@@ -147,14 +214,15 @@ class DESI(train.Train):
         self.mode = magic.deque(['elg', 'bgs', 'lrg', 'qso'])
 
         self.tablecounts = magic.TableCounts(
-            minx=1000, maxx=6000,
+            minx=1000, maxx=8000,
             miny=0, maxy=16.
         )
 
-        self.minz = 0.0
-        self.maxz = 1.5
+        self.minz = 1.0
+        self.maxz = 1.25
+        self.deltaz = 0.025
 
-        self.zplot = Zplotter(minz=self.minz, deltaz=0.25)
+        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
 
     def next_mode(self):
 
@@ -215,8 +283,8 @@ class DESI(train.Train):
         ok = ok & (mags >= 5.)
 
         ixes = ixes[ok]
-        #self.sixes = magic.deque([x[1] for x in sorted(zip(reds[ok], ixes))])
         self.sixes = magic.deque([x[1] for x in sorted(zip(reds[ok], ixes))])
+        #self.sixes = magic.deque([x[1] for x in sorted(zip(mags[ok], ixes))])
         self.means = {}
         self.redname = redname
 
@@ -238,7 +306,57 @@ class DESI(train.Train):
         # wonder which flux value to use for magnitude
         flux = self.fibermap['FLUX_G']
 
-        
+    def bgs(self):
+
+        while self.mode[0] != 'bgs':
+            self.mode.rotate()
+        self.tablecounts.maxx = 8000
+        self.minz = self.zplot.minz = 0.
+        self.maxz = .5
+        self.deltaz = 0.05
+        self.tablecounts.reset()
+        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
+        self.tablecounts.reset()
+
+    def qso(self):
+
+        while self.mode[0] != 'qso':
+            self.mode.rotate()
+        self.tablecounts.maxx = 6000
+        self.minz = self.zplot.minz = 1.0
+        self.maxz = 4.
+        self.deltaz = 0.25
+        self.tablecounts.reset()
+        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
+        self.tablecounts.reset()
+
+    def lrg(self):
+
+        while self.mode[0] != 'lrg':
+            self.mode.rotate()
+        self.tablecounts.maxx = 6000
+        self.minz = self.zplot.minz = 0.0
+        self.maxz = 2.5
+        self.deltaz = 0.25
+        self.tablecounts.reset()
+        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
+        self.tablecounts.reset()
+
+    def qso2(self):
+
+        while self.mode[0] != 'qso':
+            self.mode.rotate()
+        self.tablecounts.maxx = 6000
+        self.tablecounts.miny = 12.
+        self.tablecounts.maxy = 25.
+        self.tablecounts.maxx = 6000
+        self.minz = self.zplot.minz = 1.5
+        self.maxz = 2.5
+        self.deltaz = 0.1
+        self.tablecounts.reset()
+        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
+        self.tablecounts.reset()
+
     def show_fibermap(self):
         """ Try show something interesting about current observation """
         tab = self.fibermap[self.sixes[0]]
@@ -267,7 +385,8 @@ class DESI(train.Train):
         ix = self.sixes[0]
         xx = tab[band + '_WAVELENGTH'].data
         #norm = self.fibermap['FLUX_'+band.replace('B', 'G')][ix]
-        norm = self.fibermap['FLUX_Z'][ix]
+        #norm = self.fibermap['FLUX_Z'][ix]
+        norm = self.fibermap['FLUX_G'][ix]
 
         yy = tab[band + '_FLUX'].data[ix] / norm
 
@@ -279,7 +398,7 @@ class DESI(train.Train):
 
         reds = self.redrock['REDSHIFTS'].data['Z'][ix]
 
-        offset = int(reds/0.25)
+        offset = int((reds-self.tablecounts.miny)/self.deltaz)
 
         if ax: ax.plot(xx[ok]/(1+reds), gf(yy[ok])+offset)
         
@@ -296,7 +415,7 @@ class DESI(train.Train):
 
         self.tablecounts.update(xx[ok]/(1+reds), yy[ok] + offset)
 
-        self.zplot.update(reds, xx[ok], yy[ok])
+        self.zplot.update(reds, xx[ok], gf(yy[ok]))
 
     async def run(self):
 
