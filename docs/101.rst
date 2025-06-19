@@ -63,11 +63,14 @@ assumption to General Relativity that re-instates matter, in
 particular the distant stars, as the origin of inertia.  More on this
 later.
 
+If cosmology is to be defined as a study of evolution and change then
+it is a study of the evolution and change of galaxies.
+
 
 Expansion of the Universe Explained
 ===================================
 
-The Universe is uniformly, negatively curved.  The geometry of our
+The Universe is uniformly curved.  The geometry of our
 universe is non-Euclidean, we live in a Poincare disk world.
 
 In a curved spacetime, each galaxy that enters our visible universe
@@ -131,11 +134,13 @@ Can we see the primordial fire of the Big Bang?
 The answer is no, the Big Bang did not happen.
 
 The Cosmic Microwave Background is thermalised radiation from distant
-galaxies in the universe.
+galaxies in the universe.  We should expect it to be very uniform,
+since the universe is assumed to be ancient, it has had a lot of time
+to get into equilibrium.
 
 Note that in an ancient universe there has been plenty of time for
 very distant regions to communicate, so no problem with the uniformity
-we see.
+we see.  Likewise, large scale spherical harmonics are not a surprise.
 
 Why is it the temperature it is?
 --------------------------------

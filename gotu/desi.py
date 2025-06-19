@@ -73,8 +73,33 @@ class Curve:
 
         self.data = np.zeros(size)
         self.count = np.zeros(size)
+        self.square = np.zeros(size)
         self.reds = 0.
         self.n = 0
+
+    def update(self, data, ix, reds):
+
+        lix = ix + len(data)
+        self.data[ix:lix] += data
+        self.count[ix:lix] += 1
+        self.square[ix:lix] += data * data
+        self.reds += reds
+        self.n += 1
+
+    def mean(self):
+
+        counts = np.clip(self.count, 1, max(self.count))
+        means = self.data/counts
+
+        return means
+
+    def sd(self):
+
+        counts = np.clip(self.count, 2, max(self.count))
+        means = self.mean()
+        meansquare = self.square/(counts-1)
+
+        return np.sqrt(meansquare - (means * means))
 
 def score(curve, data, sd, ix, lix):
 
@@ -92,17 +117,12 @@ def score(curve, data, sd, ix, lix):
         
 class Zplotter:
 
-    def __init__(self,
-                 minwl=1000., maxwl=6000, deltawl=0.1,
-                 minz=0, maxz=4, deltaz=0.1):
+    def __init__(self, minwl=1000., maxwl=6000, deltawl=0.1):
 
         self.minwl = minwl
         self.maxwl = maxwl
         self.deltawl = deltawl
-        self.minz = minz
-        self.maxz = maxz
-        self.deltaz = deltaz
-        self.thresh = .25
+        self.thresh = .15
         self.reset()
 
     def reset(self):
@@ -126,8 +146,6 @@ class Zplotter:
         xx  array of y values (flux)
         scale factor applied to normalise
         """
-
-        deltaz2 = self.deltaz/2.
 
         # adjust xx for zz
         xxz = xx / (1+zz)
@@ -156,10 +174,7 @@ class Zplotter:
             curve = Curve(self.wls)
             self.curves.append(curve)
 
-        curve.data[ix:lix+1] += data
-        curve.count[ix:lix+1] += 1
-        curve.reds += zz
-        curve.n += 1
+        curve.update(data, ix, zz)
 
         return curve
 
@@ -186,9 +201,19 @@ class Zplotter:
             curve = self.curves[ix]
             ok = curve.count != 0
             xx = self.dwaves[ok]
-            yy = (2*ix) + (curve.data[ok]/(1+curve.count[ok]))
+            yy = (2*ix) + curve.mean()[ok]
+            sd = curve.sd()[ok]
+            print(sd)
+            #ax.plot(xx, yy-sd)
+            #ax.plot(xx, yy+sd)
+            #ax.plot(xx, sd + (2*ix))
+            ax.fill_between(xx, yy-sd, yy+sd, color='grey')
             ax.plot(xx, yy)
-    
+
+        if data:
+            ax.set_title(f'Mean redshift: {sum(x[0] for x in data)/len(data):.2}')
+
+
 def target_expand(zcat):
 
     bits = 0, 1, 2, 32, 60, 61, 62
@@ -219,16 +244,24 @@ class DESI(train.Train):
         )
 
         self.minz = 1.0
-        self.maxz = 1.25
-        self.deltaz = 0.025
+        self.maxz = 2.5
+        self.deltaz = 0.1
 
-        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
+        self.reset()
 
+
+    def reset(self):
+        """ Reset tablecounts and zplots after changing parms """
+        bands = int((self.maxz - self.minz)/self.deltaz)
+        self.zplots = [Zplotter() for x in range(bands)] 
+        self.tablecounts.reset()
+        
+        
     def next_mode(self):
 
         self.mode.rotate()
         self.next_table()
-        self.tablecounts.reset()
+        self.reset()
 
     async def start(self):
         """ FIXME: scan a table of what's here
@@ -311,36 +344,30 @@ class DESI(train.Train):
         while self.mode[0] != 'bgs':
             self.mode.rotate()
         self.tablecounts.maxx = 8000
-        self.minz = self.zplot.minz = 0.
+        self.minz = 0.
         self.maxz = .5
         self.deltaz = 0.05
-        self.tablecounts.reset()
-        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
-        self.tablecounts.reset()
+        self.reset()
 
     def qso(self):
 
         while self.mode[0] != 'qso':
             self.mode.rotate()
         self.tablecounts.maxx = 6000
-        self.minz = self.zplot.minz = 1.0
+        self.minz = 1.0
         self.maxz = 4.
         self.deltaz = 0.25
-        self.tablecounts.reset()
-        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
-        self.tablecounts.reset()
+        self.reset()
 
     def lrg(self):
 
         while self.mode[0] != 'lrg':
             self.mode.rotate()
         self.tablecounts.maxx = 6000
-        self.minz = self.zplot.minz = 0.0
-        self.maxz = 2.5
-        self.deltaz = 0.25
-        self.tablecounts.reset()
-        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
-        self.tablecounts.reset()
+        self.minz = 0.5
+        self.maxz = 1.5
+        self.deltaz = 0.1
+        self.reset()
 
     def qso2(self):
 
@@ -350,12 +377,10 @@ class DESI(train.Train):
         self.tablecounts.miny = 12.
         self.tablecounts.maxy = 25.
         self.tablecounts.maxx = 6000
-        self.minz = self.zplot.minz = 1.5
+        self.minz = 1.5
         self.maxz = 2.5
         self.deltaz = 0.1
-        self.tablecounts.reset()
-        self.zplot = Zplotter(minz=self.minz, deltaz=self.deltaz)
-        self.tablecounts.reset()
+        self.reset()
 
     def show_fibermap(self):
         """ Try show something interesting about current observation """
@@ -415,7 +440,16 @@ class DESI(train.Train):
 
         self.tablecounts.update(xx[ok]/(1+reds), yy[ok] + offset)
 
-        self.zplot.update(reds, xx[ok], gf(yy[ok]))
+        band = int((reds-self.minz)/self.deltaz)
+        if band >=0 and band < len(self.zplots):
+            self.zplots[band].update(reds, xx[ok], gf(yy[ok]))
+
+    async def show_zplot(self):
+        
+        ax = await self.get()
+        magic.random.choice(self.zplots).show(ax)
+        ax.show()
+
 
     async def run(self):
 
@@ -445,12 +479,9 @@ class DESI(train.Train):
 
                     axes = await self.tablecounts.show()
 
-                    ax = await self.get()
-                    self.zplot.show(ax)
-                    ax.show()
                     await magic.sleep(self.sleep)
                     tot = 0.0
-
+                    await self.show_zplot()
                     ax = axes['nonorm']
                 else:
                     if ax:
