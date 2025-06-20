@@ -95,7 +95,7 @@ class Curve:
 
     def sd(self):
 
-        counts = np.clip(self.count, 2, max(self.count))
+        counts = np.clip(self.count, 2, max(self.count)+2)
         means = self.mean()
         meansquare = self.square/(counts-1)
 
@@ -111,8 +111,6 @@ def score(curve, data, sd, ix, lix):
 
     hits = sum(curve.count[ix:lix+1])
     
-    if hits < 100: return 10.
-
     return math.sqrt(total/(1+lix-ix))
         
 class Zplotter:
@@ -170,7 +168,6 @@ class Zplotter:
         if scores and scores[0][0] < self.thresh:
             curve = self.curves[scores[0][1]]
         else:
-            print([s[0] for s in scores])
             curve = Curve(self.wls)
             self.curves.append(curve)
 
@@ -203,7 +200,6 @@ class Zplotter:
             xx = self.dwaves[ok]
             yy = (2*ix) + curve.mean()[ok]
             sd = curve.sd()[ok]
-            print(sd)
             #ax.plot(xx, yy-sd)
             #ax.plot(xx, yy+sd)
             #ax.plot(xx, sd + (2*ix))
@@ -236,7 +232,7 @@ class DESI(train.Train):
         self.add_filter(' ', self.next_mode)
         self.add_filter('l', self.show_fibermap)
 
-        self.mode = magic.deque(['elg', 'bgs', 'lrg', 'qso'])
+        self.mode = magic.deque([None, 'elg', 'bgs', 'lrg', 'qso'])
 
         self.tablecounts = magic.TableCounts(
             minx=1000, maxx=8000,
@@ -305,15 +301,20 @@ class DESI(train.Train):
         ixes = np.arange(0, len(reds))
 
         #ok = [True] * len(ixes)
-        ok = self.fibermap[self.mode[0]] == 1
+        if self.mode[0]:
+            ok = self.fibermap[self.mode[0]] == 1
+        else:
+            self.mode.rotate()
+            ok = self.fibermap[self.mode[0]] == 1
+            while self.mode[0] != None:
+                ok |= self.fibermap[mode]==1                
+                self.mode.rotate()
 
         if self.minz is not None:
             ok = ok & (reds > self.minz)
 
         if self.maxz is not None:
             ok = ok & (reds < self.maxz)
-
-        ok = ok & (mags >= 5.)
 
         ixes = ixes[ok]
         self.sixes = magic.deque([x[1] for x in sorted(zip(reds[ok], ixes))])
@@ -349,6 +350,16 @@ class DESI(train.Train):
         self.deltaz = 0.05
         self.reset()
 
+    def elg(self):
+
+        while self.mode[0] != 'elg':
+            self.mode.rotate()
+        self.tablecounts.maxx = 8000
+        self.minz = .5
+        self.maxz = 1.5
+        self.deltaz = 0.05
+        self.reset()
+
     def qso(self):
 
         while self.mode[0] != 'qso':
@@ -363,7 +374,7 @@ class DESI(train.Train):
 
         while self.mode[0] != 'lrg':
             self.mode.rotate()
-        self.tablecounts.maxx = 6000
+        self.tablecounts.maxx = 6500
         self.minz = 0.5
         self.maxz = 1.5
         self.deltaz = 0.1
@@ -459,7 +470,7 @@ class DESI(train.Train):
 
         while True:
             self.runs += 1
-        
+            good = 0
             while self.sixes:
                 ix = self.sixes[0]
                 zwarn = self.redrock['REDSHIFTS'].data['ZWARN'][ix]
@@ -473,7 +484,7 @@ class DESI(train.Train):
                 self.waveplot(ax, 'B')
                 self.waveplot(ax, 'R')
                 self.waveplot(ax, 'Z')
-                
+                good += 1
                 tot += time.time() - t1
                 if tot > self.sleep:
 
@@ -493,7 +504,7 @@ class DESI(train.Train):
                 self.sixes.popleft()
 
             self.paths.rotate()
-            print('loading next table', self.paths[0])
+            print(f'{good} good observations, loading next table {self.paths[0]}')
             self.next_table()
 
 
