@@ -239,7 +239,7 @@ class DESI(train.Train):
             miny=0, maxy=16.
         )
 
-        self.minz = 1.0
+        self.minz = 0.0
         self.maxz = 2.5
         self.deltaz = 0.1
 
@@ -307,7 +307,7 @@ class DESI(train.Train):
             self.mode.rotate()
             ok = self.fibermap[self.mode[0]] == 1
             while self.mode[0] != None:
-                ok |= self.fibermap[mode]==1                
+                ok |= self.fibermap[self.mode[0]]==1                
                 self.mode.rotate()
 
         if self.minz is not None:
@@ -315,6 +315,8 @@ class DESI(train.Train):
 
         if self.maxz is not None:
             ok = ok & (reds < self.maxz)
+
+        ok = ok & (mags >= 5.)
 
         ixes = ixes[ok]
         self.sixes = magic.deque([x[1] for x in sorted(zip(reds[ok], ixes))])
@@ -344,6 +346,7 @@ class DESI(train.Train):
 
         while self.mode[0] != 'bgs':
             self.mode.rotate()
+        self.tablecounts.minx = 1000
         self.tablecounts.maxx = 8000
         self.minz = 0.
         self.maxz = .5
@@ -355,6 +358,7 @@ class DESI(train.Train):
         while self.mode[0] != 'elg':
             self.mode.rotate()
         self.tablecounts.maxx = 8000
+        self.tablecounts.minx = 2000
         self.minz = .5
         self.maxz = 1.5
         self.deltaz = 0.05
@@ -365,6 +369,7 @@ class DESI(train.Train):
         while self.mode[0] != 'qso':
             self.mode.rotate()
         self.tablecounts.maxx = 6000
+        self.tablecounts.minx = 950
         self.minz = 1.0
         self.maxz = 4.
         self.deltaz = 0.25
@@ -374,6 +379,7 @@ class DESI(train.Train):
 
         while self.mode[0] != 'lrg':
             self.mode.rotate()
+        self.tablecounts.minx = 1000
         self.tablecounts.maxx = 6500
         self.minz = 0.5
         self.maxz = 1.5
