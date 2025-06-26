@@ -27,7 +27,8 @@ Further, the Sciama Principle provides a natural mechanism for this
 transfer.
 
 If the Sciama Principle holds as well as General Relativity, this
-implies that space is not a vacuum.
+implies that space is not a vacuum.  Put another way, the assumption
+that space is a vacuum, restricts models to Euclidean Geometry.
 
 Note also that the radius of curvature of the Universe is some 13.7
 billion light years, so a Euclidean Geometry is a very good
