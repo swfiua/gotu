@@ -72,8 +72,23 @@ Pulsar Timing Array
 Sciama and Kerr
 ===============
 
+Sciama says frame dragging drops off with 1/r, Kerr says it is 1/r**3.
+
+Kerr assumes space-time is a vacuum and is the unique solution for a
+vacuum.
+
+Gravitational waves are assumed to propagate at the speed of light (1
+part in 10-15 difference according to GW170817), with amplitude
+reducing with a 1/r relationship, per Sciama.
+
+
 The River Clyde Gravitational Observatory
 =========================================
+
+
+
+Therapy dogs
+------------
 
 Afternoon in the Launderette
 ============================
@@ -94,9 +109,24 @@ with significant intrinsic redshift from the AGN.
 Priors
 ======
 
+Bayesian probability is in wide use through the community and there is
+considerable awareness of the problems that can arise with priors.
+
+I particularly enjoyed the talk on biases from choice of m1 in a
+merger. (which talk?)
+
+What prior should be used for, what if Colin, Fred and Jayant were
+rigth?
+
+Did the conference change my priors?
+------------------------------------
+
+
 
 Art Exhibition
 ==============
+
+Where is the Sun?
 
 The Future
 ==========
