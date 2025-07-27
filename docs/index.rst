@@ -107,6 +107,8 @@ Talks
 
    johnny
 
+   gr24
+
 
 Interactive Examples thanks to pyscript
 =======================================

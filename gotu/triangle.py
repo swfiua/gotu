@@ -56,6 +56,9 @@ image:: images/milkyway_rotation.png
 Puzzles
 -------
 
+Re: transfer of angular momentum, does symmetry imply that the loss to
+one body matches the gain for the other, in a two-body scenario?
+
 When I hear *angular momentum*, there is an implied rotation, but
 about what axis?
 
