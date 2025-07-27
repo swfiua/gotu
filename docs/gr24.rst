@@ -1,0 +1,110 @@
+===================
+ GR24 and Amaldi16
+===================
+
+
+Earlier in the year I submitted a proposal to this conference in
+Glasgow about general relativity and gravitational waves :ref:`birch`.
+
+
+   Revive interest in theories based on the Sciama Principle
+   [coda in the book]
+
+   Is there anything else?  Colin Rourke, on light.
+
+   The CMB and gravitational waves should be in equilibrium due to the
+   Rees-Sciama effect?
+
+   When an old guy from a ski school, who believes the big bang did
+   not happen attended an astrophysics conference.
+
+
+After submitting the talk, I realised the subject was a little more
+complex than I had hoped, requiring not just de Sitter Space, but also
+the model of galaxy evolution outlined in Rourke's work, where
+galaxies are characterised by the size of their central black holes.
+
+The release of data from the Dark Energy Spectroscopic Instrument
+has provided ideal data to help determine the split between
+cosmological and intrinsic redshift.
+
+
+The key idea is that smaller black holes exhibit intrinsic redshift,
+with light coming from close to the black hole.  As the central black
+hole and galaxy grow the redshift diminishes and is negligble in a
+full size galaxy.
+
+The talk was not accepted, which was somewhat of a relief.  It has
+taken me some time to understand what is going on with galaxy spectra.
+
+I had also made the submission before I had heard the very sad news
+that Colin Rourke had passed away.
+
+I decided I would still attend the conference, as it gave an ideal
+opportunity to get the latest information on gravitational wave
+observations and next generation detectors.  I was not disappointed. 
+
+As I am not in academia, I listed my institution as *Académie Camp
+Fortune, Chelsea, Quebec*, where I work as a ski instructor doing
+practical experiments in gravity, in a low friction environment.
+
+I am fortunate that this gives me a great deal of time to ponder the
+mysteries of the universe.
+
+
+
+Early Career Workshop
+=====================
+
+Despite my advanced age, I felt it would be worthwhile to attend the
+early career workshop before the main conference.
+
+
+GW231123
+========
+
+GW170817
+========
+
+Pulsar Timing Array
+===================
+
+Sciama and Kerr
+===============
+
+The River Clyde Gravitational Observatory
+=========================================
+
+Afternoon in the Launderette
+============================
+
+Tensions in cosmology
+=====================
+
+DESI in the LRG at redshift 0.7
+-------------------------------
+
+Essentionally, in the DESI dataset, if you assume redshift gives
+distance then the 0.7 bucket is out of whack with the scale factor we
+would assume.
+
+In Rourke's model many of the LRG are relatively near objects, but
+with significant intrinsic redshift from the AGN.
+
+Priors
+======
+
+
+Art Exhibition
+==============
+
+The Future
+==========
+
+HMXW - half max width for spectra (check acronym in little red dot
+paper).  Use on DESI via spectral matching stuff.
+
+
+
+Sgr A* location.
+
