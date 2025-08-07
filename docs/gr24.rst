@@ -197,6 +197,26 @@ Specifically, the Hulse-Taylor binary, where the system is showing
 slow orbital decay, consistent with the energy it should lose due to
 general relativity, according to the Kerr metric.
 
+The idea is that rotation causes energy to radiate away in the form of
+gravitational waves.  The Kerr metric defines how much energy is
+radiated in this way.
+
+The assumption is that orbitting objects will, eventually, decay to
+the point that they inspiral and coalesce into a single black whole.
+
+Why this might not happen
+-------------------------
+
+First the Kerr metric analysis and Hulse-Taylor observations seem
+sound.
+
+A rotating body drags space-time around with it, but it also feels
+that drag and slows accordingly.
+
+Now having created a wave in space, the wave itself propogates
+according to the Sciama Principle.  It's magnitude drops with 1/r.
+
+
 Sciama says frame dragging drops off with 1/r, Kerr says it is 1/r**3.
 
 Kerr assumes space-time is a vacuum and is the unique solution for a
@@ -241,7 +261,7 @@ I particularly enjoyed the talk on biases from choice of m1 in a
 merger. (which talk?)
 
 What prior should be used for, what if Colin, Fred and Jayant were
-rigth?
+right?
 
 
 
