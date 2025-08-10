@@ -268,7 +268,11 @@ right?
 Art Exhibition
 ==============
 
-Where is the Sun?
+**Where is the Sun?**
+
+
+
+.. image:: images/witsart.png
 
 
 Did the conference change my priors?
