@@ -5,17 +5,27 @@
 **A quest from Bingley to Glasgow in search of the truth of
 gravitational waves**
 
+.. toctree::
+   :maxdepth: 2
+
+   bingley
+   jodrell
+   warwick
+   glasgow
+   gw170817
+   binary
+
 This story begins in the Yorkshire town of Bingley.
 
 .. image:: images/gr24/bingley.png
 
 It is where I spent my earlier years.  In the image above I am on a
-mission to dig a whole to Australia.  Dad had mention Australia is
+mission to dig a whole to Australia.  Dad had mentioned Australia is
 close to the antipodal point, so obviously I had to go there.
 
-It was a few years later, looking up at the sky and asking mum if it
-goes on forever?  It must stop, but then what comes next, so maybe it
-never stops?
+It was a few years later, looking up at the sky and asking mum (or was
+it dad) if it goes on forever?  It must stop, but then what comes
+next, so maybe it never stops?
 
 It is the same town in which Fred Hoyle spent his early years.  There
 is now a road named Fred Hoyle Way.
@@ -28,7 +38,6 @@ It was Fred that coined the term Big Bang.  Fred looked at the
 Universe through the biggest telescopes of the day.
 
 .. image:: images/m31.png
-
 
 Like Einstein, he believed the Universe was likely ancient and vast.
 He believed in the perfect Copernican Principle: the universe looks
@@ -48,8 +57,16 @@ Observations of quasars, by radio telescopes were interpretted as
 extremely powerful, very distant objects, from an early stage of the
 universe.
 
+Jodrell Bank
+============
+
+I visited one of the world's radio telescopes and was delighted to
+find statue of Copernicus at the site.
+
 .. image:: images/jodrellcoper.png
 
+Jodrell Bank was heavily involved in the early explorations of
+quasars.
 
 As we do not see such objects near to home, this helps strengthen the
 Big Bang theory.
@@ -66,7 +83,7 @@ After my early years in Bingley, I went to study mathematics at
 Warwick University.  My personal tutor was Professor Colin Rourke.
 
 He taught undergraduate analysis, using a method he had developed for
-the Open University.  
+the Open University. 
 
 I graduated with first class honours, but it was not until 2017 that I
 discovered Professor Rourke's work in cosmology.
@@ -77,7 +94,7 @@ under the title, "The Geometry of the Universe" was published in 2021.
 In this work he presents a model for the universe with no need for
 dark matter and no Big Bang!
 
-I obtained a copy of the book and was enthralled.   As an
+I obtained a copy of the book and was enthralled.  As an
 under-graduate I had rarely spoken to Professor Rourke, other than to
 let him know where I was living.
 
@@ -85,8 +102,10 @@ I plucked up the courage to contact him about the book and to my
 immense delight it was the beginning of a wonderful correspondence as
 he guided me through his perspective on the universe.
 
-With no big bang, there is ample time for galaxies to grow, by slow
-acretion of matter to their central black holes.
+With no big bang, there is also ample time for galaxies to grow, by
+slow acretion of matter to their central black holes.  Galaxies
+giving birth to baby galaxies, which may one day grow into galaxies
+themselves, or a globular cluster perhaps?
 
 The Sciama Principle is proposed, as an addition to General
 Relativity, to explain galactic rotation curves without recourse to
@@ -96,13 +115,40 @@ The same principle allows central black holes to absorb angular
 momentum from inflowing matter and so no need for complex acretion
 disk theories.
 
-The Eddington sphere can be arbitrarily close to the black hole, the
-distance depending on the temperature and density of the medium.
+It is also just a theorem about the propogation of gravitational
+waves: that their amplitude reduces as 1/r, where r is the distance
+from the source.  This is widely accepted in the community and is
+usually used to calculate the distance of the source, usually
+expressed as redshift, with a Hubble-law.
 
-All things being equal, smaller black holes can exhibit significant
-intrinsic redshift.
+Outline
+=======
 
-In short, not all redshift is cosmological.
+Now imagine in the 1960's Fred's idea of the continuous arrival of new
+matter arriving in our visible universe, at exactly the rate required
+to balance the observed expansion.
+
+What would that universe look like?
+
+This is the view Rourke provides.  He uses *de Sitter Space*, in which
+pairs of geodesics eventually separate exponentially, in both forwards
+and backwards time.
+
+It is a natural first model for a universe, one with constant
+curvature.  New galaxies are constantly arriving in our backwards
+light cone, and do so highly redshifted as gamma-ray bursts.  It is
+not new matter, spontaneously created, it has existed a very long
+time, but has only just now entered our visible universe.  We will see
+it until the end of time.
+
+The waves we are seeing are not drammatic in-spirals of black holes,
+but are the result of the same modulation of gravitational waves
+generated by the central black holes of galaxies.
+
+
+
+
+
 
 
 Earlier in the year I submitted a proposal to this conference in
@@ -171,15 +217,63 @@ Early Career Workshop
 Despite my advanced age, I felt it would be worthwhile to attend the
 early career workshop before the main conference.
 
+It was excellent to have an opportunity to really get to understand
+the current state of research into gravitational waves.
 
-GW231123
-========
 
 GW170817
 ========
 
+Everybody's favourite wave.
+
+1.7 second delay between merger and light, of the order of the
+distance between the earth and the moon.
+
+
+Imagine the arrival of a small galaxy.  
+
+It is long overdue for me to fit a model to this observation, based on
+the arriving galaxy model.
+
+144 million light years away, or 1% of the Hubble distance.
+
+GW231123
+========
+
+This wave is believed to originate from two inter-mediate mass black
+holes, from an area known as the mass-gap.
+
+The issue here is that inspirals take a long time to actually happen,
+if they happen at all.  And with a big bang, there is not sufficient
+time for multiple generations of mergers.
+
+Parameter Distribution
+======================
+
+There was an excellent talk on the distribution of parameters, such as
+the masses involve, and the distance of events.
+
+With the number of detections in the hundreds, some intriguing
+features are starting to emerge.
+
+There are more detections per unit volume, the further out you go.
+
+Another interpretation is that weaker signals dominate the sample.
+
+There are more weak waves than stronger ones.
+
+If the wave is proportional to the mass of the arriving quasar or
+galaxy, then we would indeed expect more smaller than large objects.
+
+
+
+
 Pulsar Timing Array
 ===================
+
+More data on this experiment would be good to work with.
+
+I have a growing interest in binary pulsars.
 
 Sciama, Kerr and the Hulse-Taylor pulsar
 ========================================
@@ -216,6 +310,8 @@ that drag and slows accordingly.
 Now having created a wave in space, the wave itself propogates
 according to the Sciama Principle.  It's magnitude drops with 1/r.
 
+Further, only the wavelength, or angular velocity matters, angular
+momentum is not a factor.
 
 Sciama says frame dragging drops off with 1/r, Kerr says it is 1/r**3.
 
@@ -225,6 +321,18 @@ vacuum.
 Gravitational waves are assumed to propagate at the speed of light (1
 part in 10-15 difference according to GW170817), with amplitude
 reducing with a 1/r relationship, per Sciama.
+
+Conservation of angular momentum in curved space time
+-----------------------------------------------------
+
+There is a geometric proof of conservation of angular momentum that
+relies on certain triangles having the same area.  The proof is a
+theorem of Euclidean Geometry.  In a curved space-time, angular
+momentum is not, in general, concerved.
+
+
+Of course, in many cases curvature is small enough that space can be
+consider to be Euclidean, to first order.
 
 
 The River Clyde Gravitational Observatory
@@ -263,6 +371,13 @@ merger. (which talk?)
 What prior should be used for, what if Colin, Fred and Jayant were
 right?
 
+The Perfect Copernican Principle?
+
+It that holds, then quasars must have intrinsic redshift.  The little
+red dots of JWST fame too.
+
+Unravelling the spectral information from DESI should help provide
+mass distribution for arriving quasars and galaxies.
 
 
 Art Exhibition
@@ -295,3 +410,15 @@ Sgr A* location.
 
 
 Sciama waves.
+
+
+Redshift
+========
+
+The Eddington sphere can be arbitrarily close to the black hole, the
+distance depending on the temperature and density of the medium.
+
+All things being equal, smaller black holes can exhibit significant
+intrinsic redshift.
+
+In short, not all redshift is cosmological.

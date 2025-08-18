@@ -71,6 +71,9 @@ With a little work on the :ref:`gaia` module it should be possible to
 zoom into the gaia data and get an idea of the view around Sgr A*, or
 indeed any other location across the galaxy.
 
+Artwork
+=======
+
 """
 import math
 
