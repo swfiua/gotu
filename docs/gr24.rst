@@ -230,12 +230,42 @@ Everybody's favourite wave.
 distance between the earth and the moon.
 
 
-Imagine the arrival of a small galaxy.  
-
 It is long overdue for me to fit a model to this observation, based on
 the arriving galaxy model.
 
 144 million light years away, or 1% of the Hubble distance.
+
+A 1.7 second delay over this distance gives a speed difference of less
+than 3.74e-16.
+
+Now in the arriving galaxy model,  the distance is 100 times greater
+and we get 3.7e-18 as the potential difference in the speed of light
+and gravitational waves.
+
+
+CMB oddity
+----------
+
+This is commensurate with the size of the Sciama effect expected for
+the CMB.
+
+::
+
+   >>> 144e6 * u.lightyear / sp.cosmo.hubble_distance
+   <Quantity 0.00996433>
+   >>> 1.7 * u.s / u.year 
+   <Quantity 1.7 s / yr>
+   >>> _.decompose()
+   <Quantity 5.38697493e-08>
+   >>> 1.7 * u.s / 144e6 * u.year 
+   <Quantity 1.18055556e-08 s yr>
+   >>> 1.7 * u.s / (144e6 * u.year )
+   <Quantity 1.18055556e-08 s / yr>
+   >>> _.decompose()
+   <Quantity 3.74095481e-16>
+   >>> _ * (144e6 * u.lightyear / sp.cosmo.hubble_distance)
+   <Quantity 3.72760915e-18>
+   
 
 GW231123
 ========
@@ -292,11 +322,11 @@ slow orbital decay, consistent with the energy it should lose due to
 general relativity, according to the Kerr metric.
 
 The idea is that rotation causes energy to radiate away in the form of
-gravitational waves.  The Kerr metric defines how much energy is
-radiated in this way.
+gravitational waves.  The Kerr metric defines how much angular
+momentum is radiated in this way.
 
 The assumption is that orbitting objects will, eventually, decay to
-the point that they inspiral and coalesce into a single black whole.
+the point that they inspiral and coalesce into a single black hole.
 
 Why this might not happen
 -------------------------
@@ -376,18 +406,52 @@ The Perfect Copernican Principle?
 It that holds, then quasars must have intrinsic redshift.  The little
 red dots of JWST fame too.
 
+Gamma-ray bursts and the cosmic microwave background?
+
 Unravelling the spectral information from DESI should help provide
 mass distribution for arriving quasars and galaxies.
 
+Prior distribution on mass of arrivals?
 
 Art Exhibition
 ==============
 
 **Where is the Sun?**
 
+My submition to the art exhibition for the conference was displayed.
 
+The work showed two matplotlib images generated using data from the
+European Space Agency's Gaia satellite to visualise the Milky Way's
+rotation curve: the relationship between distance from the galactic
+centre and tangential velocity, for stars in the Milky Way.
+
+The two images choose a different point for the galactic centre.
+
+The lower, red image places the centre as Sagittarius A*, at 26,000
+light years.  The upper images assumes the centre is twice as far
+away.
+
+In both images, the sun is in the are where there are most
+observations.
+
+There are a number of striking features to both plots.
+
+Near the centre we see plate-like rotation, velocity proportional to
+distance from the centre.
+
+Further out, we see a flat asymptote.
 
 .. image:: images/witsart.png
+
+
+Calculating the Hubble constant from observations
+=================================================
+
+Part of the problem is determining the host galaxy for a merger.
+
+Localisation is generally poor and galaxy catalogs are incomplete.
+
+More observations will help.
 
 
 Did the conference change my priors?
@@ -408,9 +472,9 @@ simulation of nanohertz waves to compare with PTA observations.
 
 Sgr A* location.
 
-
 Sciama waves.
 
+Hulse-Taylor and a Milky Way model.
 
 Redshift
 ========
