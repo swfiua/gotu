@@ -236,18 +236,34 @@ the arriving galaxy model.
 144 million light years away, or 1% of the Hubble distance.
 
 A 1.7 second delay over this distance gives a speed difference of less
-than 3.74e-16.
+than one part in 3.74e-16.
 
 Now in the arriving galaxy model,  the distance is 100 times greater
 and we get 3.7e-18 as the potential difference in the speed of light
-and gravitational waves.
+and the speed of gravitational waves.
 
 
 CMB oddity
 ----------
 
 This is commensurate with the size of the Sciama effect expected for
-the CMB.
+the CMB: all the photons of the CMB induce a rotation on the
+surrounding space-time.
+
+A tiny ripple.  It is not that light travels slower, rather, it
+travels further.
+
+Gravity waves of a given frequency all travel at the speed of light,
+but light itself follows all the tiny wrinkles.
+
+If this is what is happening the 1.7 seconds should turn out to be
+quite consistent across observations.
+
+In the arriving galaxy model, we see a speeded up version of the
+galaxy's history, so the light is averaged across lots of time.  As
+such we should expect the peak to be very close to the galactic
+centre.
+
 
 ::
 
