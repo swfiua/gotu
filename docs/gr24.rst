@@ -5,8 +5,8 @@
 **A quest from Bingley to Glasgow in search of the truth of
 gravitational waves**
 
-An old guy from a ski school, who believes the big bang did
-not happen attends an astrophysics conference.
+How an old guy from a ski school, came to believe the big bang might not
+have happened and attends an astrophysics conference in search of truth.
 
 .. toctree::
    :maxdepth: 2
@@ -15,7 +15,6 @@ not happen attends an astrophysics conference.
    jodrell
    warwick
    glasgow
-   gw170817
    binary
 
 
@@ -291,6 +290,10 @@ There was also a light wind blowing.
 
 .. image:: images/clyde.png
 
+
+
+
+
 Therapy dogs
 ------------
 
@@ -298,13 +301,30 @@ The conference had organised *therapy dogs* for the Wednesday
 lunchtime, a nice idea, but I had not booked a slot.
 
 Fortunately, there were many therapy dogs enjoying their lunch time
-walks. 
+walks along the Clyde.
 
 Afternoon in the Launderette
 ============================
 
 Tensions in cosmology
 =====================
+
+Hubble Tension
+--------------
+
+There general impression I got was people felt the tension would
+likely disappear with more analysis.
+
+There is a hope that gravitational waves will eventually help resolve
+this tension. More detectors will give better localisation which
+should help with finding optical transients.  Rubin telescope could be
+very helpful here.
+
+Without localisation it is not possible to associate the wave with a
+galaxy.
+
+And this localisation relies on a reliable galaxy catalogue.
+
 
 DESI in the LRG at redshift 0.7
 -------------------------------
