@@ -1,3 +1,4 @@
+.. _cpr:
 ==============
  Colin Rourke
 ==============
@@ -103,9 +104,9 @@ of Mathematics at Warwick University and author of  ref:`gotu`
 A visit to his `homepage <https://homepages.warwick.ac.uk/~masaw/>`__
 is highly recommended.
 
-In particular, it is here you will find an earlier edition of the
-book, published under the title, `A new paradigm for the universe
-<https://homepages.warwick.ac.uk/~masaw/paradigm/>`__
+You can find an earlier edition of the book on arxiv, published under
+the title, `A new paradigm for the universe
+<https://arxiv.org/abs/astro-ph/0311033>`__
 
 There is an excellent summary of the book written by Robert MacKay, who
 was a co-author of all the key papers behind the ideas in :ref:`gotu`:

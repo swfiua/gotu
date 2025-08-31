@@ -13,10 +13,10 @@ I graduated with first class honours, but it was not until 2017 that I
 discovered Professor Rourke's work in cosmology.
 
 He published, "A new paradigm for the universe".  A second edition
-under the title, "The Geometry of the Universe" was published in 2021.
+under the title, :ref:`gotu` was published in 2021.
 
 In this work he presents a model for the universe with no need for
-dark matter and no Big Bang!
+dark matter and no Big Bang.
 
 I obtained a copy of the book and was enthralled.  As an
 under-graduate I had rarely spoken to Professor Rourke, other than to
