@@ -34,8 +34,11 @@ class Binary(magic.Ball):
         # initial state
         kms = units.km / units.second
         
-        self.m1 = 0.5 * units.solMass
-        self.m2 = 0.5 * units.solMass
+        self.m1 = 1.441 * units.solMass
+        self.m2 = 1.387 * units.solMass
+        self.period = 7.751938773864 * units.hour
+        self.rotation_m1 = 59.02999792988 * units.millisecond
+
         self.r1 = [100000 * units.au, 0 * units.au]
         self.r2 = [-100000 * units.au, 0 * units.au]
         self.v1 = [0 * kms, 0.4 * kms]

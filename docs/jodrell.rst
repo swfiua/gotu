@@ -22,13 +22,8 @@ Gamma-ray bursts similarly hint of dramatic events in the early
 universe, but also provide explanations for some mysteries such as how
 we got so many heavy elements in such short a time?
 
-Fred
-====
-           
-Back in Fred's time, observations of quasars, by radio telescopes were
-interpretted as extremely powerful, very distant objects, from an
-early stage of the universe.  Then there was the Cosmic Microwave
-Background.
+Back in Fred Hoyle's time, observations of quasars, by radio
+telescopes were interpretted as extremely powerful, very distant
+objects, from an early stage of the universe.  Then there was the
+Cosmic Microwave Background.
 
-Vera Rubin's discovery that galactic rotation curves are not
-consistent with General Relativity gave rise to dark matter.

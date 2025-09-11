@@ -7,6 +7,9 @@ early career workshop before the main conference.
 It was excellent to have an opportunity to really get to understand
 the current state of research into gravitational waves.
 
+It was a good way to get to understand the community working on
+gravitational wave science.
+
 
 GW170817
 ========
@@ -134,7 +137,7 @@ the point that they inspiral and coalesce into a single black hole.
 Why this might not happen
 -------------------------
 
-First the Kerr metric analysis and Hulse-Taylor observations seem
+The Kerr metric analysis and Hulse-Taylor observations seem
 sound.
 
 A rotating body drags space-time around with it, but it also feels
@@ -144,12 +147,16 @@ Now having created a wave in space, the wave itself propogates
 according to the Sciama Principle.  It's magnitude drops with 1/r.
 
 Further, only the wavelength, or angular velocity matters, angular
-momentum is not a factor.
+momentum is not a factor, other than it determines the amplitude of
+the Kerr effect.
 
 Sciama says frame dragging drops off with 1/r, Kerr says it is 1/r**3.
+Both are correct.
 
-Kerr assumes space-time is a vacuum and is the unique solution for a
-vacuum.
+The resolution to this conundrum is to recognise that the rotation
+creates a wave in the fabric of space-time, according to the Kerr
+metric, but that distortion of space-time then propogares according to
+Sciama.
 
 Gravitational waves are assumed to propagate at the speed of light (1
 part in 10-15 difference according to GW170817), with amplitude
@@ -241,18 +248,42 @@ Art Exhibition
 
 My submition to the art exhibition for the conference was displayed.
 
-The work showed two matplotlib images generated using data from the
-European Space Agency's Gaia satellite to visualise the Milky Way's
-rotation curve: the relationship between distance from the galactic
-centre and tangential velocity, for stars in the Milky Way.
+.. image:: images/witsart.png
 
-The two images choose a different point for the galactic centre.
+     Where is the Sun?
 
-The lower, red image places the centre as Sagittarius A*, at 26,000
-light years.  The upper images assumes the centre is twice as far
-away.
+     Caption at gr24::
 
-In both images, the sun is in the are where there are most
+       Two visualisaltions of the Milky Way rotation curve using Gaia
+       data.
+       Lower assumes Sagittarius A*, lower assumes it is twice as far
+       away, as Professor Rourke suggest it is too small to drive a
+       galaxy.
+
+    The typos were all mine.
+
+    The work shows two matplotlib images generated using data from the
+    European Space Agency's Gaia satellite to visualise the Milky Way's
+    rotation curve: the relationship between distance from the galactic
+    centre and tangential velocity, for stars in the Milky Way.
+
+    Different matplotlib colormaps were used for the two plots,
+    high-lighting the need to consider the blue as well as the reds.
+
+    In both plots, the Sun is at the dense part of the plot, some
+    26,000 light-years from Sagittarius A*.
+
+    If you align the two plots, we see general agreement, the question
+    is what we see in the blue a reflection of the red about Sgr A*?
+
+One of Rourke's boldest predictions, that Sagittarius A* is not large
+enough to drive a galaxy the size of the Milky Way, arguing that a
+mass of 1-100e9 solar masses would be required.
+
+He argued that it just happened to be in the direction of the true
+centre.  
+
+In both images, the sun is in the area where there are most
 observations.
 
 There are a number of striking features to both plots.
@@ -262,7 +293,8 @@ distance from the centre.
 
 Further out, we see a flat asymptote.
 
-.. image:: images/witsart.png
+
+       
 
 
 Calculating the Hubble constant from observations
@@ -311,3 +343,7 @@ In short, not all redshift is cosmological.
 
    
    
+Ammonite
+========
+
+A new Sedna? object.

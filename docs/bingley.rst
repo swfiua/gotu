@@ -64,6 +64,10 @@ universe <https://arxiv.org/abs/astro-ph/0311033>`__.
 
 I do recall a school friend talking about black holes back in those
 days.  It was the first time I had heard they might actually exist.
+Later in high school we were shown they were theoretically possible.
 
 The cosmic microwave background, gamma-ray bursts and quasars had only
 just been discovered.
+
+Vera Rubin's discovery that galactic rotation curves are not
+consistent with General Relativity gave rise to dark matter.

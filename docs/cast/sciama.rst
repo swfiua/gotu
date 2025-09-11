@@ -2,11 +2,22 @@
  Dennis Sciama
 ===============
 
+Dennis Sciama proposed the Sciama Principle in a paper with the title,
+*On the origin of inertia*.
+
+He was trying to create a theory of gravity that satisfied Mach's
+Principle: he wanted a physical explanation for inertial frames.
+
 Chapter 4 of the book has the title, *Sciama's Principle*.
 
-It is central to the story, indeed at the end of the chapter it is
-stated that one of the aims of the book is to reawaken Sciama's
-approach to dynamics.
+Rourke ends the chapter a *coda*::
+
+  Sciama's initiative to base a dynamical theory on Mach's
+  principle as formulated in Sciama's principle, has never
+  been followed up and this approach to dynamics remains
+  dormant.  One of the aims of this book is to reawaken
+  this approach.
+
 
 The Weak Sciama Principle
 -------------------------
@@ -18,9 +29,11 @@ The Weak Sciama Principle
 
    k is a constant.
 
-
 Gravitational Waves
 -------------------
+
+It is believed that gravitational waves travel at the speed of light
+and that the amplitude of a wave at distance r is proportional to 1/r.
 
 A rotation is just two orthogonal oscillations.
 
