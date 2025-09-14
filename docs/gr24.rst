@@ -39,6 +39,8 @@ LIGO, Virgo and Kagra detectors are seeing.
    jodrell
    warwick
    apftu
+   gw150914
+   gw170817
    birch
    glasgow
    binary

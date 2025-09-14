@@ -11,67 +11,8 @@ It was a good way to get to understand the community working on
 gravitational wave science.
 
 
-GW170817
-========
-
-Everybody's favourite wave.
-
-1.7 second delay between merger and light, of the order of the
-distance between the earth and the moon.
 
 
-It is long overdue for me to fit a model to this observation, based on
-the arriving galaxy model.
-
-144 million light years away, or 1% of the Hubble distance.
-
-A 1.7 second delay over this distance gives a speed difference of less
-than one part in 3.74e-16.
-
-Now in the arriving galaxy model,  the distance is 100 times greater
-and we get 3.7e-18 as the potential difference in the speed of light
-and the speed of gravitational waves.
-
-
-CMB oddity
-----------
-
-This is commensurate with the size of the Sciama effect expected for
-the CMB: all the photons of the CMB induce a rotation on the
-surrounding space-time.
-
-A tiny ripple.  It is not that light travels slower, rather, it
-travels further.
-
-Gravity waves of a given frequency all travel at the speed of light,
-but light itself follows all the tiny wrinkles.
-
-If this is what is happening the 1.7 seconds should turn out to be
-quite consistent across observations.
-
-In the arriving galaxy model, we see a speeded up version of the
-galaxy's history, so the light is averaged across lots of time.  As
-such we should expect the peak to be very close to the galactic
-centre.
-
-
-::
-
-   >>> 144e6 * u.lightyear / sp.cosmo.hubble_distance
-   <Quantity 0.00996433>
-   >>> 1.7 * u.s / u.year 
-   <Quantity 1.7 s / yr>
-   >>> _.decompose()
-   <Quantity 5.38697493e-08>
-   >>> 1.7 * u.s / 144e6 * u.year 
-   <Quantity 1.18055556e-08 s yr>
-   >>> 1.7 * u.s / (144e6 * u.year )
-   <Quantity 1.18055556e-08 s / yr>
-   >>> _.decompose()
-   <Quantity 3.74095481e-16>
-   >>> _ * (144e6 * u.lightyear / sp.cosmo.hubble_distance)
-   <Quantity 3.72760915e-18>
-   
 
 GW231123
 ========
@@ -137,11 +78,11 @@ the point that they inspiral and coalesce into a single black hole.
 Why this might not happen
 -------------------------
 
-The Kerr metric analysis and Hulse-Taylor observations seem
+The Kerr metric analysis and Hulse-Taylor observations is
 sound.
 
 A rotating body drags space-time around with it, but it also feels
-that drag of the rest of the universe, and slows accordingly.
+that drag of the rest of the universe, and slows accordingly.  
 
 Now having created a wave in space, the wave itself propogates
 according to the Sciama Principle.  It's magnitude drops with 1/r.
@@ -155,8 +96,7 @@ Both are correct.
 
 The resolution to this conundrum is to recognise that the rotation
 creates a wave in the fabric of space-time, according to the Kerr
-metric, but that distortion of space-time then propogares according to
-Sciama.
+metric, but that distortion of space-time then propogares according to Sciama.
 
 Gravitational waves are assumed to propagate at the speed of light (1
 part in 10-15 difference according to GW170817), with amplitude

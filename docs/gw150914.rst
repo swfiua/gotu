@@ -1,0 +1,49 @@
+========
+GW150914
+========
+
+The first gravitational wave detection.
+
+I heard about this event during a Python conference in 2016 around the
+time of the announcement.
+
+Brandon Rhodes fave a keynote where he mentioned the recent
+announcement by the LIGO team and how python was used at key parts of
+the analysis.
+
+The detection of these ripples in space time was a stunning
+achievement, after decates of hunting.
+
+Two black holes, 35.6 and 30.6 solar masses merge to form a final mass
+of just 63.1 solar masses.
+
+Energy emitted as gravitational waves: 3.1 solar masses.
+
+Chirp mass 28.6 Suns and at a distance of 430 Mpc.
+
+There was a lot of interest at the conference and a number of
+attendees with good knowledge of the discovery.
+
+It was not until :ref:`GW170817` that I started to wonder whether the
+signals being detected might have another explanation than merging
+black holes.
+
+By that time I had read Rourke's work and was aware of the hypothesis
+that gamma-ray bursts may be the arrivals of new galaxies in our
+visible universe. 
+
+This was around 2018.  In a discussion on black holes there is this
+fascinating comment from Colin Rourke::
+
+
+   There is another possible more important problem that I have with
+   black holes.  The fundamental inertial drag hypothesis that explains
+   the dynamics of galaxies needs every mass in the universe to have a
+   well-defined rotation (or a well-defined inertial frame in which it is
+   static).  But the current fiction is that a BH is a POINT SINGULARITY
+   and therefore it has nothing to define its rotation.  I mention this
+   problem in passing in the book, but I did not stress it because I did
+   not want to murder yet another sacred cow.
+
+
+   
