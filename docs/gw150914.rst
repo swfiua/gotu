@@ -25,15 +25,34 @@ There was a lot of interest at the conference and a number of
 attendees with good knowledge of the discovery.
 
 It was not until :ref:`GW170817` that I started to wonder whether the
-signals being detected might have another explanation than merging
-black holes.
+signals being detected might have another explanation other than the
+merging black holes.
 
-By that time I had read Rourke's work and was aware of the hypothesis
-that gamma-ray bursts may be the arrivals of new galaxies in our
-visible universe. 
+By that time I had read Rourke's work.  How to reconcile the Sciama
+Principle with the Kerr metric?
 
-This was around 2018.  In a discussion on black holes there is this
-fascinating comment from Colin Rourke::
+Rourke uses the Sciama Principle as an addition to General Relativity,
+to explain galactic rotation curves without need for dark matter.
+
+The problem for gravitational wave physics that with the Sciama
+Principle binary systems are highly stable and there is a limit to how
+far they can inspiral.
+
+Fortunately, Rourke also proposes the hypothesis that gamma-ray bursts
+may be the arrivals of new galaxies in our visible universe.
+
+Along with Robert MacKay he shows how in a de Sitter universe, new
+arrivals burst on the scene highly blue shifted.
+
+It is due to the curvature of space time, each galaxy arrives highly
+blue shifted, the blue shift reduces over time, until the galaxy then
+starts to accelerate away and converge to a Hubble law.
+
+Now any gravitational waves the galaxy is emitting will be modulated
+in the same way.  Perhaps that is what we are detecting?
+
+In a 2018 discussion on black holes there is this fascinating comment from
+Colin Rourke::
 
 
    There is another possible more important problem that I have with
@@ -45,5 +64,43 @@ fascinating comment from Colin Rourke::
    problem in passing in the book, but I did not stress it because I did
    not want to murder yet another sacred cow.
 
+ 
+The issue here is that in the merging black hole models it is assumed
+that the angular momentum that the two black holes have around each
+other is lost to the surrounding universe, in a very brief amount of
+time.
 
-   
+In the arriving galaxy model, it is the wave from new angular
+momentum, in the form of a rotating galaxy or quasar, arriving in our
+universe.
+
+Interestingly, the wave front will be shaped by the Kerr metric.
+
+
+
+The key to resolving the Kerr/Sciama paradox is to understand that
+both effects apply.
+
+If you know the angular momentum of a body, you can calculate how it
+will drag the surrounding space time round with it using the Kerr
+metric.
+
+This also gives the angular momentum that will be lost by the body,
+and leads to the conclusion that bodies will eventually inspiral.
+
+Now this will create a wave in the surrounding space time, with it's
+amplitude dropping off inversely with distance, as assumed in
+gravitaitonal wave physics.
+
+ringdown
+========
+
+The ringdown phase will be depend on two parameters, theta and phi.
+
+theta is the angle of approach, distributed as cos(theta).
+
+phi is the hyperbolic rotation for the arrival, distributed as
+sinh(phi) squared.
+
+The same parameters will characterise any accompanying gamma-ray burst
+and other observations in the electromagnetic spectrum.
