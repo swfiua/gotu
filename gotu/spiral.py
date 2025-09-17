@@ -360,6 +360,8 @@ class Cosmo:
 
         cosmo = cosmo or cosmology.default_cosmology.get()
 
+        self.cosmo = cosmo
+        
         # Our Cosmos is essentially static so all these
         # Omega values are the same regardless of z
         # Code below is magic to set up these functions

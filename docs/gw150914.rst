@@ -4,8 +4,8 @@ GW150914
 
 The first gravitational wave detection.
 
-I heard about this event during a Python conference in 2016 around the
-time of the announcement.
+I heard about this event during a Python conference in Februeary 2016
+at the time of the announcement.
 
 Brandon Rhodes fave a keynote where he mentioned the recent
 announcement by the LIGO team and how python was used at key parts of
@@ -19,8 +19,6 @@ of just 63.1 solar masses.
 
 Energy emitted as gravitational waves: 3.1 solar masses.
 
-Chirp mass 28.6 Suns and at a distance of 430 Mpc.
-
 There was a lot of interest at the conference and a number of
 attendees with good knowledge of the discovery.
 
@@ -28,8 +26,9 @@ It was not until :ref:`GW170817` that I started to wonder whether the
 signals being detected might have another explanation other than the
 merging black holes.
 
-By that time I had read Rourke's work.  How to reconcile the Sciama
-Principle with the Kerr metric?
+By that time I had read Rourke's book.
+
+How to reconcile the Sciama Principle with the Kerr metric?
 
 Rourke uses the Sciama Principle as an addition to General Relativity,
 to explain galactic rotation curves without need for dark matter.
@@ -51,8 +50,8 @@ starts to accelerate away and converge to a Hubble law.
 Now any gravitational waves the galaxy is emitting will be modulated
 in the same way.  Perhaps that is what we are detecting?
 
-In a 2018 discussion on black holes there is this fascinating comment from
-Colin Rourke::
+In a 2018 discussion on black holes there is this fascinating comment
+from Colin Rourke::
 
 
    There is another possible more important problem that I have with
@@ -64,7 +63,7 @@ Colin Rourke::
    problem in passing in the book, but I did not stress it because I did
    not want to murder yet another sacred cow.
 
- 
+   
 The issue here is that in the merging black hole models it is assumed
 that the angular momentum that the two black holes have around each
 other is lost to the surrounding universe, in a very brief amount of
@@ -92,6 +91,13 @@ Now this will create a wave in the surrounding space time, with it's
 amplitude dropping off inversely with distance, as assumed in
 gravitaitonal wave physics.
 
+
+chirp redshift degenerecy
+=========================
+
+Chirp mass 28.6 Suns and at a distance of 430 Mpc.
+
+
 ringdown
 ========
 
@@ -104,3 +110,17 @@ sinh(phi) squared.
 
 The same parameters will characterise any accompanying gamma-ray burst
 and other observations in the electromagnetic spectrum.
+
+The first multi-messenger event?
+--------------------------------
+
+There was a weak burst of gamma-ray energy
+
+
+And now for the python module
+-----------------------------
+
+
+.. automodule:: gotu.gw150914
+   :members:
+      

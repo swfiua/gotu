@@ -15,6 +15,55 @@ practical experiments in gravity, in a low friction environment.
 I am fortunate that this gives me a great deal of time to ponder the
 mysteries of the universe.
 
+Since returning from Glasgow, I have spent the summer trying to write
+up why I went on this journey.  It is taking longer than expected as
+the conference itselt has very much helped focus my attention on the
+crux of this matter.
+
+In a 2018 discussion on black holes there is this fascinating comment
+from Colin Rourke::
+
+   There is another possible more important problem that I have with
+   black holes.  The fundamental inertial drag hypothesis that explains
+   the dynamics of galaxies needs every mass in the universe to have a
+   well-defined rotation (or a well-defined inertial frame in which it is
+   static).  But the current fiction is that a BH is a POINT SINGULARITY
+   and therefore it has nothing to define its rotation.  I mention this
+   problem in passing in the book, but I did not stress it because I did
+   not want to murder yet another sacred cow.
+
+The story is one of Kerr and Sciama, how both are right at the same
+time.
+
+And how there is another explanation for the observations.   This
+explanation has the following in common::
+
+* We are seeing black holes
+
+* the waves are shaped by the Kerr metric
+
+* events have an inspiral, a peak and a ringdown
+
+* we can estimate the mass involved in an event
+
+* we expect co-incident gamma-ray bursts, depending on the mass involved
+
+* the mass redshift degeneracy is of interest
+
+* the observation is a confirmation of Einstein's general relativity.  
+
+In the new explanation::
+
+* the masses are likely of the order of a million solar masses
+* we are feeling the influence of new angular momentum for the first
+  time.
+* we see the entire history of the body's affect on the surrounding
+  space time in a very short period of time.
+
+In the ringdown phase, the blue shift decreases rapidly.  The shape of
+the curve allows two parameters, theta and phi to be estimate, that
+will also define the shape of any gamma-ray burst.
+
 
 
 Rourke ends chapter 4 of The Geometry of the Universe with a
@@ -38,13 +87,13 @@ LIGO, Virgo and Kagra detectors are seeing.
    bingley
    jodrell
    warwick
-   apftu
+   anpftu
    gw150914
    gw170817
    birch
    glasgow
    binary
-
+   ringdown
 
 
 
