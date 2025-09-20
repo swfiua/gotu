@@ -73,9 +73,9 @@ In the arriving galaxy model, it is the wave from new angular
 momentum, in the form of a rotating galaxy or quasar, arriving in our
 universe.
 
-Interestingly, the wave front will be shaped by the Kerr metric.
-
-
+Interestingly, the wave front will be shaped by the Kerr metric.  It
+is the Kerr metric based frame dragging that creates a wave in space
+time.
 
 The key to resolving the Kerr/Sciama paradox is to understand that
 both effects apply.
@@ -91,17 +91,34 @@ Now this will create a wave in the surrounding space time, with it's
 amplitude dropping off inversely with distance, as assumed in
 gravitaitonal wave physics.
 
+In short, the detection of gravitational waves is direct confirmation
+of the Sciama Principle, which in terms of the fabric of space-time
+can be phrased::
+
+  an oscillation w in space time induces an oscillation of amplitude
+  w/r in the space time at distance r.
+
+
+
 
 chirp redshift degenerecy
 =========================
 
 Chirp mass 28.6 Suns and at a distance of 430 Mpc.
 
+The wave we observed depends on both the redshift and the source mass.
+
+Suppose we have a chirp mass m, at distance z, then the wave we
+observe will be the same as a mass m_0 = m * (1 + z).
+
+
 
 ringdown
 ========
 
-The ringdown phase will be depend on two parameters, theta and phi.
+The ringdown phase will be depend on two parameters, theta and
+phi. [aside: these will likely have some impact on what the inspiral
+looks like???]
 
 theta is the angle of approach, distributed as cos(theta).
 
@@ -110,6 +127,7 @@ sinh(phi) squared.
 
 The same parameters will characterise any accompanying gamma-ray burst
 and other observations in the electromagnetic spectrum.
+
 
 The first multi-messenger event?
 --------------------------------

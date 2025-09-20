@@ -16,9 +16,15 @@ I am fortunate that this gives me a great deal of time to ponder the
 mysteries of the universe.
 
 Since returning from Glasgow, I have spent the summer trying to write
-up why I went on this journey.  It is taking longer than expected as
-the conference itselt has very much helped focus my attention on the
-crux of this matter.
+up why I went on this journey.
+
+It is taking longer than expected as the conference itself has very
+much helped focus my attention on the crux of this matter.
+
+Central to the story is Professor Colin Rourke.  He sadly passed away
+in December 2024.  It was his work that shaped my views on cosmology
+and brought me to a belief that the waves in spacetime that we are
+seeing may not be coming from colliding black holes.
 
 In a 2018 discussion on black holes there is this fascinating comment
 from Colin Rourke::
@@ -32,11 +38,41 @@ from Colin Rourke::
    problem in passing in the book, but I did not stress it because I did
    not want to murder yet another sacred cow.
 
-The story is one of Kerr and Sciama, how both are right at the same
-time.
+Instead, he focussed on reviving old ideas: de Sitter Space and the
+Sciama Principle.  de Sitter Space is a solution to Einstein's general
+relativity, a uniformly curved universe.
 
-And how there is another explanation for the observations.   This
-explanation has the following in common::
+Rather than murdering another sacred cow, this story asks if the
+sacred cow is not in fact a mirror image of a grander beast?
+
+It should be noted that a Kerr black hole does have angular momentum.
+There is a parameter, a, the angular momentum per unit mass and cannot
+exceed 1.0.  If two maximally rotating black holes merge there is
+nowhere for their angular momentum to go but out into the universe.
+
+If the angular momentum exceeds this the mathematics says it collapses
+to a point, at which point, it's angular momentum disappears.  Or
+rather, creates a ripple in spacetime, strong enough for us to see.
+
+The Kerr solution is known to be the unique solution for a rotating
+mass, if space is a vacuum.
+
+Now the detection of gravitational waves is also the detection of the
+aether that Michelson and Morley were persuing.  Space is not a
+vacuum.  A rotating mass not only distorts the space-time around it,
+but in turn that distortion of space-time becomes a gravitational
+wave.
+
+We should also think about the curving of spacetime that mass creates
+and ask the question, how exactly does mass curve spacetime?  In
+short, it does this by rotating, hence sending off waves.
+
+The rotations of all the atoms in a body?  A high frequency wobble
+that all matter is bound to follow.
+
+As promised another explanation for the observations is presented.
+This explanation has the following in common with the merging of black
+holes::
 
 * We are seeing black holes
 
@@ -48,23 +84,21 @@ explanation has the following in common::
 
 * we expect co-incident gamma-ray bursts, depending on the mass involved
 
-* the mass redshift degeneracy is of interest
+* the mass redshift degeneracy turns up as a mass blueshift degeneracy
+
+* gravitational waves move according to the Sciama Principle
 
 * the observation is a confirmation of Einstein's general relativity.  
 
 In the new explanation::
 
 * the masses are likely of the order of a million solar masses
-* we are feeling the influence of new angular momentum for the first
-  time.
-* we see the entire history of the body's affect on the surrounding
-  space time in a very short period of time.
-
+* the shape of gamma-ray bursts and ringdown are related.
+  
 In the ringdown phase, the blue shift decreases rapidly.  The shape of
-the curve allows two parameters, theta and phi to be estimate, that
-will also define the shape of any gamma-ray burst.
-
-
+the curve allows two parameters, theta and phi to be estimated. These values
+will also define the shape of any accompanying gamma-ray burst and
+also the inspiral.
 
 Rourke ends chapter 4 of The Geometry of the Universe with a
 *coda*::
@@ -79,7 +113,9 @@ It is my belief that the Sciama principle is the best explanation of
 the gravitational waves that both the Pulsar Timing Array and the
 LIGO, Virgo and Kagra detectors are seeing.
 
-
+I have split this story into a number of sections, reflecting how my
+understanding has evolved.  For some sections there is a corresponding
+python module.
 
 .. toctree::
    :maxdepth: 2

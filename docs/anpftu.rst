@@ -23,7 +23,7 @@ The idea that small galaxies grow into larger galaxies seems quite
 natural.
 
 In this work Rourke presents a model for the universe with no need for
-dark matter and no Big Bang.
+dark matter and no Big Bang.  
 
 I obtained a copy of the book and was enthralled.  As an
 under-graduate I had rarely spoken to Professor Rourke, other than to
@@ -70,6 +70,10 @@ from the source.  This is widely accepted in the community and is
 usually used to calculate the distance of the source, usually
 expressed as redshift, with a Hubble-law.
 
+Once there is a ripple in space-time, that ripple moves at the speed
+of light, with amplitude reducing with distance.
+
+
 de Sitter Space
 ---------------
 
@@ -91,4 +95,17 @@ asymptotically to a Hubble law.
 We see each galaxy redshifted for all but a small finite part of the
 infinite time that we see the galaxy.
 
+Are quasars baby galaxies?
+--------------------------
+
+de Sitter Space has a more complex relationship between distance and
+redshift than a simple Hubble law, but it is not the whole story.
+
+The Eddington sphere of a black hole, where much of the light is
+produced, can be close enough to the black hole that the light is
+gravitationally redshifted.
+
+
+Little Red Dots too
+-------------------
 
