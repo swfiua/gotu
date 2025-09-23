@@ -38,17 +38,15 @@ from Colin Rourke::
    problem in passing in the book, but I did not stress it because I did
    not want to murder yet another sacred cow.
 
-Instead, he focussed on reviving old ideas: de Sitter Space and the
-Sciama Principle.  de Sitter Space is a solution to Einstein's general
-relativity, a uniformly curved universe.
-
 Rather than murdering another sacred cow, this story asks if the
 sacred cow is not in fact a mirror image of a grander beast?
 
 It should be noted that a Kerr black hole does have angular momentum.
 There is a parameter, a, the angular momentum per unit mass and cannot
-exceed 1.0.  If two maximally rotating black holes merge there is
-nowhere for their angular momentum to go but out into the universe.
+exceed 1.0.
+
+If two maximally rotating black holes merge there is nowhere for their
+angular momentum to go but out into the universe.
 
 If the angular momentum exceeds this the mathematics says it collapses
 to a point, at which point, it's angular momentum disappears.  Or
@@ -61,7 +59,12 @@ Now the detection of gravitational waves is also the detection of the
 aether that Michelson and Morley were persuing.  Space is not a
 vacuum.  A rotating mass not only distorts the space-time around it,
 but in turn that distortion of space-time becomes a gravitational
-wave.
+wave.  It's amplitude at a distance r, is 1/r times the original
+amplitude.
+
+So spacetime is not a vacuum, rotating objects make waves.  In the
+case of binary pulsars, this should create a stable system with no
+final inspiral.
 
 We should also think about the curving of spacetime that mass creates
 and ask the question, how exactly does mass curve spacetime?  In
@@ -71,6 +74,16 @@ The rotations of all the atoms in a body?  A high frequency wobble
 that all matter is bound to follow.
 
 As promised another explanation for the observations is presented.
+
+Just like in the black hole merger idea, we have a boundary in our
+space time, the edge of our visible universe.
+
+When a new body enters our visible universe we see it's entire
+gravitational history in a very short period of time.
+
+Imagine the waves given off by a black hole, that grows slowly by
+acretion to say a million solar masses.  How long might this take? 
+
 This explanation has the following in common with the merging of black
 holes::
 
