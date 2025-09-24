@@ -6,6 +6,8 @@ https://gwosc.org/eventapi/html/GWTC/
 
 from astropy import table, io, units as u, constants as c
 
+from pycbc import waveform
+
 import csv
 
 from blume import magic, farm
@@ -66,7 +68,11 @@ class View(magic.Ball):
 
         data = self.table
         
-    
+        m1 = data['mass_1_source']
+        m2 = data['mass_2_source']
+
+        chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
+        
         redshift = data['redshift']
 
         zzerochirp = chirp / (1 + redshift)
@@ -89,15 +95,36 @@ class View(magic.Ball):
         
     async def run(self):
 
-        fields = 
-        for row in self.table.iterrows(fields):
-            ax = await self.get()
+        fields = ['mass_1_source', 'mass_2_source', 'redshift']
+        
+        for row in self.table.iterrows(*fields):
 
+            m1, m2, redshift = row
+
+            try:
+                wf = waveform.get_td_waveform(
+                    mass1=m1,
+                    mass2=m2,
+                    approximant='TaylorF2', delta_t=.001, f_lower=20)
+            except:
+                print(m1, m2, 'bad')
+                continue
+
+            ts = wf[0]
+            nn = len(ts)
+
+
+            ax = await self.get()
+            ax.plot(ts)
+        
+            ax.set_title(f"Solar Masses: {m1:.1f} {m2:.1f}")
             ax.show()
 
             await magic.sleep(self.sleep)
 
 
+
+            
 if __name__ == '__main__':
 
     import argparse
