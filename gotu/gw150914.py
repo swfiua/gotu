@@ -101,11 +101,13 @@ class View(magic.Ball):
 
             m1, m2, redshift = row
 
+            delta_t = 0.001
+            
             try:
                 wf = waveform.get_td_waveform(
                     mass1=m1,
                     mass2=m2,
-                    approximant='TaylorF2', delta_t=.001, f_lower=20)
+                    approximant='TaylorF2', delta_t=delta_t, f_lower=20)
             except:
                 print(m1, m2, 'bad')
                 continue
@@ -115,7 +117,7 @@ class View(magic.Ball):
 
 
             ax = await self.get()
-            ax.plot(ts)
+            ax.plot(magic.np.arange(len(ts)) * delta_t, ts)
         
             ax.set_title(f"Solar Masses: {m1:.1f} {m2:.1f}")
             ax.show()

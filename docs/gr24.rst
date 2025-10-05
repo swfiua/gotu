@@ -137,10 +137,11 @@ python module.
    jodrell
    warwick
    anpftu
+   birch
    gw150914
    gw170817
-   birch
    glasgow
+   jfc
    binary
    ringdown
 

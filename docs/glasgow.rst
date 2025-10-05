@@ -13,7 +13,6 @@ gravitational wave science.
 
 
 
-
 GW231123
 ========
 
