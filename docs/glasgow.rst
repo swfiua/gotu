@@ -215,6 +215,18 @@ My submition to the art exhibition for the conference was displayed.
     If you align the two plots, we see general agreement, the question
     is what we see in the blue a reflection of the red about Sgr A*?
 
+    The images are created by dividing the distance and tangential
+    velocity into a grid and counting how many observations are in
+    each grid square.
+
+    To create an image, we need values in the range 0 - 1, so some
+    sort of nomralisation is needed.   In these image, each column is
+    divided by the sum of the values in that column.  The columns
+    correspond to distances.
+
+    So for each distance, we see the proportion of stars with each
+    velocity.   
+
 One of Rourke's boldest predictions, that Sagittarius A* is not large
 enough to drive a galaxy the size of the Milky Way, arguing that a
 mass of 1-100e9 solar masses would be required.
@@ -228,12 +240,19 @@ observations.
 There are a number of striking features to both plots.
 
 Near the centre we see plate-like rotation, velocity proportional to
-distance from the centre.
+distance from the centre, at Sagittarius A*, the velocity is zero.
 
-Further out, we see a flat asymptote.
+Further out, we see a flat asymptote, with a tangential velocity of
+200km/s.
 
+Beyond 50,000 light years or so, things get more complex.   The most
+likely value at a given distance tends to drop a little.   However,
+there are many other objects which are moving faster than we would
+expect.
 
-       
+It is like there is a general fanning out as stars have more time for
+random motions to accumulate and generally there is increasing spread
+from the 200 km/s assymptote predicted by Rourke's model.
 
 
 Calculating the Hubble constant from observations

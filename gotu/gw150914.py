@@ -10,6 +10,8 @@ from pycbc import waveform
 
 import csv
 
+import math
+
 from blume import magic, farm
 
 from . import spiral
@@ -92,14 +94,41 @@ class View(magic.Ball):
         ax.show()
 
 
+    def to_spiral(self, m1, m2, redshift, blueshift, distance):
+        """ Create a Spiral object with mass based on this observation """
+        sp = spiral.Spiral()
+
+        # 1 <= m1/m2 < infinity
+        # looks like this is in fact cosh(phi)
+        sp.phi = math.acosh(m1/2)
+
+        # sp.theta -- need to figure this one out too - for now go with
+        # random (but correct distro) version we are given
+
+        # chirp and z
+        chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
+
+        bluechirp = (chirp/(1+redshift))/(1+blueshift)
+
+        # How big does a mass at the Hubble distance have to be to
+        # create a strain like the one detected?
+        # strain is proportional to mass**(3/5) and inversely proportional
+        # to distance.  
+        mass35 = ((chirp**(3/5) / (distance * u.Mpc)) * sp.cosmo.hubble_distance).decompose()
+
+        mass = mass35**(5/3)
         
+        
+        print(f'chirp {chirp} bluechirp {bluechirp} phi {sp.phi}phi mass {mass}')
+        
+
     async def run(self):
 
-        fields = ['mass_1_source', 'mass_2_source', 'redshift']
-        
+        fields = ['mass_1_source', 'mass_2_source', 'redshift', 'luminosity_distance']
+        blueshift = -0.999
         for row in self.table.iterrows(*fields):
 
-            m1, m2, redshift = row
+            m1, m2, redshift, distance = row
 
             delta_t = 0.001
             
@@ -115,6 +144,7 @@ class View(magic.Ball):
             ts = wf[0]
             nn = len(ts)
 
+            self.to_spiral(m1, m2, redshift, blueshift, distance)
 
             ax = await self.get()
             ax.plot(magic.np.arange(len(ts)) * delta_t, ts)

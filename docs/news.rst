@@ -5,6 +5,15 @@
 I will try to give updates from time to time as to what is happening
 here
 
+18/10/2025
+==========
+
+A news update is long overdue.
+
+I attended :ref:`gr24` conference in Glasgow back in July.  It was a
+wonderful experience, that has really helped 
+
+
 16/4/2025
 =========
 
