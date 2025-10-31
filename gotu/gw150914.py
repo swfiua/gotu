@@ -120,6 +120,7 @@ class View(magic.Ball):
         
         
         print(f'chirp {chirp} bluechirp {bluechirp} phi {sp.phi}phi mass {mass}')
+
         
 
     async def run(self):

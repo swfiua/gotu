@@ -73,17 +73,40 @@ the observed expansion.
 So based on a sky-scraper being a 100m cube, and galaxies of a mass of
 1e12 solar masses, we would need 9000 new galaxies arriving each year.
 
-This is in the same ball park as the number of gamma-ray bursts per year.
+The number of large gamma-ray bursts per year that we see each year is
+somewhat lower than this.
+
+There are some details missing from Hoyle's calculation.  With a
+larger Hubble constant, the universe is smaller and the calculation
+gives a good match, if we also increase sky-scraper height by a factor
+of 3.
+
+Then we have to factor in how the outward flow changes with the size.
+
+    >>> lcdm = cosmology.FlatLambdaCDM(H0=100, Om0=0.3)
+    >>> lcdm .hubble_distance
+    >>> <Quantity 2997.92458 Mpc>
+
+    >>> hd = lcdm.hubble_distance
+    >>> 
+    >>> volume_of_the_universe = (pi * 4/3) * (hd**3)
+    >>> 
+    >>> ((volume_of_the_universe / skyscraper) * c.m_p / (c.M_sun * suns_per_galaxy)).decompose()
+    <Quantity 278.92935871>
+    >>> skyscraper = ((100 * u.m) ** 3) * 3
+    >>> ((volume_of_the_universe / skyscraper) * c.m_p / (c.M_sun * suns_per_galaxy)).decompose()
+    <Quantity 92.9764529>
+
 
 There is no continuous creation in Rourke's model for the universe,
 but there is a continuous replenishment of matter in our visible
-universe through new arrivals.
+universe through new arrivals.  
 
 The idea is that the universe is vast and ancient, a view shared by
-this trio, myself and many others.
+this trio, myself and many others, including Einstein.
 
 It is also curved, that curvature creates a visibility horizon at the
-Hubble distance.
+Hubble distance. 
 
 This is what creates the redshift we see, but it also creates
 blue-shift.
@@ -93,13 +116,17 @@ history in a short period of time.  Rourke suggests this as an
 explanation for gamma-ray bursts and provides a model which fits the
 observations.
 
-Is it the same for any gravitational waves that we see: all the
+Is it the same for any gravitational waves that we see? All the
 gravitational waves it has emitted through it's life time arrive at
 the same time!
 
 There are natural parallels with the merging black hole model.
 
 We are seeing the effects of horizons in our visible universe.
+
+Rourke's model can also inform models of galactic potential, the
+Pulsar Timing Array can help test models and Rourke's belief in a much
+larger black hole than Sagittarius A*.
 
 
 
