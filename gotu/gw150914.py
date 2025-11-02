@@ -95,14 +95,31 @@ class View(magic.Ball):
 
 
     def to_spiral(self, m1, m2, redshift, blueshift, distance):
-        """ Create a Spiral object with mass based on this observation """
-        sp = spiral.Spiral()
+        """Create a Spiral object with mass based on this observation
+
+        Also want to estimate phi and theta.
+
+        Although the wavefront all arrives at the same time, the waves
+        that departed the source earlier have travelled further and so
+        will be weaker.
+
+        Rourke also notes that there is a limit to how far light (and
+        hence gravitational waves) can travel before being thoroughly
+        diverted from its original direction.
+
+        Using the magnitude of the CMB he suggests that this is
+        probably of the order of 3-6 Hubble distances.
+
+        There is also the acretion of matter over time to consider.
+
+        """
+        self.galaxy = galaxy = spiral.Spiral()
 
         # 1 <= m1/m2 < infinity
         # looks like this is in fact cosh(phi)
-        sp.phi = math.acosh(m1/2)
+        galaxy.phi = math.acosh(m1/2)
 
-        # sp.theta -- need to figure this one out too - for now go with
+        # galaxy.theta -- need to figure this one out too - for now go with
         # random (but correct distro) version we are given
 
         # chirp and z
@@ -114,12 +131,12 @@ class View(magic.Ball):
         # create a strain like the one detected?
         # strain is proportional to mass**(3/5) and inversely proportional
         # to distance.  
-        mass35 = ((chirp**(3/5) / (distance * u.Mpc)) * sp.cosmo.hubble_distance).decompose()
+        mass35 = ((chirp**(3/5) / (distance * u.Mpc)) * galaxy.cosmo.hubble_distance).decompose()
 
         mass = mass35**(5/3)
         
         
-        print(f'chirp {chirp} bluechirp {bluechirp} phi {sp.phi}phi mass {mass}')
+        print(f'chirp {chirp} bluechirp {bluechirp} phi {galaxy.phi}phi mass {mass}')
 
         
 
