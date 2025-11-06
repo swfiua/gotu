@@ -10,6 +10,7 @@ from pycbc import waveform
 
 import csv
 
+import random
 import math
 
 from blume import magic, farm
@@ -65,6 +66,9 @@ class View(magic.Ball):
 
         super().__init__(**kwargs)
 
+        self.skymap = spiral.SkyMap()
+        self.skymap.tborigin = False
+
 
     async def zerochirp(self):
 
@@ -115,12 +119,19 @@ class View(magic.Ball):
         """
         self.galaxy = galaxy = spiral.Spiral()
 
+
         # 1 <= m1/m2 < infinity
         # looks like this is in fact cosh(phi)
-        galaxy.phi = math.acosh(m1/2)
+        galaxy.phi = math.acosh(m1/m2)
 
-        # galaxy.theta -- need to figure this one out too - for now go with
-        # random (but correct distro) version we are given
+        # galaxy.theta -- need to figure this one out too - 
+        # NB theta could be related to spin alignment of black holes, or spin
+        # of final black hole, where 0<=spin<=1, so theta = acos(spin)?
+        # for now go withtheta distributed sin(theta) 
+        # Note that the strength of the signal also depends on theta, I think
+        # the stronger signals likely have small theta.
+
+        galaxy.theta = math.acos((2*random.random()-1)) 
 
         # chirp and z
         chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
@@ -144,6 +155,8 @@ class View(magic.Ball):
 
         fields = ['mass_1_source', 'mass_2_source', 'redshift', 'luminosity_distance']
         blueshift = -0.999
+
+        epsilon = 1e-6
         for row in self.table.iterrows(*fields):
 
             m1, m2, redshift, distance = row
@@ -162,7 +175,6 @@ class View(magic.Ball):
             ts = wf[0]
             nn = len(ts)
 
-            self.to_spiral(m1, m2, redshift, blueshift, distance)
 
             ax = await self.get()
             ax.plot(magic.np.arange(len(ts)) * delta_t, ts)
@@ -170,6 +182,13 @@ class View(magic.Ball):
             ax.set_title(f"Solar Masses: {m1:.1f} {m2:.1f}")
             ax.show()
 
+            self.to_spiral(m1, m2, redshift, blueshift, distance)
+
+            await self.skymap.explore(
+                #thetas=[self.galaxy.theta],
+                thetas=[epsilon + (x * math.pi/12) for x in range(4)],
+                phis=[self.galaxy.phi])
+            
             await magic.sleep(self.sleep)
 
 

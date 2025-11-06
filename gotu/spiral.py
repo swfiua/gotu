@@ -1069,6 +1069,8 @@ class SkyMap(magic.Ball):
         A = D = (a - d)/2
         B = C = (a + d)/2
 
+        epsilon = 1e-25
+        
         # first time visible is tstar given by
         tstar = np.log(np.sqrt(A/B))
 
@@ -1079,14 +1081,18 @@ class SkyMap(magic.Ball):
             ttb = t-(tstar+tb)
             title = 't-(t*+tb) v '
         else:
-            t = np.linspace(tstar, tstar+tmax, 5000)
+            t = np.linspace(epsilon+tstar, tstar+tmax, 5000)
             ttb = t - tstar
             title = 't-t* v '
 
-        uu = [uoft(tt, theta, phi) for tt in t]
-        zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
-        zz = np.array([zzx[0] for zzx in zx])
-        xx = np.array([zzx[1] for zzx in zx])
+        try:
+            uu = [uoft(tt, theta, phi) for tt in t]
+            zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
+            zz = np.array([zzx[0] for zzx in zx])
+            xx = np.array([zzx[1] for zzx in zx])
+        except ValueError:
+            print('ValueError in uoft', t[0], theta, phi)
+            return
 
         mask = xx < self.max_distance.value
 
