@@ -221,7 +221,8 @@ balances things out with blue shifted galaxies, new arrivals in our
 visible universe.
 
 """
-
+import traceback
+import sys
 import argparse
 
 import random
@@ -985,7 +986,6 @@ class SkyMap(magic.Ball):
 
         return
 
-
     async def showzdimage(self):
 
         result = self.good
@@ -1069,7 +1069,7 @@ class SkyMap(magic.Ball):
         A = D = (a - d)/2
         B = C = (a + d)/2
 
-        epsilon = 1e-25
+        epsilon = 1e-20
         
         # first time visible is tstar given by
         tstar = np.log(np.sqrt(A/B))
@@ -1090,8 +1090,9 @@ class SkyMap(magic.Ball):
             zx = [zandx(tt, u, theta, phi) for u, tt in zip(uu,t)]
             zz = np.array([zzx[0] for zzx in zx])
             xx = np.array([zzx[1] for zzx in zx])
-        except ValueError:
-            print('ValueError in uoft', t[0], theta, phi)
+        except Exception as e:
+            traceback.print_exception(e)
+            print('in uoft', t[0], theta, phi)
             return
 
         mask = xx < self.max_distance.value
@@ -1835,6 +1836,7 @@ class Spiral(magic.Ball):
         ax.plot(rr, tvalues)
         ax.show()
 
+
 def zandx(t, u, theta, phi):
 
     a = cosh(phi)
@@ -1851,7 +1853,23 @@ def zandx(t, u, theta, phi):
     x = ((a-1) * cosh(t)) ** 2
     x -= ((d-1) * sinh(t)) ** 2
 
-    x = sqrt((sinh(t) - sinh(u))**2 - (cosh(t) - cosh(u))**2)
+    try:
+        sinhu = sinh(u)
+    except OverflowError:
+        print("sinh overflow for", u)
+        sinhu = math.log(sys.float_info.max)
+
+    try:
+        coshu = cosh(u)
+    except OverflowError:
+        print("cosh overflow for", u)
+        coshu = math.log(sys.float_info.max)
+
+    try:
+        x = sqrt((sinh(t) - sinhu)**2 - (cosh(t) - coshu)**2)
+    except Exception as ee:
+        traceback.print_exception(ee)
+        print('zandx exception', t, u, theta, phi)
 
     x = 1 - (((B/T) - (A*T)) * U)
 
@@ -1918,7 +1936,11 @@ def uoft(t, theta, phi):
          / (C - A * T*T))
 
     #print('ABCDU', A,B,C,D,U)
-    u = log(U)
+    try:
+        u = log(U)
+    except:
+        print("log(U) does not work for U:", U)
+        u = -sys.float_info.max
 
     z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
 

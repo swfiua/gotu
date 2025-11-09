@@ -70,6 +70,13 @@ class View(magic.Ball):
         self.skymap.tborigin = False
 
 
+    def select(self, name='150914'):
+        """ Really need the carpet to handle tables """
+        if not hasattr(self, 'xtable'):
+            self.xtable = self.table
+        self.table = self.xtable[[name in x for x in self.xtable['name']]]
+    
+
     async def zerochirp(self):
 
         data = self.table
@@ -185,8 +192,8 @@ class View(magic.Ball):
             self.to_spiral(m1, m2, redshift, blueshift, distance)
 
             await self.skymap.explore(
-                #thetas=[self.galaxy.theta],
-                thetas=[epsilon + (x * math.pi/12) for x in range(4)],
+                thetas=[self.galaxy.theta],
+                #thetas=[self.galaxy.theta] + [epsilon + (x * math.pi/12) for x in range(4)],
                 phis=[self.galaxy.phi])
             
             await magic.sleep(self.sleep)

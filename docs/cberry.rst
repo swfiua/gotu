@@ -11,12 +11,10 @@ a wonderful experience.
 The conference has had an immense impact on my personal understanding
 and appreciation of gravitational wave science.  
 
-I have spent the rest of the summer trying to write up why I went to
-the conference and how my ideas have evolved as a result.  
-
 It was the work of Professor Colin Rourke, of Warwick University that
 was the reason for going to the conference.  Professor Rourke was my
-personal tutor as an undergraduate in the early 1980's.
+personal tutor as an undergraduate at Warwick University in the early
+1980's.
 
 I hope you will enjoy his book, the Geometry of the Universe, which I
 am sending in thanks not only for the work you put into the conference
@@ -30,9 +28,15 @@ responded, *"We had the observations of the binary pulsars."*
 I was aware of the Hulse-Taylor observations, but had not appreciated
 how compelling they were to the community.  
 
+The reason for my question was a belief that there is another
+potential explanation for the gravitational waves we are seeing.
 
-Rourke was a brilliant topologist with a deep understanding of
-geometry.
+The explanation is also a confirmation of Einstein's general
+relativity, involves black holes.  It has event horizons and extreme
+space-time curvature.  The Kerr metric plays an important part.
+
+The story begins with Professor Rourke, a brilliant topologist with a
+deep understanding of geometry.
 
 It was not until 2017 that I discovered his work on cosmology.  Since
 this time I corresponded regularly with Professor Rourke.  In
@@ -45,9 +49,9 @@ that gamma-ray bursts are in fact new galaxies arriving in our visible
 universe, with light highly blue-shifted, we see the arrival's entire
 history in a short space of time.
 
-Presumably, the same is true for the gravitational waves that are
-emitted by the galaxy?  The wave front arrives like a tsunami, with
-all the waves from the galaxy arriving at the same time.
+Is the same true for the gravitational waves that are emitted by the
+galaxy?  The wave front arrives like a tsunami, with all the waves
+from the galaxy arriving at the same time.
 
 Rourke's model also requires the Sciama Principle, which he adopts as
 an additional assumption on top of Einstein's General Relativity.
@@ -61,31 +65,20 @@ science, where we use the amplitude of the wave at detection to
 determine the distance of the source.
 
 Rourke shows that galactic rotation curves can be explained with the
-adoption of the Sciama Principle.  
+adoption of the Sciama Principle, as an additional assumption to
+general relativity.
 
+Without the Sciama Principle, the wave a body emits must follow the
+Kerr metric, which is the unique vacuum solution for a rotating body,
+since this is the unique solution for the general relativity
+equations for a rotating body in a vacuum.
 
-
-The issue here is that we are observing bodies moving according to the
-Kerr metric, which has waves dropping off with a factor of *1/r^3*.
-
-Further, this is the unique solution for the general relativity
-equations for a rotating body in a vacuum, how can the Sciama
-Principle also apply? What if both apply, but sometimes you can ignore
-the Sciama part?
+How can the Sciama Principle also apply?
 
 The Kerr metric determines the penalty you will pay, in terms of
 angular momentum, for any rotation giving rise to the angular
-momentum.   The Sciama Principle determines how that wave will
-propogate through space time.
-
-Rourke notes that two inertial frames that differ only by a constant
-velocity are deemed equivalent in special and general relativity and
-concludes that uniform motion should have no inertial effect on the
-surrounding universe.
-
-He then notes that you can change the angular momentum of a body by
-adding a constant velocity, but that angular velocity cannot be so
-changed.
+momentum.  The Sciama Principle determines how the resulting
+distortion of space time will propogate through space time.
 
 If we also assume that a black hole's angular momentum is proportional
 to it's mass, we have the wave's amplitude proportional to the mass.
@@ -94,7 +87,7 @@ Further, the period of the wave is determined by the angular velocity
 of the body.
 
 So while the Kerr metric is the unique solution is space is not a
-vacuum, Rourke proposes that space is not a vacuum.
+vacuum, Rourke proposes that space is not a vacuum.  
 
 The detection of gravitational waves is itself a confirmation of this
 fact.  Space is a medium through which gravitational waves travel and
@@ -106,11 +99,64 @@ is possible to ignore the waves that a body sends out.
 Notable exceptions are when there is a very large mass or when two
 bodies are close to each other.
 
-The former explains galactic rotation curves: a large rotating mass at
-the centre of every galaxy that drags space time around with it.
+A large mass explains galactic rotation curves: a super-massive black
+hole at the centre of each galaxy drags space time around with it.
 
-The latter case explains the pulsar observations:  the binaries are
-far enough apart that the waves emitted due to their roation can be
+The mass has to be truly supermassive, for a galaxy the size of the
+Milky Way a mass of 10-100 billion solar masses would be necessary.
+
+Rourke says that Sagittarius A* cannot be at the centre of our galaxy,
+since it is simply not large enough to drive a mature galaxy.
+
+This was the motivation for the *Where Is the Sun?" artwork that I
+submitted to the conference.
+
+.. image::  images/witsart.png
+
+The image shows two versions of the galactic rotation curve based on
+two different assumptions about where the centre of the Milky Way: at
+Sgr A*, or at twice the distance of Sgr A*.
+
+The plots have distance from the galactic centre on the x-axis and
+tangential velocity of stars on the y-axis.   
+
+The good news is that the Pulsar Timing Array can be used to compare
+between different models for the galactic gravitational potential:
+modelling oscillations in the Milky Way's stellar medium.
+
+This brings us to the nanohertz gravitational waves, an oscillation of
+10m over the period of a year.
+
+With the Sciama Principle, oscillations from distant galaxies
+dominate.  This is why Sciama chose a factor of 1/r, as he was aiming
+to satisfy Mach's Principle by showing what determines our inertial
+frame.
+
+I have done simulations that show that the observed waves are
+commensurate with the observed waves, based on Rourke's model.
+
+Returning to the pulsar observations, where orbits are observed to be
+decaying according to the Kerr metric.
+
+This puzzle requires an explanation, but first some observations about
+binary pulsars.
+
+* They are often found distant from the galactic plane.
+
+* They have large *kick velocities*.
+
+  This means the system is moving 200 to 500 km/s faster than the
+  typical 200km/s.  In the wits image, that means the part above the
+  200km/s asymptote on which the sun lies.
+
+* Strong correlation between polarisation and kick direction.
+
+* Globular clusters have more binary pulsars than they should have
+  given the low escape velocity for the globular cluster.
+
+
+explains the pulsar observations:  the binaries are
+far enough apart that the waves emitted due to their rotation can be
 ignored for now.
 
 A third area where these waves become important is the wave-particle
