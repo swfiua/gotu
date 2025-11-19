@@ -17,6 +17,8 @@ from blume import magic, farm
 
 from . import spiral
 
+np = magic.np
+
 m1 = 35.6 * u.M_sun
 m2 = 30.6 * u.M_sun
 
@@ -68,6 +70,7 @@ class View(magic.Ball):
 
         self.skymap = spiral.SkyMap()
         self.skymap.tborigin = False
+        self.skymap.max_t0 = 1e-12
 
 
     def select(self, name='150914'):
@@ -138,7 +141,11 @@ class View(magic.Ball):
         # Note that the strength of the signal also depends on theta, I think
         # the stronger signals likely have small theta.
 
-        galaxy.theta = math.acos((2*random.random()-1)) 
+        
+        galaxy.theta = math.acos((2*random.random()-1))
+
+        # assume theta is small
+        #galaxy.theta = random.gauss(0, math.pi/32)
 
         # chirp and z
         chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
@@ -148,14 +155,106 @@ class View(magic.Ball):
         # How big does a mass at the Hubble distance have to be to
         # create a strain like the one detected?
         # strain is proportional to mass**(3/5) and inversely proportional
-        # to distance.  
+        # to distance.
         mass35 = ((chirp**(3/5) / (distance * u.Mpc)) * galaxy.cosmo.hubble_distance).decompose()
 
         mass = mass35**(5/3)
-        
+
+        # This what you would need if a black hole merger happened at that blueshift.
+        # But that is not what is happening.
+        # We are in a universe where galaxys grow slowly over time as they acrete matter
+        # There is plenty of time and everything is older than you might think.
+
+        # There is, however, a limit to how far light can travel
+        # before being thoroughly diverted from it's original direction.
+
+        # The ripples in space time reduce how far you can go from
+        # your origin, before being turned back on yourself.
         
         print(f'chirp {chirp} bluechirp {bluechirp} phi {galaxy.phi}phi mass {mass}')
 
+        # assume masses are normally distributed about the frequency of the detector
+        mass = (3 * u.km)* random.gauss(10e6, 1e6)
+
+        galaxy.Mcent = (mass << u.lightyear).value
+
+    async def birth(self, tmax=None, samples=None):
+        """What does the wave for the current galaxy look like?
+        
+        What would the gravitational wave from a black hole arriving
+        in a de Sitter space universe look like?
+
+        The wavefront, the distortion of space time due to the body's
+        angular momentum, will follow the 1/r**3 relationship from the
+        Kerr metric.
+        
+        However, the curvature of space time means we see this through
+        curved glasses.
+
+        There's a hyperbolic rotation parameterised by theta and phi.
+
+        """
+
+        galaxy = self.galaxy
+        if tmax is None:
+            tmax = ((galaxy.cosmo.cosmo.hubble_time << u.s).value) * self.skymap.max_t0
+
+        if samples is None: samples = 1000
+
+        # time of birth
+        tstar = galaxy.tstar()
+        ttt = np.linspace(tstar, tstar + self.skymap.max_t0, samples+1)
+        ttt = ttt[1:]
+        uuu = [galaxy.uoft(t) for t in ttt]
+        zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
+
+        # zzz and xxx are the redshift (in our case, blueshift) and distance of the newborn
+        zzz = [zx[0] for zx in zandx]
+        xxx = [zx[1] for zx in zandx]
+
+        # set mass and wavelength
+        wavelength = mass = galaxy.schwartzchild().value
+
+        # inspiral -- this isn't quite right yet, but close
+        inspiral = []
+        u0 = uuu[0]
+        for ix, uu in enumerate(uuu):
+            umu0 = uu - u0
+            value = mass * math.sin(umu0 / wavelength) / (umu0**3)
+            inspiral.append(value)
+        
+        ax = await self.get()
+
+        sniff = 3
+        ringdown = []
+        ax.set_title("Inspiral")
+        clip = max(inspiral[:sniff])
+        ax.plot(ttt, np.clip(inspiral, -clip, clip))
+
+        ax.show()
+        ax = await self.get()
+
+        ringdown = []
+        for ix, uu in enumerate(uuu):
+            distance = xxx[ix]
+            zz = zzz[ix]
+            value = mass * math.sin(umu0 / wavelength) / (distance * (1+zz))
+            ringdown.append(value)
+
+        ax.set_title("Ringdown")
+        clip = max(ringdown[:sniff])
+        ax.plot(ttt, np.clip(ringdown, -clip, clip))
+
+        ax.show()
+
+        ax = await self.get()
+        ax.set_title("full")
+
+        times = np.concat(((-1. * (ttt - tstar))[::-1], ttt-tstar))
+        print('JJJJJJJJJ', len(times), len(inspiral[::-1] + ringdown))
+        ax.plot(times, np.clip(inspiral[::-1] + ringdown, -clip, clip))
+
+        ax.show()
         
 
     async def run(self):
@@ -195,10 +294,12 @@ class View(magic.Ball):
                 thetas=[self.galaxy.theta],
                 #thetas=[self.galaxy.theta] + [epsilon + (x * math.pi/12) for x in range(4)],
                 phis=[self.galaxy.phi])
+
+            await self.birth()
             
             await magic.sleep(self.sleep)
 
-
+            
 
             
 if __name__ == '__main__':
@@ -208,6 +309,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--events', default='events.csv')
+    parser.add_argument('--name', default=None)
 
     args = parser.parse_args()
     
@@ -217,8 +319,12 @@ if __name__ == '__main__':
     
     data = table.Table(data)
 
+    view = View(table=data)
+
+    if args.name:
+        view.select(args.name)
 
     land = farm.Farm()
-    land.add(View(table=data))
+    land.add(view)
     farm.run(land)
         

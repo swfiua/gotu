@@ -1,6 +1,8 @@
-==================
- Dear Christopher
-==================
+======================================
+We had the observations of the pulsars
+======================================
+
+Dear Christopher
 
 I am writing to thank you for all the work you and the team at Glasgow
 University put into the :ref:`gr24` conference last July.
@@ -17,7 +19,7 @@ personal tutor as an undergraduate at Warwick University in the early
 1980's.
 
 I hope you will enjoy his book, the Geometry of the Universe, which I
-am sending in thanks not only for the work you put into the conference
+am sent in thanks not only for the work you put into the conference
 but also because it was a conversation with you at the conference that
 has very much help focus my attendion on crux of the matter.
 
@@ -108,7 +110,7 @@ Milky Way a mass of 10-100 billion solar masses would be necessary.
 Rourke says that Sagittarius A* cannot be at the centre of our galaxy,
 since it is simply not large enough to drive a mature galaxy.
 
-This was the motivation for the *Where Is the Sun?" artwork that I
+This was the motivation for the *Where Is the Sun?* artwork that I
 submitted to the conference.
 
 .. image::  images/witsart.png
@@ -118,7 +120,8 @@ two different assumptions about where the centre of the Milky Way: at
 Sgr A*, or at twice the distance of Sgr A*.
 
 The plots have distance from the galactic centre on the x-axis and
-tangential velocity of stars on the y-axis.   
+tangential velocity of stars on the y-axis.   The data is from the
+Gaia mission.
 
 The good news is that the Pulsar Timing Array can be used to compare
 between different models for the galactic gravitational potential:
@@ -143,10 +146,10 @@ binary pulsars.
 
 * They are often found distant from the galactic plane.
 
-* They have large *kick velocities*.
+* They may have large *kick velocities*.
 
   This means the system is moving 200 to 500 km/s faster than the
-  typical 200km/s.  In the wits image, that means the part above the
+  typical 200km/s.  In the wits image, it is the part above the
   200km/s asymptote on which the sun lies.
 
 * Strong correlation between polarisation and kick direction.
@@ -154,6 +157,16 @@ binary pulsars.
 * Globular clusters have more binary pulsars than they should have
   given the low escape velocity for the globular cluster.
 
+
+In Rourke's model, distance from galactic plane is an indicator of
+age.  Globular clusters are known to be older objects.  The pulsars
+they have are likely not recent captures, so why have they not already
+merged?
+
+
+
+  
+https://www3.mpifr-bonn.mpg.de/staff/pfreire/GCpsr.html
 
 explains the pulsar observations:  the binaries are
 far enough apart that the waves emitted due to their rotation can be
@@ -167,4 +180,17 @@ speed of light.
 This is also why general relativity is funamentally incompatible with
 quantum mechanics: it ignores the waves bodies are creating, whereas
 quantum theory explicitly includes them.
+
+Rourke's idea of adopting the Sciama Principle as an additional
+assumption to General Relativity is what is needed to make it
+compatible with quantum mechanics.
+
+We can also ask how does matter curve space time?  What is the
+mechanism?  It is because rotations of matter induce rotations of
+space time, which can be captured very well, to a first approximation
+as curvature.
+
+When the spin of binary pulsars is taken into account, there is not
+final inspiral.   Long before that the waves from the spin come into
+play.
 
