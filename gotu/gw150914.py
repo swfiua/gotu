@@ -226,7 +226,6 @@ class View(magic.Ball):
         ax = await self.get()
 
         sniff = 3
-        ringdown = []
         ax.set_title("Inspiral")
         clip = max(inspiral[:sniff])
         ax.plot(ttt, np.clip(inspiral, -clip, clip))
@@ -242,7 +241,7 @@ class View(magic.Ball):
             ringdown.append(value)
 
         ax.set_title("Ringdown")
-        clip = max(ringdown[:sniff])
+        clip = max(ringdown)
         ax.plot(ttt, np.clip(ringdown, -clip, clip))
 
         ax.show()
