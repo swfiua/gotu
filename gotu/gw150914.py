@@ -228,13 +228,15 @@ class View(magic.Ball):
         sniff = 3
         ax.set_title("Inspiral")
         clip = max(inspiral[:sniff])
-        ax.plot(ttt, np.clip(inspiral, -clip, clip))
+        #ax.plot(ttt, np.clip(inspiral, -clip, clip))
+        ax.plot(ttt, inspiral)
 
         ax.show()
         ax = await self.get()
 
         ringdown = []
         for ix, uu in enumerate(uuu):
+            umu0 = uu - u0
             distance = xxx[ix]
             zz = zzz[ix]
             value = mass * math.sin(umu0 / wavelength) / (distance * (1+zz))
