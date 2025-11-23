@@ -178,7 +178,7 @@ class View(magic.Ball):
 
         galaxy.Mcent = (mass << u.lightyear).value
 
-    async def birth(self, tmax=None, samples=None):
+    async def birth(self, samples=None):
         """What does the wave for the current galaxy look like?
         
         What would the gravitational wave from a black hole arriving
@@ -196,31 +196,34 @@ class View(magic.Ball):
         """
 
         galaxy = self.galaxy
-        if tmax is None:
-            tmax = ((galaxy.cosmo.cosmo.hubble_time << u.s).value) * self.skymap.max_t0
+        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
 
         if samples is None: samples = 1000
 
         # time of birth
+        epsilon = 1/hubble_time
         tstar = galaxy.tstar()
-        ttt = np.linspace(tstar, tstar + self.skymap.max_t0, samples+1)
-        ttt = ttt[1:]
+        ttt = np.linspace(tstar+epsilon, tstar + self.skymap.max_t0, samples)
         uuu = [galaxy.uoft(t) for t in ttt]
         zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
 
         # zzz and xxx are the redshift (in our case, blueshift) and distance of the newborn
         zzz = [zx[0] for zx in zandx]
-        xxx = [zx[1] for zx in zandx]
+        xxx = [zx[1] * hubble_time for zx in zandx]
 
         # set mass and wavelength
-        wavelength = mass = galaxy.schwartzchild().value
+        wavelength = mass = (galaxy.schwartzchild() << u.lightsecond).value
 
         # inspiral -- this isn't quite right yet, but close
         inspiral = []
         u0 = uuu[0]
         for ix, uu in enumerate(uuu):
-            umu0 = uu - u0
-            value = mass * math.sin(umu0 / wavelength) / (umu0**3)
+            umu0 = (uu - u0) * hubble_time
+            try:
+                value = mass * math.sin(umu0 / wavelength) / (umu0**3)
+            except ValueError:
+                value = mass
+
             inspiral.append(value)
         
         ax = await self.get()
@@ -236,10 +239,14 @@ class View(magic.Ball):
 
         ringdown = []
         for ix, uu in enumerate(uuu):
-            umu0 = uu - u0
+            umu0 = (uu - u0) * hubble_time
             distance = xxx[ix]
             zz = zzz[ix]
-            value = mass * math.sin(umu0 / wavelength) / (distance * (1+zz))
+            try:
+                value = mass * math.sin(umu0 / wavelength) / (distance * (1+zz))
+            except ValueError:
+                value = mass
+                
             ringdown.append(value)
 
         ax.set_title("Ringdown")
