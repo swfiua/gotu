@@ -5,13 +5,48 @@
 I will try to give updates from time to time as to what is happening
 here
 
-18/10/2025
+24/11/2025
 ==========
 
 A news update is long overdue.
 
 I attended :ref:`gr24` conference in Glasgow back in July.  It was a
-wonderful experience, that has really helped 
+wonderful experience.
+
+I have spent the summer months and more trying to write up what I
+learnt at the conference.
+
+This has taken longer than I had hoped as my understanding of what I
+believe is happening has increased.
+
+In short, Rourke's work implies that black holes do not merge.
+
+The principle that Rourke adopts, in addition to General Relativity is
+the Sciama Principle.   This specifies how waves propogate through
+space time.
+
+This results in oscillations of space time.  Much of the time these
+can be ignored, but there are notable exceptions where General
+Relativity breaks down.
+
+Galactic rotation curves are one.   The distortion that a galaxy's
+central black hole makes in space-time, according to the Kerr metric,
+creates a wave that propogates through the galaxy and induces a
+coherent rotation on the surrouunding space time, explaining galactic
+rotation curves without recourse to dark matter.
+
+The oscillations of space time itself are the dark matter.  But those
+oscillations have a firm origin in the rotations of matter.
+
+Quantum mechanics models wave particle duality and hence explicitly
+models the effects of the waves in space time that particles are
+creating.
+
+It is this that is at the heart of the incompatibility of quantum
+mechanics and General Relativity.
+
+Rourke's adoption of the Sciama Principle should remove this
+incompatibility.
 
 
 16/4/2025
