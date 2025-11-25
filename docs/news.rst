@@ -46,7 +46,7 @@ It is this that is at the heart of the incompatibility of quantum
 mechanics and General Relativity.
 
 Rourke's adoption of the Sciama Principle should remove this
-incompatibility.
+incompatibility, re-introducing wave-particle duality.
 
 
 16/4/2025

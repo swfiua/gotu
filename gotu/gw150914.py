@@ -251,7 +251,8 @@ class View(magic.Ball):
 
         ax.set_title("Ringdown")
         clip = max(ringdown)
-        ax.plot(ttt, np.clip(ringdown, -clip, clip))
+        #ax.plot(ttt, np.clip(ringdown, -clip, clip))
+        ax.plot(ttt, ringdown)
 
         ax.show()
 
