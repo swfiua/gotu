@@ -92,7 +92,7 @@ collections = {
 
 intersphinx_mapping = {
     'Pillow': ('https://pillow.readthedocs.io/en/stable/', None),
-    'matplotlib': ('https://matplotlib.org/matplotlib/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
     'cycler': ('https://matplotlib.org/cycler/', None),
     'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
     'ipykernel': ('https://ipykernel.readthedocs.io/en/latest/', None),

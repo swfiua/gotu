@@ -10,14 +10,14 @@ here
 
 A news update is long overdue.
 
-I attended :ref:`gr24` conference in Glasgow back in July.  It was a
+I attended :ref:`gramaldi` conference in Glasgow back in July.  It was a
 wonderful experience.
 
 I have spent the summer months and more trying to write up what I
 learnt at the conference.
 
 This has taken longer than I had hoped as my understanding of what I
-believe is happening has increased.
+believe is happening has improved significantly.
 
 In short, Rourke's work implies that black holes do not merge.
 
@@ -33,10 +33,49 @@ Galactic rotation curves are one.   The distortion that a galaxy's
 central black hole makes in space-time, according to the Kerr metric,
 creates a wave that propogates through the galaxy and induces a
 coherent rotation on the surrouunding space time, explaining galactic
-rotation curves without recourse to dark matter.
+rotation curves without recourse to dark matter.  
 
-The oscillations of space time itself are the dark matter.  But those
-oscillations have a firm origin in the rotations of matter.
+The oscillations of space time itself are in effect the dark matter!
+
+The detections of gravitational waves is only possible because those
+waves propogate through space time.  
+
+But those oscillations have a firm origin in the rotations of matter.
+If we work in terms of the angular momentum of a body, then Kerr
+metric gives how that body distorts space time.
+
+This effect drops off rapidly with distance, r, from the body.  In
+fact as 1/r**3, which means it can very often be ignored.
+
+Now in the case of binary pulsars, such as Hulse-Taylor, the current
+separation of the two objects in the binary is large compared to the
+wavelength of the waves from the millisecond rotation of the primary
+body.   Hence it can be ignored and the observations fit perfectly
+with the Kerr metric and General Relativity.
+
+Regardless of whether black holes can and do merge, there is another
+explanation for the observations that Ligo, Virgo and Kagra are
+seeing.
+
+In a de Sitter space universe there is horizon due to the curvature of
+space time.  There is an edge to the part of the universe we can see.
+
+New quasars or galaxies entering our visible universe burst on the
+scene highly blue shifted.
+
+In the case of a galaxy we see a gamma-ray burst as we see it's entire
+history in a short period of time.
+
+The wave front is shaped by the Kerr metric, but as in the merging
+black holes there is a hyperbolic rotation going on.
+
+I am currently working on this in the gw150914 module. 
+
+
+
+
+Quantum Gravity
+---------------
 
 Quantum mechanics models wave particle duality and hence explicitly
 models the effects of the waves in space time that particles are
@@ -45,8 +84,10 @@ creating.
 It is this that is at the heart of the incompatibility of quantum
 mechanics and General Relativity.
 
-Rourke's adoption of the Sciama Principle should remove this
+Rourke's adoption of the Sciama Principle removes this
 incompatibility, re-introducing wave-particle duality.
+
+
 
 
 16/4/2025
@@ -70,7 +111,7 @@ particular looking at the data from the Dark Energy Spectrographic
 Instrument (DESI).
 
 The data for data release 1 was recently released publicly.  The
-gotu.desi module downloads data and the :ref:`bitch` module has a
+gotu.desi module downloads data and the :ref:`birch` module has a
 viewer for the data.
 
 

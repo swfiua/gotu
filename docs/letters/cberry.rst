@@ -117,7 +117,7 @@ that Sgr A* is a modest sized quasar.
 This was the motivation for the *Where Is the Sun?* artwork that I
 submitted to the conference.
 
-.. image::  images/witsart.png
+.. image::  ../images/witsart.png
 
 The image shows two versions of the galactic rotation curve based on
 two different assumptions about where the centre of the Milky Way: at
