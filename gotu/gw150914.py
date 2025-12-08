@@ -2,6 +2,151 @@
 Thanks to the Gravitational Wave Open Science Center for event catalogs and data.
 
 https://gwosc.org/eventapi/html/GWTC/
+
+The first gravitational wave detection.
+
+I heard about this event during a Python conference in Februeary 2016
+at the time of the announcement.
+
+Brandon Rhodes gave a keynote where he mentioned the recent
+announcement by the LIGO team and how python was used at key parts of
+the the entire process.
+
+The detection of these ripples in space time was a stunning
+achievement, after decates of hunting.
+
+Two black holes, 35.6 and 30.6 solar masses merge to form a final mass
+of just 63.1 solar masses.
+
+Energy emitted as gravitational waves: 3.1 solar masses.
+
+There was a lot of interest at the conference and a number of
+attendees with good knowledge of the discovery.
+
+It was not until :ref:`GW170817` that I started to wonder whether the
+signals being detected might have another explanation other than the
+merging black holes.
+
+By that time I had read Rourke's book.
+
+How to reconcile the Sciama Principle with the Kerr metric?
+
+And how does the Perfect Copernican Principle change priors?
+
+What if everything is much, much older than 13 billion years?
+
+Rourke uses the Sciama Principle as an addition to General Relativity,
+to explain galactic rotation curves, without need for dark matter.
+
+The problem for gravitational wave physics that with the Sciama
+Principle binary systems are highly stable and there is a limit to how
+far they can inspiral.
+
+Fortunately, Rourke also proposes the hypothesis that gamma-ray bursts
+may be the arrivals of new galaxies in our visible universe.
+
+Along with Robert MacKay he shows how in a de Sitter universe, new
+arrivals burst on the scene highly blue shifted.
+
+It is due to the curvature of space time, each galaxy arrives highly
+blue shifted, the blue shift reduces over time, until the galaxy then
+starts to accelerate away and converge to a Hubble law.
+
+Now any gravitational waves the galaxy is emitting will be modulated
+in the same way.  Perhaps that is what we are detecting?
+
+In a 2018 discussion on black holes there is this fascinating comment
+from Colin Rourke::
+
+
+   There is another possible more important problem that I have with
+   black holes.  The fundamental inertial drag hypothesis that explains
+   the dynamics of galaxies needs every mass in the universe to have a
+   well-defined rotation (or a well-defined inertial frame in which it is
+   static).  But the current fiction is that a BH is a POINT SINGULARITY
+   and therefore it has nothing to define its rotation.  I mention this
+   problem in passing in the book, but I did not stress it because I did
+   not want to murder yet another sacred cow.
+
+   
+In the merging black hole models it is assumed that the angular
+momentum that the two black holes have around each other is lost to
+the surrounding universe, in a very brief amount of time.
+
+In the arriving galaxy model, it is the wave from new angular
+momentum, in the form of a rotating galaxy or quasar, arriving in our
+visible universe.
+
+So instead of masses in the stellar graveyard, we could be seeing
+masses in our cosmic birth registry?
+
+The black hole model also has to take account of space-time curvature:
+close to black holes, time slows, exponentially.
+
+Interestingly, the wave front will be shaped by the Kerr metric.  It
+is the Kerr metric based frame dragging that creates a wave in space
+time.
+
+The key to resolving the Kerr/Sciama paradox is to understand that
+both effects apply.
+
+If you know the angular momentum of a body, you can calculate how it
+will drag the surrounding space time round with it using the Kerr
+metric.
+
+This also gives the angular momentum that will be lost by the body,
+and leads to the conclusion that bodies will eventually inspiral.
+
+Now this will create a wave in the surrounding space time, with it's
+amplitude dropping off inversely with distance, as assumed in
+gravitaitonal wave physics.
+
+In short, the detection of gravitational waves is direct confirmation
+of the Sciama Principle, which in terms of the fabric of space-time
+can be phrased::
+
+  an oscillation w in space time induces an oscillation of amplitude
+  w/r in the space time at distance r.
+
+
+
+chirp redshift degenerecy
+=========================
+
+Chirp mass 28.6 Suns and at a distance of 430 Mpc.
+
+The wave we observed depends on both the redshift and the source mass.
+
+Suppose we have a chirp mass m, at distance z, then the wave we
+observe will be the same as a mass m_0 = m * (1 + z).
+
+
+
+ringdown
+========
+
+The ringdown phase will be depend on two parameters, theta and
+phi. [aside: these will likely have some impact on what the inspiral
+looks like???]
+
+theta is the angle of approach, distributed as cos(theta).
+
+phi is the hyperbolic rotation for the arrival, distributed as
+sinh(phi) squared.
+
+The same parameters will characterise any accompanying gamma-ray burst
+and other observations in the electromagnetic spectrum.
+
+
+The first multi-messenger event?
+--------------------------------
+
+There was a weak burst of gamma-ray energy
+
+
+And now for the python module
+-----------------------------
+
 """
 
 from astropy import table, io, units as u, constants as c
@@ -71,6 +216,8 @@ class View(magic.Ball):
         self.skymap = spiral.SkyMap()
         self.skymap.tborigin = False
         self.skymap.max_t0 = 1e-12
+        self.minz = -0.999
+        self.tmax = 10
 
 
     def select(self, name='150914'):
@@ -145,7 +292,7 @@ class View(magic.Ball):
         galaxy.theta = math.acos((2*random.random()-1))
 
         # assume theta is small
-        #galaxy.theta = random.gauss(0, math.pi/32)
+        galaxy.theta = random.gauss(0, math.pi/32)
 
         # chirp and z
         chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
@@ -178,6 +325,7 @@ class View(magic.Ball):
 
         galaxy.Mcent = (mass << u.lightyear).value
 
+
     async def birth(self, samples=None):
         """What does the wave for the current galaxy look like?
         
@@ -193,23 +341,38 @@ class View(magic.Ball):
 
         There's a hyperbolic rotation parameterised by theta and phi.
 
+        We do not actually see all the waves the body has ever emitted.
+
+        The universe is full of low level gravitational waves and so waves can only go so far before being 
+
         """
 
         galaxy = self.galaxy
         hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+
+        tmax = self.tmax / hubble_time
 
         if samples is None: samples = 1000
 
         # time of birth
         epsilon = 1/hubble_time
         tstar = galaxy.tstar()
-        ttt = np.linspace(tstar+epsilon, tstar + self.skymap.max_t0, samples)
+        ttt = np.linspace(tstar+epsilon, tstar +epsilon+ tmax, samples)
         uuu = [galaxy.uoft(t) for t in ttt]
         zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
 
         # zzz and xxx are the redshift (in our case, blueshift) and distance of the newborn
         zzz = [zx[0] for zx in zandx]
         xxx = [zx[1] * hubble_time for zx in zandx]
+
+        zfilter = [z > self.minz for z in zzz]
+        print(magic.Counter(zfilter))
+        self.subtable = table.Table(dict(uuu=uuu, ttt=ttt, zzz=zzz, xxx=xxx, zfilter=zfilter))
+        #uuu = np.array(uuu)[zfilter]
+        #ttt = np.array(ttt)[zfilter]
+        #zzz = np.array(zzz)[zfilter]
+        #xxx = np.array(xxx)[zfilter]
+
 
         # set mass and wavelength
         wavelength = mass = (galaxy.schwartzchild() << u.lightsecond).value
@@ -221,6 +384,7 @@ class View(magic.Ball):
             umu0 = (uu - u0) * hubble_time
             try:
                 value = mass * math.sin(umu0 / wavelength) / (umu0**3)
+                value = math.log(mass / (umu0**3))
             except ValueError:
                 value = mass
 
@@ -229,7 +393,7 @@ class View(magic.Ball):
         ax = await self.get()
 
         sniff = 3
-        ax.set_title("Inspiral")
+        ax.set_title(f"Inspiral tstar={tstar}")
         clip = max(inspiral[:sniff])
         #ax.plot(ttt, np.clip(inspiral, -clip, clip))
         ax.plot(ttt, inspiral)
@@ -243,7 +407,9 @@ class View(magic.Ball):
             distance = xxx[ix]
             zz = zzz[ix]
             try:
-                value = mass * math.sin(umu0 / wavelength) / (distance * (1+zz))
+                value = mass * math.sin(umu0 / wavelength) / (distance * ((1+zz)**2))
+                value = math.log(mass / (distance * ((1+zz)**2)))
+                #value = mass * math.sin(umu0 / wavelength) / distance
             except ValueError:
                 value = mass
                 

@@ -1739,6 +1739,17 @@ class Spiral(magic.Ball):
 
         return tstar
 
+    def umax(self):
+        """ the last time u that the source can be seen
+
+        notice e^umax = 1/(e**tstar = e**(-tstar)
+        so umax = -1 * tstar.
+        t for umax is infinite and u for tstar is -infinity
+        """
+        
+        return -1 * self.tstar()
+
+
     def tb(self):
         """ blue shift period """
         a = cosh(self.phi)

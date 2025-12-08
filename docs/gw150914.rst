@@ -9,7 +9,7 @@ at the time of the announcement.
 
 Brandon Rhodes gave a keynote where he mentioned the recent
 announcement by the LIGO team and how python was used at key parts of
-the analysis.
+the the entire process.
 
 The detection of these ripples in space time was a stunning
 achievement, after decates of hunting.
@@ -30,8 +30,12 @@ By that time I had read Rourke's book.
 
 How to reconcile the Sciama Principle with the Kerr metric?
 
+And how does the Perfect Copernican Principle change priors?
+
+What if everything is much, much older than 13 billion years?
+
 Rourke uses the Sciama Principle as an addition to General Relativity,
-to explain galactic rotation curves without need for dark matter.
+to explain galactic rotation curves, without need for dark matter.
 
 The problem for gravitational wave physics that with the Sciama
 Principle binary systems are highly stable and there is a limit to how
@@ -73,10 +77,10 @@ momentum, in the form of a rotating galaxy or quasar, arriving in our
 visible universe.
 
 So instead of masses in the stellar graveyard, we could be seeing
-masses in our cosmic birth registry.
+masses in our cosmic birth registry?
 
 The black hole model also has to take account of space-time curvature:
-close to black holes, time slows.
+close to black holes, time slows, exponentially.
 
 Interestingly, the wave front will be shaped by the Kerr metric.  It
 is the Kerr metric based frame dragging that creates a wave in space
@@ -102,7 +106,6 @@ can be phrased::
 
   an oscillation w in space time induces an oscillation of amplitude
   w/r in the space time at distance r.
-
 
 
 
