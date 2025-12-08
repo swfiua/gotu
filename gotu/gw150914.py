@@ -173,7 +173,8 @@ I was wrong about the cosmic birth registry!  It is not a births, it is weddings
 It is our cosmic wedding registry.
 
 A new object has arrived in our universe.  It made everything wobble
-together, then as everything picks up the wobble, away it goes.
+together, then as everything picks up the wobble, away it goes?
+Entanglement, a marriage between celestial objects.
 
 The ringdown phase will presumably also depend on the two parameters,
 theta and phi.
