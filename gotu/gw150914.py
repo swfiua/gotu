@@ -1,5 +1,4 @@
-"""
-Thanks to the Gravitational Wave Open Science Center for event catalogs and data.
+"""Thanks to the Gravitational Wave Open Science Center for event catalogs and data.
 
 https://gwosc.org/eventapi/html/GWTC/
 
@@ -120,16 +119,67 @@ The wave we observed depends on both the redshift and the source mass.
 Suppose we have a chirp mass m, at distance z, then the wave we
 observe will be the same as a mass m_0 = m * (1 + z).
 
+inspiral
+========
 
+I have now spent a while trying to match the sort of curves we see.
+
+The idea is that the whole curve will be determined by two parameters, theta and phi.
+
+theta is the angle of approach.
+
+theta is distributed as cos(theta), but there is a relationship
+between theta and the brightness of the wave, so that needs to be taken into account.
+
+phi is distribute as sinh(phi) squared, but again there are some complications.
+
+My belief is that in observations, theta is biassed to small theta and
+phi is arccosh(m1/m2).
+
+Now the wave we see is not the entire history of the new arrival,
+since there are two horizons a body needs to cross, in order for it to be visible to us.
+
+Due to the low level waves throughout the universe, there is a limit
+to how far waves can travel before they are thoroughly diverted from
+their original direction.
+
+This distance is likely a few hubble distances.
+
+Now the hypothesis is that we are seeing new objects arriving in our
+visible universe.  How old might those objects be?
+
+My guess is that for an isolated quasar the actual acretion rate is
+very low indeed.  [TODO problem is T and n to pass to acretion formulae]
+
+For now, my approach is to go with the 3-6 hubble distance range
+(which is in line with the cosmic microwave background).
+
+This and the acretion rate can be tuned to create any magnitude wave
+that we might detect.
+
+From Rourke::
+
+    For a short time after the first appearance we have the asymptotic relation:
+
+       1 + z ~ t - t*
+
+We are in the small t regime for both the ringdown and the inspiral.
 
 ringdown
 ========
 
-The ringdown phase will be depend on two parameters, theta and
-phi. [aside: these will likely have some impact on what the inspiral
-looks like???]
+I was wrong about the cosmic birth registry!  It is not a births, it is weddings!.
 
-theta is the angle of approach, distributed as cos(theta).
+It is our cosmic wedding registry.
+
+A new object has arrived in our universe.  It made everything wobble
+together, then as everything picks up the wobble, away it goes.
+
+The ringdown phase will presumably also depend on the two parameters,
+theta and phi.
+
+It feels like it might depend on the local conditions, would a space
+based detector behave differently further from the earth's influence?
 
 phi is the hyperbolic rotation for the arrival, distributed as
 sinh(phi) squared.
@@ -137,15 +187,14 @@ sinh(phi) squared.
 The same parameters will characterise any accompanying gamma-ray burst
 and other observations in the electromagnetic spectrum.
 
+In the gamma-ray burst situation the decay would presumably be slower,
+and definitely be determined by theta and phi?
+
 
 The first multi-messenger event?
 --------------------------------
 
-There was a weak burst of gamma-ray energy
-
-
-And now for the python module
------------------------------
+There was a weak burst of gamma-ray energy.
 
 """
 
