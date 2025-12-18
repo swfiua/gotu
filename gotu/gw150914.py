@@ -172,15 +172,13 @@ I was wrong about the cosmic birth registry!  It is not a births, it is weddings
 
 It is our cosmic wedding registry.
 
-A new object has arrived in our universe.  It made everything wobble
-together, then as everything picks up the wobble, away it goes?
-Entanglement, a marriage between celestial objects.
-
 The ringdown phase will presumably also depend on the two parameters,
 theta and phi.
 
 It feels like it might depend on the local conditions, would a space
 based detector behave differently further from the earth's influence?
+
+I think the answer is no.   The 
 
 phi is the hyperbolic rotation for the arrival, distributed as
 sinh(phi) squared.
@@ -188,8 +186,10 @@ sinh(phi) squared.
 The same parameters will characterise any accompanying gamma-ray burst
 and other observations in the electromagnetic spectrum.
 
-In the gamma-ray burst situation the decay would presumably be slower,
-and definitely be determined by theta and phi?
+In the gamma-ray burst situation the decay in intensity would
+presumably be identical and definitely be determined by theta and phi?
+
+Now since we are seeing 
 
 
 The first multi-messenger event?
