@@ -191,7 +191,7 @@ My submition to the art exhibition for the conference was displayed.
 
      Where is the Sun?
 
-     Caption at gr24::
+Caption at gr24::
 
        Two visualisaltions of the Milky Way rotation curve using Gaia
        data.
@@ -199,33 +199,33 @@ My submition to the art exhibition for the conference was displayed.
        away, as Professor Rourke suggest it is too small to drive a
        galaxy.
 
-    The typos were all mine.
+The typos were all mine.
 
-    The work shows two matplotlib images generated using data from the
-    European Space Agency's Gaia satellite to visualise the Milky Way's
-    rotation curve: the relationship between distance from the galactic
-    centre and tangential velocity, for stars in the Milky Way.
+The work shows two matplotlib images generated using data from the
+European Space Agency's Gaia satellite to visualise the Milky Way's
+rotation curve: the relationship between distance from the galactic
+centre and tangential velocity, for stars in the Milky Way.
 
-    Different matplotlib colormaps were used for the two plots,
-    high-lighting the need to consider the blue as well as the reds.
+Different matplotlib colormaps were used for the two plots,
+high-lighting the need to consider the blue as well as the reds.
 
-    In both plots, the Sun is at the dense part of the plot, some
-    26,000 light-years from Sagittarius A*.
+In both plots, the Sun is at the dense part of the plot, some
+26,000 light-years from Sagittarius A*.
 
-    If you align the two plots, we see general agreement, the question
-    is what we see in the blue a reflection of the red about Sgr A*?
+If you align the two plots, we see general agreement, the question
+is what we see in the blue a reflection of the red about Sgr A*?
 
-    The images are created by dividing the distance and tangential
-    velocity into a grid and counting how many observations are in
-    each grid square.
+The images are created by dividing the distance and tangential
+velocity into a grid and counting how many observations are in
+each grid square.
 
-    To create an image, we need values in the range 0 - 1, so some
-    sort of nomralisation is needed.   In these image, each column is
-    divided by the sum of the values in that column.  The columns
-    correspond to distances.
+To create an image, we need values in the range 0 - 1, so some
+sort of nomralisation is needed.   In these image, each column is
+divided by the sum of the values in that column.  The columns
+correspond to distances.
 
-    So for each distance, we see the proportion of stars with each
-    velocity.   
+So for each distance, we see the proportion of stars with each
+velocity.   
 
 One of Rourke's boldest predictions, that Sagittarius A* is not large
 enough to drive a galaxy the size of the Milky Way, arguing that a
