@@ -187,7 +187,7 @@ Art Exhibition
 
 My submition to the art exhibition for the conference was displayed.
 
-.. image:: images/witsart.png
+.. figure:: images/witsart.png
 
      Where is the Sun?
 
