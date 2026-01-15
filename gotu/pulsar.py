@@ -1,7 +1,32 @@
-"""
-Milli-second pulsar edition
+"""Milli-second pulsar edition
 
 https://www.astro.umd.edu/~eferrara/pulsars/GalacticMSPs.txt
+
+
+2026 TODO
+=========
+
+Build a model for the wobbles in the Milky Way based on the Sciama Principle.
+
+There is a common component to every observation and that is the
+movement of the Sun relative to the centre of the galaxy.
+
+The mass and distance of the galactic centre are the two key
+parameters, under the prior assumption that the centre may be as much
+as 50 thousand light years distant, with a mass of 100s or thousands
+of billions of suns.
+
+Where pulsars are members of globular pulsars we can add the mass of
+the cluster's centre to our variables, and model it's movement
+releative to the galactic centre.
+
+The key test would be whether a Bayesian approach yields a
+signficantly higher posterior probability of the observations than
+other models.
+
+The model will also be able to make predictions of the amplitude we
+can expect to find as we move into longer and longer time periods.
+
 """
 
 from blume import magic

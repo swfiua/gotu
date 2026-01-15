@@ -298,10 +298,19 @@ intrinsic redshift.
 
 In short, not all redshift is cosmological.
 
-
-   
    
 Ammonite
 ========
 
-A new Sedna? object.
+I wore a pendant of an ammonite fossil on occasion at the conference.
+
+It was a slice through an ancient creature that had grown slowly over
+time, bigger and bigger spirals.
+
+I had hoped it might spark discussions of how spiral galaxies grow.
+Slow acretion over time or mergers of smaller objects?
+
+How do ammonites grow?
+
+Curiously, during the conference, the discovery of a new Sedna object
+was announced, with the new object nicknamed Ammonite.

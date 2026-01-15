@@ -406,6 +406,7 @@ class View(magic.Ball):
 
         # time of birth
         epsilon = 1/hubble_time
+        epsilon = 0.
         tstar = galaxy.tstar()
         ttt = np.linspace(tstar+epsilon, tstar +epsilon+ tmax, samples)
         uuu = [galaxy.uoft(t) for t in ttt]
@@ -430,7 +431,7 @@ class View(magic.Ball):
         # inspiral -- this isn't quite right yet, but close
         inspiral = []
         u0 = uuu[0]
-        for ix, uu in enumerate(uuu):
+        for ix, uu in enumerate(uuu[1:]):
             umu0 = (uu - u0) * hubble_time
             try:
                 value = mass * math.sin(umu0 / wavelength) / (umu0**3)
@@ -446,21 +447,23 @@ class View(magic.Ball):
         ax.set_title(f"Inspiral tstar={tstar}")
         clip = max(inspiral[:sniff])
         #ax.plot(ttt, np.clip(inspiral, -clip, clip))
+        ttt = ttt[1:]
         ax.plot(ttt, inspiral)
 
         ax.show()
         ax = await self.get()
 
         ringdown = []
-        for ix, uu in enumerate(uuu):
+        for ix, uu in enumerate(uuu[1:]):
             umu0 = (uu - u0) * hubble_time
             distance = xxx[ix]
             zz = zzz[ix]
             try:
+                rho = galaxy.rho(ttt[ix])
                 value = mass * math.sin(umu0 / wavelength) / (distance * ((1+zz)**2))
                 value = math.log(mass / (distance * ((1+zz)**2)))
-                #value = mass * math.sin(umu0 / wavelength) / distance
-            except ValueError:
+                value = mass * math.sin(umu0 / wavelength) / ((rho * (1+zz))*82)
+            except:
                 value = mass
                 
             ringdown.append(value)
