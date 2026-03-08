@@ -5,7 +5,7 @@ Getting the data:
 
 wget https://data.desi.lbl.gov/public/dr1/spectro/redux/iron/zcatalog/v1/zall-pix-iron.fits
 
-It's bit, so use fitsio to just extract columns we want..
+It's big, so use fitsio to just extract columns we want..
 
 magic.TableCounts exists, it would be good to have separate counts for
 each DESI_TARGET.
@@ -494,12 +494,13 @@ class DESI(train.Train):
                 tot += time.time() - t1
                 if tot > self.sleep:
 
-                    axes = await self.tablecounts.show()
+                    #axes = await self.tablecounts.show()
 
                     await magic.sleep(self.sleep)
                     tot = 0.0
                     await self.show_zplot()
-                    ax = axes['nonorm']
+                    # ax = axes['nonorm']
+                    ax = None
                 else:
                     if ax:
                         ax.show()

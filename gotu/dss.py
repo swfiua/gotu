@@ -386,6 +386,8 @@ class Dss(magic.Ball):
 
         At least that's how I think de Sitter Space works.
 
+        It is not a pure de Sitter Space, since space itself appears to wobble.
+
         The goal here is to explore what we might expect to see.
 
         Bonus marks for a model which produces the spherical harmonics
@@ -393,6 +395,18 @@ class Dss(magic.Ball):
 
         Perhaps restrict to a circle of radius phi and use 0 theta for the
         angle around the circle.
+
+        Update
+        ======
+
+        We should expect the CMB and the oscillations of space time to be in high equilibrium.
+
+        As a photon travels through space time it gains energy from the waves from the wobbles
+        of space time,  the Rees-Sciama effect.
+
+        At the same time a wave goes out from each photon, that adds to the wobble.
+
+        I believe there are 4 billion microwave photons in each meter cubed of space time.
 
         """
         raise NotImplemented

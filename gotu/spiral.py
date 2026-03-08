@@ -2055,7 +2055,6 @@ def uoft(t, theta, phi):
     try:
         u = log(U)
     except:
-        print("log(U) does not work for U:", U)
         u = -sys.float_info.max
 
     z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))

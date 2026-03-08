@@ -267,7 +267,7 @@ class View(magic.Ball):
         self.skymap.tborigin = False
         self.skymap.max_t0 = 1e-12
         self.minz = -0.999
-        self.tmax = 10
+        self.tmax = 10000
 
 
     def select(self, name='150914'):
@@ -406,9 +406,9 @@ class View(magic.Ball):
 
         # time of birth
         epsilon = 1/hubble_time
-        epsilon = 0.
+        epsilon = tmax / (100 * samples)
         tstar = galaxy.tstar()
-        ttt = np.linspace(tstar+epsilon, tstar +epsilon+ tmax, samples)
+        ttt = np.linspace(tstar+epsilon, tstar+epsilon+ tmax, samples)
         uuu = [galaxy.uoft(t) for t in ttt]
         zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
 
@@ -430,8 +430,12 @@ class View(magic.Ball):
 
         # inspiral -- this isn't quite right yet, but close
         inspiral = []
+        delta_u = []
         u0 = uuu[0]
+        ulast = u0
         for ix, uu in enumerate(uuu[1:]):
+            delta_u.append(uu - uuu[ix-1])
+
             umu0 = (uu - u0) * hubble_time
             try:
                 value = mass * math.sin(umu0 / wavelength) / (umu0**3)
@@ -440,7 +444,7 @@ class View(magic.Ball):
                 value = mass
 
             inspiral.append(value)
-        
+
         ax = await self.get()
 
         sniff = 3
@@ -479,11 +483,14 @@ class View(magic.Ball):
         ax.set_title("full")
 
         times = np.concat(((-1. * (ttt - tstar))[::-1], ttt-tstar))
-        print('JJJJJJJJJ', len(times), len(inspiral[::-1] + ringdown))
         ax.plot(times, np.clip(inspiral[::-1] + ringdown, -clip, clip))
 
         ax.show()
         
+        ax = await self.get()
+        ax.set_title("delta_u")
+        ax.plot(delta_u)
+        ax.show()
 
     async def run(self):
 
