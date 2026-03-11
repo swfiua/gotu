@@ -1819,6 +1819,9 @@ class Spiral(magic.Ball):
 
         return tofu(u, self.theta, self.phi)
 
+    def e2tofu(self, u):
+
+        return e2tofu(u, self.theta, self.phi)
 
     def tstar(self):
 
@@ -1863,6 +1866,10 @@ class Spiral(magic.Ball):
     def uoft(self, t):
 
         return uoft(t, self.theta, self.phi)
+
+    def e2uoft(self, t):
+
+        return e2uoft(t, self.theta, self.phi)
 
 
     def rho(self, t):
@@ -1972,13 +1979,13 @@ def zandx(t, u, theta, phi):
     try:
         sinhu = sinh(u)
     except OverflowError:
-        print("sinh overflow for", u)
+        #print("sinh overflow for", u)
         sinhu = math.log(sys.float_info.max)
 
     try:
         coshu = cosh(u)
     except OverflowError:
-        print("cosh overflow for", u)
+        #print("cosh overflow for", u)
         coshu = math.log(sys.float_info.max)
 
     try:
@@ -1992,7 +1999,7 @@ def zandx(t, u, theta, phi):
     return z, x
 
 
-def tofu(u, theta, phi):
+def e2tofu(u, theta, phi):
     """ Work in natural units, c=G=Hubble Distance=1
 
     Time in Hubble times.
@@ -2017,16 +2024,22 @@ def tofu(u, theta, phi):
     T = ((U + sqrt(A*B + ((1 - B*B - A*A) * U*U) + A * B* U*U*U*U))
          / (B - A * U*U))
 
+    return T
+
+def tofu(u, theta, phi):
+
+    T = logtofu(u, theta, phi)
+    
     t = log(T)
 
-    z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+    # z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
 
     # use distance as t0, adjust time for t0
     #hd = self.cosmo.hubble_distance
     #t0 = [(-1 * ball.distance/hd) for ball in self.balls]
     return t
 
-def uoft(t, theta, phi):
+def e2uoft(t, theta, phi):
     """ Work in natural units, c=G=Hubble Distance=1
 
     Time in Hubble times.
@@ -2051,13 +2064,18 @@ def uoft(t, theta, phi):
     U = ((T - sqrt(C*D + ((1 - B*C - A*D) * T*T) + A * B * T*T*T*T))
          / (C - A * T*T))
 
+    return U
+
+def uoft(t, theta, phi):
     #print('ABCDU', A,B,C,D,U)
+
+    U = e2uoft(t, theta, phi)
     try:
         u = log(U)
     except:
         u = -sys.float_info.max
 
-    z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
+    # z = (d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))
 
     # use distance as t0, adjust time for t0
     #hd = self.cosmo.hubble_distance
@@ -2353,6 +2371,7 @@ class RandomPhi:
 
         zval = sample[0]
         self.counts = [int(s/zval) for s in sample]
+
 
     def __call__(self):
 
