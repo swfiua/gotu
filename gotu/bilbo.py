@@ -1,11 +1,45 @@
-"""
-I am exploring the python project bilby.
+"""I am exploring the python project bilby.
 
 This is Bilbo Bilby, boldly going where no astrophysicist has gone before.
 
-bilby takes priors and 
+bilby takes priors and waveforms and calculates odds.
+
+2026/03/27
+==========
+
+I am now at the point where I just have to generate waveforms given priors.
+
+It may just be my choice of units that is causing me trouble.
+
+We are interested in the first few seconds of a new arrival.
+
+It turns out that the distribution of events that occur is strongly
+biased to ones whose blue-shift time is short compared to the Hubble time.
+
+The larger phi, the shorter the blue shift time.  So is there any
+limit to how large phi can be?
+
+Rourke argued that the low level wobbles of spacetime mean no light
+can travel more than a certain distance, a handful of Hubbble times,
+before being thoroughly diverted from it's original direction.
+
+A second 2e-18 times the Hubble time, which is 1 in my units.
+
+At the same time, when an object initially appears it is infitely blue shifted.
+
+Actual gamma-ray bursts are powerful, but not infinite.  The burst associated with
+GW20170817 is a good example.
+
+There were observations in ultra-violet (15 hours), x-ray (9 days rising to a peak at 150 days)
+
+In short, there is sufficient data to fit a phi/theta model that gives the blueshift over time of
+a new arrival.
+
+150 days is around 1e-11 Hubble times.
+
 """
 
+from math import *
 from blume import magic
 np = magic.np
 
@@ -25,10 +59,65 @@ def get_args():
     parser.add_argument('--outdir', default='outdir')
     parser.add_argument('--label', default='GW150914')
     parser.add_argument('--trigger_time', type=float, default=1126259462.4)
+    parser.add_argument('--post_trigger_duration', type=float, default=2.)
+    parser.add_argument('--duration', type=float, default=4.)
     parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
 
     return parser.parse_args()
 
+def find_r(galaxy, tdash, utest=-5., factor=1000):
+    """
+
+    tdash is tstar for a point r nearer than galaxy
+    what is r at tdash?
+
+    This is tricky, because u is infinite at tstar and near to tstar this
+    leads to overflow problems.
+
+    The larger phi, the smaller the blue shift period.
+
+    At large phi, we run into overflow problems.
+
+    r is also small compared to the size of the visible universe.
+
+    This creates computational problems in studying the region of interest.
+
+    We are interested in a short period of time, before and after tstar.
+
+    Before tstar, we are seeing the building Kerr wave-front.
+
+    We are interested in the first time a point a distance r from the centre
+    becomes visible to us.
+
+    We know this happens for some time tdash and a time udash in the emitter time.
+
+    (-a * sinh(udash) * sinh(tdash)) + (d * (cosh(udash) - r) * cosh(tdash) = 1.
+
+    
+    """
+    a = cosh(galaxy.phi)
+    d = cos(galaxy.theta)
+
+    umax = utest
+
+    def f(r):
+        value = (-a * sinh(umax) * sinh(tdash)) + (d * (cosh(umax) - r) * cosh(tdash) - 1.0)
+
+        return value
+
+    r = (factor * galaxy.schwartzchild() << u.lightyear).value
+
+    while True:
+
+        value = f(r)
+
+        if value > 1.:
+            r /= 2.
+        if value < 0.:
+            r *= 1.5
+        print(r, f(r))
+        if r > 1e50: break
+        if r == 0.0: break
 
 def time_domain_source_model(
         gtimes,
@@ -40,10 +129,14 @@ def time_domain_source_model(
         ra=None,
         psi=None,
         phase=None,
+        zboost=None,
+        post_trigger_duration=None
 ):
     print('TDSM ******')
     print(len(gtimes), gtimes[0])
     print('mass/theta/phi', mass, theta, phi)
+
+    print('gpstimes', geocent_time, post_trigger_duration)
 
     galaxy = Spiral()
     galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
@@ -56,27 +149,34 @@ def time_domain_source_model(
 
     tstar = galaxy.tstar()
 
+    # two parts to this the inspiral. what is the definition of gps time?
+    # inspiral is up to post_trigger_duration
+    # ringdown is the piece after
+
     minz = -0.9999
 
-    phi_factor = phi
-    zeds = [1 - (1/(10**blue)) for blue in range(1, 8)]
-    while phi_factor < 35.:
-        galaxy.phi = phi_factor
-
-        tstar = galaxy.tstar()
-        tminz = find_t_forz(galaxy, hubble_time, minz)
-        tforz = [find_t_forz(galaxy, hubble_time, z) for z in zeds]
-        tb = galaxy.tb()
-        for zed, tforz in zip(zeds, tforz):
-            print('phi z t tb', phi_factor, zed, tforz-tstar, tb, galaxy.zandx(tstar+tb))
-
-
-        phi_factor *= 2.
-    # reset galaxy.phi
     phi = galaxy.phi
 
-    inspiral = gtimes[:int(len(gtimes)/2)]
+    tinspiral = [gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration]
+    tringdown= [gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration]
 
+    # calculate ringdown
+    uuu = [galaxy.uoft(tstar + (t-tstar) * zboost) for t in tringdown]
+    zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
+    zzz = np.array([zx[0] for zx in zandx])
+    xxx = np.array([zx[1] for zx in zandx])
+    strain = (galaxy.schwartzchild() << u.lightsecond).value
+    rho = strain/(zzz*zzz*xxx*xxx)
+
+    # calculate inspiral
+    uuu = [galaxy.uoft(tstar + (t-tstar) * zboost) for t in tringdown]
+    zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
+    zzz = np.array([zx[0] for zx in zandx])
+    xxx = np.array([zx[1] for zx in zandx])
+
+    rr = []
+    strain = (galaxy.schwartzchild() << u.lightsecond).value / (rr ** 3.0)
+    
     ttt = [tminz+((gtime-geocent_time)/hubble_time) for gtime in inspiral]
     uuu = [galaxy.uoft(t) for t in ttt]
     zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
@@ -101,7 +201,7 @@ def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
     while True:
         t = (tmax+tmin)/2
         zoft, xx = galaxy.zandx(t)
-        print(t-tstar, zoft)
+        #print(t-tstar, zoft)
         if abs(zoft-z) < epsilon:
             break
         #print(tb, tmax, tmin, zoft, z)
@@ -120,9 +220,10 @@ def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
 
     return t
 
-async def tfortb_show(galaxy, mintheta=0.001, maxtheta=.8, minphi=.5, maxphi=5., tb_factor=0.001):
+async def tfortb_show(mintheta=0.001, maxtheta=.8, minphi=.5, maxphi=5., tb_factor=0.001,
+                      minz=-0.999):
 
-    width = height = 1024
+    width = height = 128
     tc = magic.TableCounts(title=f'z for tb * {tb_factor}',
         minx=mintheta, maxx=maxtheta, miny=minphi, maxy=maxphi,
         width=width, height=height, xname='theta', yname='phi',
@@ -132,11 +233,18 @@ async def tfortb_show(galaxy, mintheta=0.001, maxtheta=.8, minphi=.5, maxphi=5.,
         minx=mintheta, maxx=maxtheta, miny=minphi, maxy=maxphi,
         width=width, height=height, xname='theta', yname='phi',
         colorbar=True)
-    
+
+    tabminz = magic.TableCounts(title=f't for {minz}',
+        minx=mintheta, maxx=maxtheta, miny=minphi, maxy=maxphi,
+        width=width, height=height, xname='theta', yname='phi',
+        colorbar=True)
+
     thetas = np.linspace(mintheta, maxtheta, width)
     phis = np.linspace(minphi, maxphi, height)
 
-    sp = Spiral()
+    galaxy = Spiral()
+    hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+
     for theta in thetas:
         for phi in phis:
             galaxy.theta = theta
@@ -146,8 +254,66 @@ async def tfortb_show(galaxy, mintheta=0.001, maxtheta=.8, minphi=.5, maxphi=5.,
             tc.update([theta], [phi], 1/(1+z))
             tbtab.update([theta], [phi], tb)
 
+            tminz = find_t_forz(galaxy, minz, hubble_time)
+            tabminz.update([theta], [phi], tminz)
+
     await tc.show()
     await tbtab.show()
+    await tabminz.show()
+
+async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
+
+    ax = await magic.TheMagicRoundAbout.get()
+    xax = await magic.TheMagicRoundAbout.get()
+    lax = await magic.TheMagicRoundAbout.get()
+    uax = await magic.TheMagicRoundAbout.get()
+    for power in powers:
+        atheta = acos(cos(theta)**power)
+        aphi = acosh(cosh(phi)**power)
+        print('theta/phi/atheta/aphi/power', theta, phi, atheta, aphi, power)
+        galaxy = Spiral()
+        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+
+        galaxy.theta = atheta
+        galaxy.phi = aphi
+        tb = galaxy.tb()
+        tstar = galaxy.tstar()
+        ttt = np.linspace(0., tb/tbfactor, samples+1)[1:]
+
+        uuu = np.array([galaxy.uoft(tt+tstar) for tt in ttt])
+        zzz = np.array([galaxy.zandx(tt+tstar)[0] for tt in ttt])
+        xxx = np.array([galaxy.zandx(tt+tstar)[1] for tt in ttt])
+        zdash = []
+        for zz in zzz:
+            if zz < 0:
+                zz = 1/(1+zz)
+
+            zdash.append(zz)
+            
+        lum = []
+        for ix, zz in enumerate(zzz):
+            xx = xxx[ix]
+            lum.append(1/(xx*xx*(1+zz)*(1+zz)))
+
+        ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        lax.plot(ttt, np.clip(np.log10(lum), 7, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        uax.plot(ttt, np.clip(uuu, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+
+    xax.set_title('Distance v time')
+    ax.set_title('zdash v time')
+    lax.set_title('luminosity v time')
+    uax.set_title('u v t')
+
+    ax.legend()
+    xax.legend()
+    lax.legend()
+    uax.legend()
+    ax.show()
+    xax.show()
+    lax.show()
+    uax.show()
+    
 
 
 class Sinh2(WeightedDiscreteValues):
@@ -179,8 +345,8 @@ if __name__ == '__main__':
     maximum_frequency = 512
     minimum_frequency = 20
     roll_off = 0.4  # Roll off duration of tukey window in seconds, default is 0.4s
-    duration = 4  # Analysis segment duration
-    post_trigger_duration = 2  # Time between trigger time and end of segment
+    duration = args.duration  # Analysis segment duration
+    post_trigger_duration = args.post_trigger_duration  # Time between trigger time and end of segment
     end_time = trigger_time + post_trigger_duration
     start_time = end_time - duration
 
@@ -235,10 +401,17 @@ if __name__ == '__main__':
     # or choose a fixed value by just providing a float value as the prior.
     priors = bilby.core.prior.PriorDict(filename=label + ".prior")
 
-    # Add the geocent time prior
-    priors["geocent_time"] = bilby.core.prior.Uniform(
-        trigger_time - 0.1, trigger_time + 0.1, name="geocent_time"
-    )
+    # Add the geocent time prior if it is not already there
+    if "geocent_time" not in priors:
+        priors["geocent_time"] = bilby.core.prior.Uniform(
+            trigger_time - 0.1, trigger_time + 0.1, name="geocent_time"
+        )
+
+    # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
+    priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
+            peak=post_trigger_duration, name="post_trigger_duration"
+        )
+    
 
     for key in priors:
         if isinstance(priors[key], Prior):
@@ -256,11 +429,6 @@ if __name__ == '__main__':
     waveform_generator = bilby.gw.WaveformGenerator(
         time_domain_source_model=time_domain_source_model,
         parameter_conversion=identity,
-        #parameter_conversion=bilby.gw.conversion.convert_to_lal_binary_black_hole_parameters,
-        #waveform_arguments={
-        #    "waveform_approximant": "IMRPhenomPv2",
-        #    "reference_frequency": 50,
-        #},
     )
 
     # In this step, we define the likelihood. Here we use the standard likelihood
