@@ -2028,7 +2028,7 @@ def e2tofu(u, theta, phi):
 
 def tofu(u, theta, phi):
 
-    T = logtofu(u, theta, phi)
+    T = e2tofu(u, theta, phi)
     
     t = log(T)
 

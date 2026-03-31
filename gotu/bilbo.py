@@ -35,7 +35,44 @@ There were observations in ultra-violet (15 hours), x-ray (9 days rising to a pe
 In short, there is sufficient data to fit a phi/theta model that gives the blueshift over time of
 a new arrival.
 
+It is also necessary to take into account that galaxy's are energetic
+in different frequency bands, for instance, glowing in the infrared,
+which might appear as ultra-violet, soon after the arrival.
+
 150 days is around 1e-11 Hubble times.
+
+One observation is that we do not see very short gamma-ray bursts.
+These would be associated with very large phi, huge hyperbolic
+rotations.  The same wobbles in space time may limit the size of
+rotation that is possible.
+
+For the inspiral, it is necessary to take account of how theta and phi
+affect distances from the source.
+
+Now suppose we detect the front of the Kerr wave-front at t*.  A short
+time, dt, afterwards, the source will have moved a distance x'.
+
+In the inspiral we are only interested within some multiple of the
+Schwartzchild radius of the source, and this will be small compared to
+the size of the universe.  To a first approximation all objects near
+the source will have moved x' closer.
+
+Turning this around, a time dt before the event peak we will see the
+Kerr wave at distance x' from the source.
+
+The second problem to deal with is figure out the amplitude of wave we
+should expect.
+
+There is a limit to how far a wave can travel before being thouroughly
+diverted from its original direction.  This limit is why the cosmic
+microwave background is not brighter.
+
+The CMB is around 45 times brighter than you would expect from all the
+energy from galaxies within the visible universe.  Rourke suggests
+this indicates light cannot travel more than a handful of Hubble
+distance before being diverted from its original direction.
+
+This will place a cap on the actual energy received.
 
 """
 
@@ -157,39 +194,50 @@ def time_domain_source_model(
 
     phi = galaxy.phi
 
-    tinspiral = [gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration]
-    tringdown= [gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration]
+    tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration])
+    tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration])
 
+    # now we run into some numeric precision woes.
+    # to sidestep this, assume our time runs zboost times faster than this theta/phi
+
+    ####################
     # calculate ringdown
-    uuu = [galaxy.uoft(tstar + (t-tstar) * zboost) for t in tringdown]
+    ####################
+    ttt = ((tringdown - geocent_time) * zboost) / hubble_time
+
+    uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
     zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
     zzz = np.array([zx[0] for zx in zandx])
     xxx = np.array([zx[1] for zx in zandx])
-    strain = (galaxy.schwartzchild() << u.lightsecond).value
-    rho = strain/(zzz*zzz*xxx*xxx)
 
+    # base signal is a sine wave, wavelength schwartzchild radius
+    scr = (galaxy.schwartzchild() << u.lightsecond).value
+    strain = scr * np.sin(2*pi*uuu * hubble_time/scr)
+
+    # amplitude of wave we see
+    ringdown = strain/(zzz*zzz*xxx*xxx*hubble_time*hubble_time)
+
+
+    ####################
     # calculate inspiral
-    uuu = [galaxy.uoft(tstar + (t-tstar) * zboost) for t in tringdown]
+    ####################
+    # now for the inspiral calculate inspiral
+    ttt = (tinspiral - geocent_time) * zboost / hubble_time
+
+    # ttt <= 0., flip sign here
+    uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
     zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
     zzz = np.array([zx[0] for zx in zandx])
     xxx = np.array([zx[1] for zx in zandx])
 
-    rr = []
-    strain = (galaxy.schwartzchild() << u.lightsecond).value / (rr ** 3.0)
+    rr = 1-xxx
     
-    ttt = [tminz+((gtime-geocent_time)/hubble_time) for gtime in inspiral]
-    uuu = [galaxy.uoft(t) for t in ttt]
-    zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
-    zzz = [zx[0] for zx in zandx]
-    xxx = [zx[1] * hubble_time for zx in zandx]
 
-    wavelength = (galaxy.schwartzchild() << u.lightsecond).value
+    strain = (galaxy.schwartzchild() << u.lightsecond).value / (rr ** 3.0)
 
-    delta_u = np.array(uuu[1:]) - np.array(uuu[:-1])
-    print('urange:', uuu[0], uuu[-1])
-    print('theta/phi/tb/tstar/umax', galaxy.theta, galaxy.phi, galaxy.tb(), galaxy.tstar(), galaxy.umax())
+    inspiral = strain * np.sin(2*pi*uuu * hubble_time/galaxy.schwartzchild())
 
-    return dict(foo=np.array([1e-18] * len(gtimes)))
+    return inspiral.tolist() + ringdown.tolist()
 
 def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
 
@@ -297,7 +345,7 @@ async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
 
         ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        lax.plot(ttt, np.clip(np.log10(lum), 7, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        lax.plot(ttt, np.clip(np.log10(lum), 0, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         uax.plot(ttt, np.clip(uuu, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
 
     xax.set_title('Distance v time')
