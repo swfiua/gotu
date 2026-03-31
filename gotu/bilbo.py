@@ -233,11 +233,11 @@ def time_domain_source_model(
     rr = 1-xxx
     
 
-    strain = (galaxy.schwartzchild() << u.lightsecond).value / (rr ** 3.0)
+    strain = (scr << u.lightsecond).value / (rr ** 3.0)
 
-    inspiral = strain * np.sin(2*pi*uuu * hubble_time/galaxy.schwartzchild())
+    inspiral = strain * np.sin(2*pi*uuu * hubble_time/scr)
 
-    return inspiral.tolist() + ringdown.tolist()
+    return dict(foo=inspiral.tolist() + ringdown.tolist())
 
 def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
 
