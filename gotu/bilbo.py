@@ -203,7 +203,7 @@ def time_domain_source_model(
     ####################
     # calculate ringdown
     ####################
-    ttt = ((tringdown - geocent_time) * zboost) / hubble_time
+    ttt = (tringdown - (geocent_time+post_trigger_duration)) * zboost / hubble_time
 
     uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
     zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
@@ -215,14 +215,18 @@ def time_domain_source_model(
     strain = scr * np.sin(2*pi*uuu * hubble_time/scr)
 
     # amplitude of wave we see
-    ringdown = strain/(zzz*zzz*xxx*xxx*hubble_time*hubble_time)
+    zp1 = 1 + zzz
+    ringdown = strain/((1+zzz)*(1+zzz)*xxx*xxx*hubble_time*hubble_time)
 
+    doplot(ttt * hubble_time/zboost, 1/(zp1*zp1*xxx*xxx), 'strain')
+
+    doplot(ttt * hubble_time/zboost, ringdown, 'ringdown')
 
     ####################
     # calculate inspiral
     ####################
     # now for the inspiral calculate inspiral
-    ttt = (tinspiral - geocent_time) * zboost / hubble_time
+    ttt = (tinspiral - (geocent_time+post_trigger_duration)) * zboost / hubble_time
 
     # ttt <= 0., flip sign here
     uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
@@ -230,14 +234,27 @@ def time_domain_source_model(
     zzz = np.array([zx[0] for zx in zandx])
     xxx = np.array([zx[1] for zx in zandx])
 
-    rr = 1-xxx
+    rr = (1-xxx) * hubble_time
     
 
     strain = (scr << u.lightsecond).value / (rr ** 3.0)
 
     inspiral = strain * np.sin(2*pi*uuu * hubble_time/scr)
 
+    doplot(ttt * hubble_time/zboost, inspiral.clip(-1e-11, 1e-11), 'inspiral')
+    
     return dict(foo=inspiral.tolist() + ringdown.tolist())
+
+def doplot(xx, yy, title):
+
+    from matplotlib import pyplot as plt
+
+    fig = plt.figure()
+    ax = fig.subplots()
+
+    ax.plot(xx, yy)
+    ax.set_title(title)
+    plt.show()
 
 def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
 
