@@ -75,9 +75,9 @@ distance before being diverted from its original direction.
 This will place a cap on the actual energy received.
 
 """
-
+import sys
 from math import *
-from blume import magic
+from blume import magic, farm
 np = magic.np
 
 from gotu.spiral import RandomPhi, Spiral
@@ -90,7 +90,10 @@ from astropy import units as u
 
 import argparse
 
-def get_args():
+def get_args(args=None):
+
+    if args is None:
+        args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--outdir', default='outdir')
@@ -100,7 +103,7 @@ def get_args():
     parser.add_argument('--duration', type=float, default=4.)
     parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 def find_r(galaxy, tdash, utest=-5., factor=1000):
     """
@@ -216,11 +219,16 @@ def time_domain_source_model(
 
     # amplitude of wave we see
     zp1 = 1 + zzz
-    ringdown = strain/((1+zzz)*(1+zzz)*xxx*xxx*hubble_time*hubble_time)
+    lum = 1 / (zp1*zp1*xxx*xxx)
+    ringdown = strain*lum/(hubble_time*hubble_time)
+    tb = galaxy.tb()
+    doplot(ttt * hubble_time/zboost, 1/(zp1*zp1*xxx*xxx),
+           f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+    doplot(ttt * hubble_time/zboost, ringdown,
+           f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
-    doplot(ttt * hubble_time/zboost, 1/(zp1*zp1*xxx*xxx), 'strain')
-
-    doplot(ttt * hubble_time/zboost, ringdown, 'ringdown')
+    doplot(ttt * hubble_time/zboost, np.log(lum).clip(0, 15),
+           f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
     ####################
     # calculate inspiral
@@ -241,21 +249,32 @@ def time_domain_source_model(
 
     inspiral = strain * np.sin(2*pi*uuu * hubble_time/scr)
 
-    doplot(ttt * hubble_time/zboost, inspiral.clip(-1e-11, 1e-11), 'inspiral')
+    doplot(ttt * hubble_time/zboost, inspiral.clip(-1e-11, 1e-11),
+           f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+    
+    doplot(ttt * hubble_time/zboost, uuu.clip(-10,10),
+           f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+    doplot(ttt[1:] * hubble_time/zboost, uuu[1:] - uuu[:-1],
+           f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
     
     return dict(foo=inspiral.tolist() + ringdown.tolist())
 
 def doplot(xx, yy, title):
 
-    from matplotlib import pyplot as plt
+    magic.runner(adoplot(xx, yy, title))
 
-    fig = plt.figure()
-    ax = fig.subplots()
+async def adoplot(xx, yy, title):
 
-    ax.plot(xx, yy)
-    ax.set_title(title)
-    plt.show()
+    ax = await magic.TheMagicRoundAbout.get()
 
+    if ax is not None:
+        
+        ax.plot(xx, yy)
+        ax.set_title(title)
+        ax.show()
+
+    await magic.asyncio.sleep(1)
+    
 def find_t_forz(galaxy, hubble_time, z, epsilon=1e-6):
 
     tstar = galaxy.tstar()
@@ -363,12 +382,14 @@ async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
         ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         lax.plot(ttt, np.clip(np.log10(lum), 0, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        uax.plot(ttt, np.clip(uuu, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        du = uuu[1:] - uuu[0:-1]
+        uax.plot(ttt[1:], np.clip(du, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
 
+        
     xax.set_title('Distance v time')
     ax.set_title('zdash v time')
     lax.set_title('luminosity v time')
-    uax.set_title('u v t')
+    uax.set_title('du v t')
 
     ax.legend()
     xax.legend()
@@ -393,134 +414,153 @@ class Sinh2(WeightedDiscreteValues):
 def identity(arg):
     return arg, None
 
-if __name__ == '__main__':
+class Bilbo(magic.Ball):
 
-    logger = bilby.core.utils.logger
+    def __init__(self, args):
+
+        self.args = args
+        super().__init__()
+    
+    async def run(self):
+        
+        logger = bilby.core.utils.logger
+        args = self.args
+
+        outdir = args.outdir
+        label = args.label
+        trigger_time = args.trigger_time
+
+        # Note you can get trigger times using the gwosc package, e.g.:
+        # > from gwosc import datasets
+        # > datasets.event_gps("GW150914")
+        detectors = args.detectors
+        maximum_frequency = 512
+        minimum_frequency = 20
+        roll_off = 0.4  # Roll off duration of tukey window in seconds, default is 0.4s
+        duration = args.duration  # Analysis segment duration
+        post_trigger_duration = args.post_trigger_duration  # Time between trigger time and end of segment
+        end_time = trigger_time + post_trigger_duration
+        start_time = end_time - duration
+
+        psd_duration = 32 * duration
+        psd_start_time = start_time - psd_duration
+        psd_end_time = start_time
+
+        # We now use gwpy to obtain analysis and psd data and create the ifo_list
+        ifo_list = bilby.gw.detector.InterferometerList([])
+        form = '.hdf5'
+        for det in detectors:
+            ifo = bilby.gw.detector.get_empty_interferometer(det)
+
+            filename = magic.Path(outdir, det + label + form)
+            if filename.exists():
+                logger.info("Reading cached analysis data for ifo {}".format(det))
+                data = TimeSeries.read(filename)
+            else:
+                logger.info("Downloading analysis data for ifo {}".format(det))
+                data = TimeSeries.fetch_open_data(det, start_time, end_time)
+                data.write(filename)
+            ifo.strain_data.set_from_gwpy_timeseries(data)
+
+            filename = magic.Path(outdir, det + label + 'psd' + form)
+            if filename.exists():
+                logger.info("Reading cached psd data for ifo {}".format(det))
+                psd_data = TimeSeries.read(filename)
+            else:
+                logger.info("Downloading psd data for ifo {}".format(det))
+                psd_data = TimeSeries.fetch_open_data(det, psd_start_time, psd_end_time)
+                psd_data.write(filename)
+
+            psd_alpha = 2 * roll_off / duration
+            psd = psd_data.psd(
+                fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median"
+            )
+            ifo.power_spectral_density = bilby.gw.detector.PowerSpectralDensity(
+                frequency_array=psd.frequencies.value, psd_array=psd.value
+            )
+            ifo.maximum_frequency = maximum_frequency
+            ifo.minimum_frequency = minimum_frequency
+            ifo_list.append(ifo)
+
+        logger.info("Saving data plots to {}".format(outdir))
+        bilby.core.utils.check_directory_exists_and_if_not_mkdir(outdir)
+        ifo_list.plot_data(outdir=outdir, label=label)
+
+        # We now define the prior.
+        # We have defined our prior distribution in a local file, GW150914.prior
+        # The prior is printed to the terminal at run-time.
+        # You can overwrite this using the syntax below in the file,
+        # or choose a fixed value by just providing a float value as the prior.
+        priors = bilby.core.prior.PriorDict(filename=label + ".prior")
+
+        # Add the geocent time prior if it is not already there
+        if "geocent_time" not in priors:
+            priors["geocent_time"] = bilby.core.prior.Uniform(
+                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time"
+            )
+
+        # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
+        priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
+                peak=post_trigger_duration, name="post_trigger_duration"
+            )
+        
+
+        for key in priors:
+            if isinstance(priors[key], Prior):
+                print(key, priors[key].is_fixed)
+
+        print(priors.sample_subset(priors.keys(), size=1))
+        #import pdb
+        #pdb.set_trace()
+        
+        # In this step we define a `waveform_generator`. This is the object which
+        # creates the frequency-domain strain. In this instance, we are using the
+        # the Spiral source model. We also pass other parameters:
+        # the waveform approximant and reference frequency and a parameter conversion
+        # which allows us to sample in chirp mass and ratio rather than component mass
+        waveform_generator = bilby.gw.WaveformGenerator(
+            time_domain_source_model=time_domain_source_model,
+            parameter_conversion=identity,
+        )
+
+        # In this step, we define the likelihood. Here we use the standard likelihood
+        # function, passing it the data and the waveform generator.
+        # Note, phase_marginalization is formally invalid with a precessing waveform such as IMRPhenomPv2
+        likelihood = bilby.gw.likelihood.GravitationalWaveTransient(
+            ifo_list,
+            waveform_generator,
+            priors=priors,
+            time_marginalization=True,
+            phase_marginalization=False,
+            distance_marginalization=False,
+        )
+
+        # Finally, we run the sampler. This function takes the likelihood and prior
+        # along with some options for how to do the sampling and how to save the data
+        result = bilby.run_sampler(
+            likelihood,
+            priors,
+            sampler="dynesty",
+            outdir=outdir,
+            label=label,
+            nlive=1000,
+            check_point_delta_t=600,
+            check_point_plot=True,
+            npool=1,
+            plot=False,  # until I give up on blume...
+            #conversion_function=bilby.gw.conversion.generate_all_bbh_parameters,
+            #result_class=bilby.gw.result.CBCResult,
+        )
+        result.plot_corner()
+
+
+
+if __name__ == '__main__':
 
     args = get_args()
 
-    outdir = args.outdir
-    label = args.label
-    trigger_time = args.trigger_time
+    baggins = Bilbo(args)
 
-    # Note you can get trigger times using the gwosc package, e.g.:
-    # > from gwosc import datasets
-    # > datasets.event_gps("GW150914")
-    detectors = args.detectors
-    maximum_frequency = 512
-    minimum_frequency = 20
-    roll_off = 0.4  # Roll off duration of tukey window in seconds, default is 0.4s
-    duration = args.duration  # Analysis segment duration
-    post_trigger_duration = args.post_trigger_duration  # Time between trigger time and end of segment
-    end_time = trigger_time + post_trigger_duration
-    start_time = end_time - duration
-
-    psd_duration = 32 * duration
-    psd_start_time = start_time - psd_duration
-    psd_end_time = start_time
-
-    # We now use gwpy to obtain analysis and psd data and create the ifo_list
-    ifo_list = bilby.gw.detector.InterferometerList([])
-    form = '.hdf5'
-    for det in detectors:
-        ifo = bilby.gw.detector.get_empty_interferometer(det)
-
-        filename = magic.Path(outdir, det + label + form)
-        if filename.exists():
-            logger.info("Reading cached analysis data for ifo {}".format(det))
-            data = TimeSeries.read(filename)
-        else:
-            logger.info("Downloading analysis data for ifo {}".format(det))
-            data = TimeSeries.fetch_open_data(det, start_time, end_time)
-            data.write(filename)
-        ifo.strain_data.set_from_gwpy_timeseries(data)
-
-        filename = magic.Path(outdir, det + label + 'psd' + form)
-        if filename.exists():
-            logger.info("Reading cached psd data for ifo {}".format(det))
-            psd_data = TimeSeries.read(filename)
-        else:
-            logger.info("Downloading psd data for ifo {}".format(det))
-            psd_data = TimeSeries.fetch_open_data(det, psd_start_time, psd_end_time)
-            psd_data.write(filename)
-
-        psd_alpha = 2 * roll_off / duration
-        psd = psd_data.psd(
-            fftlength=duration, overlap=0, window=("tukey", psd_alpha), method="median"
-        )
-        ifo.power_spectral_density = bilby.gw.detector.PowerSpectralDensity(
-            frequency_array=psd.frequencies.value, psd_array=psd.value
-        )
-        ifo.maximum_frequency = maximum_frequency
-        ifo.minimum_frequency = minimum_frequency
-        ifo_list.append(ifo)
-
-    logger.info("Saving data plots to {}".format(outdir))
-    bilby.core.utils.check_directory_exists_and_if_not_mkdir(outdir)
-    ifo_list.plot_data(outdir=outdir, label=label)
-
-    # We now define the prior.
-    # We have defined our prior distribution in a local file, GW150914.prior
-    # The prior is printed to the terminal at run-time.
-    # You can overwrite this using the syntax below in the file,
-    # or choose a fixed value by just providing a float value as the prior.
-    priors = bilby.core.prior.PriorDict(filename=label + ".prior")
-
-    # Add the geocent time prior if it is not already there
-    if "geocent_time" not in priors:
-        priors["geocent_time"] = bilby.core.prior.Uniform(
-            trigger_time - 0.1, trigger_time + 0.1, name="geocent_time"
-        )
-
-    # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
-    priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
-            peak=post_trigger_duration, name="post_trigger_duration"
-        )
-    
-
-    for key in priors:
-        if isinstance(priors[key], Prior):
-            print(key, priors[key].is_fixed)
-
-    print(priors.sample_subset(priors.keys(), size=1))
-    #import pdb
-    #pdb.set_trace()
-    
-    # In this step we define a `waveform_generator`. This is the object which
-    # creates the frequency-domain strain. In this instance, we are using the
-    # the Spiral source model. We also pass other parameters:
-    # the waveform approximant and reference frequency and a parameter conversion
-    # which allows us to sample in chirp mass and ratio rather than component mass
-    waveform_generator = bilby.gw.WaveformGenerator(
-        time_domain_source_model=time_domain_source_model,
-        parameter_conversion=identity,
-    )
-
-    # In this step, we define the likelihood. Here we use the standard likelihood
-    # function, passing it the data and the waveform generator.
-    # Note, phase_marginalization is formally invalid with a precessing waveform such as IMRPhenomPv2
-    likelihood = bilby.gw.likelihood.GravitationalWaveTransient(
-        ifo_list,
-        waveform_generator,
-        priors=priors,
-        time_marginalization=True,
-        phase_marginalization=False,
-        distance_marginalization=False,
-    )
-
-    # Finally, we run the sampler. This function takes the likelihood and prior
-    # along with some options for how to do the sampling and how to save the data
-    result = bilby.run_sampler(
-        likelihood,
-        priors,
-        sampler="dynesty",
-        outdir=outdir,
-        label=label,
-        nlive=1000,
-        check_point_delta_t=600,
-        check_point_plot=True,
-        npool=1,
-        #conversion_function=bilby.gw.conversion.generate_all_bbh_parameters,
-        #result_class=bilby.gw.result.CBCResult,
-    )
-    result.plot_corner()
+    land = farm.Farm()
+    land.add(baggins)
+    farm.run(land)
