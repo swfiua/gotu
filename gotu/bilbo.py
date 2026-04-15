@@ -74,6 +74,23 @@ distance before being diverted from its original direction.
 
 This will place a cap on the actual energy received.
 
+2026/08/04
+==========
+
+A story with no beginning.
+A time and a place when everything started?
+
+Currently going round in circles working on the waveforms for incoming objects.
+
+Whilst plotting potential ringdown plots I noticed a peculiar
+discontinuity in the curves, which has lead me back to the
+Spiral.uoft() method and a closer look at the formulae I am using for
+uoft().
+
+I recall that originally I thought there may be no such formula, and
+the code used a solver instead.  I thought I tested the new version
+against the solver, but I need to re-check.
+
 """
 import sys
 from math import *
@@ -382,14 +399,15 @@ async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
         ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
         lax.plot(ttt, np.clip(np.log10(lum), 0, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        du = uuu[1:] - uuu[0:-1]
-        uax.plot(ttt[1:], np.clip(du, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        llum = np.clip(np.log10(lum), 0, 15)
+        dllum = llum[1:] - llum[0:-1]
+        uax.plot(ttt[1:], np.clip(dllum, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
 
         
     xax.set_title('Distance v time')
     ax.set_title('zdash v time')
     lax.set_title('luminosity v time')
-    uax.set_title('du v t')
+    uax.set_title('dlum v t')
 
     ax.legend()
     xax.legend()
@@ -552,6 +570,39 @@ class Bilbo(magic.Ball):
             #result_class=bilby.gw.result.CBCResult,
         )
         result.plot_corner()
+
+
+    async def oddity(self):
+
+        theta = pi / 120
+        phi = 12.
+        
+        t0 = 2e-5
+        tmax = 3e-5
+
+        sp = Spiral()
+        sp.theta = theta
+        sp.phi = phi
+
+        a = cosh(phi)
+        d = cos(theta)
+        A = D = (a-d)/2
+        B = C = (a+d)/2
+
+        tt = np.linspace(t0, tmax, 1000)
+        tstar = sp.tstar()
+        T = np.exp(tt+tstar)
+        square = C*D + ((1 - B*C - A*D) * T*T) + A * B * T*T*T*T
+        num = T - [sqrt(x) for x in square]
+        den = C - A * T*T
+        U = num/den
+
+        await adoplot(tt, [sp.uoft(t+tstar) for t in tt], 't v u')
+        await adoplot(tt, square, 't v square')
+        await adoplot(tt, num, 't v num')
+        await adoplot(tt, den, 't v den')
+        await adoplot(tt, U, 't v U')
+
 
 
 

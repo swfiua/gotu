@@ -24,6 +24,15 @@ theta measures the angle of approach.
 
 phi corresponds to the scale of the hyperbolic rotation.
 
+The formulae used in this module are from Appendix F of the Geometry
+of the Universe, and present formulae to convert emitter time, u, to
+our time t.
+
+Because of curvature it is convenient to work in terms of T = e**t and
+U == u**t.
+
+See the code for more information.
+
 de Sitter Space and the Space Telescope
 =======================================
 
@@ -60,7 +69,7 @@ speed of light.
 
 To transform time at some distant galaxy, to time at our galaxy, we
 have to take account of special relativity, the mixing of space and
-time.
+time dimensions.
 
 The result when you measure distance in this way is de Sitter Space.
 
@@ -72,8 +81,8 @@ A solution for a universe with no mass, but a constant curvature.
 It is the simplest possible model for a universe where special
 relativity holds, and it matches observations extraordinarily well.
 
-It also explains how redshift naturally occurs forwards through time
-in space-time as a result of special relativity.
+It also explains how an asymptotic redshift-distance relationship
+arises.
 
 The space is highly symmetric, in time as well as space.
 
@@ -87,9 +96,6 @@ separates exponentially from then, following a hyperbola.
 Just as there is a first time that the source is visible, there is a
 last time it will be visible, but the observer will have to wait until
 the end of time to see that.
-
-So at any time there is a large but finite set of galaxies in the
-visible universe.
 
 The modulation of a galaxy's arrival depends on the closest distance
 it approaches and the angle of approach.
@@ -121,7 +127,9 @@ away: the central black hole can absorb angular momentum of in-flowing
 particles.
 
 Distant galaxies we are seeing may in fact be smaller quasars, closer
-to home. 
+to home.  Resolving cosmological and gravitational redshift is
+complex, but the shape of emissions peaks can be helpful here.
+See the :ref:`gotu.desi` module for more on this.
 
 JWST is also showing us how much dust is scattered across galaxies and,
 the beautiful dust spirals that emerge.
@@ -130,7 +138,7 @@ The observations we have of our universe, show a place that is very
 much in balance, it has had a long time to settle into its current
 state.
 
-Once we remove the time limit imposed, due to the big bang it is
+Once we remove the time limit imposed, due to the big bang, it is
 possible to imagine very different galactic timescales and evolution.
 
 It also explains the many observations that indicate a system in high
@@ -172,6 +180,10 @@ But space is clearly not a vacuum, it is full of dust and microwaves.
 When you apply the Sciama Pricnciple to every celestial body, from the
 smallest grain of dust to the largest central mass in a galaxy, then I
 believe it will be clear why the Sciama Principle applies.
+
+Furthermore, we know from gravitational wave detections that
+space-time can carry waves, or rather, space-time itself wobbles, and
+those waves propagate according to the Sciama Principle.
 
 There is also a natural link between rotation and curvature.
 
@@ -228,17 +240,13 @@ relativity has to be taken into account when mapping the distant
 galaxy's space time to our space time.  [1]
 
 Further, when Hubble expansion is taken into account, these relative
-velocities go up by about one thousandth the speed of light every few
-mega-parsecs.
+velocities go up expontenentially, with a horizon at the Hubble
+distance.
 
-But this is just what we would expect when we do an analysis of light
-paths taking into account special relativity.
-
-Just as we can naturally divide space time into 3 dimensions of space
-and one of time, so can the alien on a distant galaxy.
+At that point the galaxy is recessing so fast, we can never see it.
 
 We both measure the same speed of light locally.  This is an
-assumption of special relativity.
+assumption of relativity.
 
 However, to map their space time to ours, we need to know our relative velocity.
 
@@ -264,7 +272,7 @@ and standard ruler.
 
 Light lines give the paths of light through space time.  Both
 ourselves and the people of Zed10, the Zeeten, agree that on these
-lines, time stands still.
+lines, time stands still, along a light line.
 
 ...
 
@@ -303,29 +311,33 @@ class Dss(magic.Ball):
 
     def set_abcd(self):
 
-        self.alpha, self.beta, self.gamma, self.delta = (
+        self.a, self.b, self.c, self.d = (
             math.cosh(self.phi), 0., 0., math.cos(self.theta))
-        self.a = (self.alpha + self.beta - self.gamma - self.delta) / 2
-        self.b = (self.alpha - self.beta - self.gamma + self.delta) / 2
-        self.c = (self.alpha + self.beta + self.gamma + self.delta) / 2
-        self.d = (self.alpha - self.beta + self.gamma - self.delta) / 2
+        self.A = (self.a + self.b - self.c - self.d) / 2
+        self.B = (self.a - self.b - self.c + self.d) / 2
+        self.C = (self.a + self.b + self.c + self.d) / 2
+        self.D = (self.a - self.b + self.c - self.d) / 2
         
 
     def constraints(self):
 
-        print(self.alpha**2 - self.gamma**2 >= 1.)
+        print(self.a**2 - self.c**2 >= 1.)
 
-        print(self.alpha > 0)
+        print(self.a > 0)
 
-        a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
+        a, b, c, d = self.A, self.B, self.C, self.D
 
         print((a * b - c * d)**2 <= (a*a - c*c - 1) * (b*b - d*d +1))
         print((b*b - d*d +1) >= 0)
+        print(a >= 0)
+        print(b >= 0)
+        print(c >= 0)
+        print(d >= 0)
 
     def blue_shift_time(self, alpha=None, delta=None):
         """ """
-        a = alpha or self.alpha
-        d = delta or self.delta
+        a = alpha or self.a
+        d = delta or self.d
 
         sqrt = math.sqrt
         etb = sqrt((1+a)/(a+d)) + sqrt((1-d)/(a-d))
@@ -333,20 +345,51 @@ class Dss(magic.Ball):
         return math.log(etb)
 
     def tofu(self, u):
-        """ -a sinh(t) sinh(u) + d cosh(t) cosh(u) = 1
+        """ Return t for u
 
-        work with U=e**u and T=e**t
+        There is a path from emitter at time u to the receiver at time t if and only if:
+
+        -a sinh(t) sinh(u) + d cosh(t) cosh(u) = 1
+
+        (Here a is cosh(phi) and d is cos(theta))
+
+        working with U=e**u and T=e**t, this constraint becomes:
+
+                -ATU + BT/U + CU/T - D/TU = 2
+
+        Where A, B, C and D are calculated as shown in set_abcd.
+
+        If we multiply by UT and re-arrange we get:
+
+               -ATTUU + BTT + CUU - D - 2TU = 0
+
+        Giving:
+               (B-AUU)TT - 2UT + CUU - D = 0            (1)
+        and 
+               (C-ATT)UU - 2UT + BTT - D = 0             (2)
+
+
+        From 1:
+
+              T = (+2U +/- sqrt(4UU - 4 * (B-AUU)(CUU - D))/(2*(B -AUU)
+                =  (U +/- sqrt(UU - (B-AUU)(CUU - D))/(B -AUU)
+                =  (U +/- sqrt(UU + BD + ACUUUU - ADUU - BCUU ))/(B -AUU)
+                =  (U +/- sqrt(BD + (1-BC-AD)UU + ACUUUU)/(B - AUU)
+
+        From 2:
+              U = (T +/- sqrt(TT - (C-ATT)(BTT-D)))/(C-ATT)
+              U = (T +/- sqrt(CD + (1-BC-AD)TT + ABTTTT))/(C-ATT)
         """
         U = math.e ** u
 
-        a, b, c, d = self.a, self.b, self.c, self.d
+        a, b, c, d = self.A, self.B, self.C, self.D
 
         xx = (b * d) + ((U**2) * (1 - b*c - a*d)) + (a * c * U**4)
         T = (U + math.sqrt(xx)) / (b - a * U**2)
 
         # check equation
         print(U,T)
-        check2 =  (-a*T*U) + (b*T/U) + (c*U/T) - (d/T*U)
+        check2 =  (-a*T*U) + (b*T/U) + (c*U/T) - (d/(T*U))
         print('check should be 2:', check2)
 
         t = math.log(T)
@@ -354,12 +397,45 @@ class Dss(magic.Ball):
         sh = math.sinh
         ch = math.cosh
 
-        a, b, c, d = self.alpha, self.beta, self.gamma, self.delta
+        a, b, c, d = self.a, self.b, self.c, self.d
         check = - a * sh(t) * sh(u) + d * ch(t) * ch(u)
         print('check should be 1:', check)
         
         return t
 
+    def uoft(self, t):
+        """ Return u for t """
+        T = math.e ** t
+
+        a, b, c, d = self.A, self.B, self.C, self.D
+
+        xx = (c * d) + ((T**2) * (1 - b*c - a*d)) + (a * b * T**4)
+        U = (T - math.sqrt(xx)) / (c - a * T**2)
+
+        # check equation
+        print(U,T)
+        check2 =  (-a*T*U) + (b*T/U) + (c*U/T) - (d/(T*U))
+        print('check should be 2:', check2)
+
+        t = math.log(T)
+        u = math.log(U)
+        sh = math.sinh
+        ch = math.cosh
+
+        a, b, c, d = self.a, self.b, self.c, self.d
+        check = - a * sh(t) * sh(u) + d * ch(t) * ch(u)
+        print('check should be 1:', check)
+        
+        return u
+
+    def tstar(self):
+
+        return math.log(math.sqrt(self.D/self.B))
+
+    def umax(self):
+
+        return math.log(math.sqrt(self.B/self.A))
+        
     def time_until_red_shift_matches_expected_for_distance(self, error=0):
         """ Curious how this value varies with phi and theta """
         raise NotImplemented        
