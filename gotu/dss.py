@@ -129,7 +129,7 @@ particles.
 Distant galaxies we are seeing may in fact be smaller quasars, closer
 to home.  Resolving cosmological and gravitational redshift is
 complex, but the shape of emissions peaks can be helpful here.
-See the :ref:`gotu.desi` module for more on this.
+See the `.desi` module for more on this.
 
 JWST is also showing us how much dust is scattered across galaxies and,
 the beautiful dust spirals that emerge.
@@ -293,11 +293,12 @@ from scipy import integrate
 from traceback import print_exc
 
 from blume import magic
-from blume import magic
 from blume import farm as fm
 
-class Dss(magic.Ball):
 
+
+class Dss(magic.Ball):
+    """ Coming and going in de Sitter Space """
     def __init__(self):
         """ initialise """
         super().__init__()
@@ -379,6 +380,12 @@ class Dss(magic.Ball):
         From 2:
               U = (T +/- sqrt(TT - (C-ATT)(BTT-D)))/(C-ATT)
               U = (T +/- sqrt(CD + (1-BC-AD)TT + ABTTTT))/(C-ATT)
+
+        See `.uoft` for more.
+
+        Some things to note.
+
+
         """
         U = math.e ** u
 
@@ -404,7 +411,18 @@ class Dss(magic.Ball):
         return t
 
     def uoft(self, t):
-        """ Return u for t """
+        """ Return u for t
+
+        As T -> infinity, U -> sqrt(B/A)
+        
+        So there is a last time, umax, that we see the emitter.
+
+        umax = sqrt(B/A)
+
+        There is also a discontinuity at T=sqrt(C/A).
+
+        This is the first time, tstar, that the source is visible.
+        """
         T = math.e ** t
 
         a, b, c, d = self.A, self.B, self.C, self.D

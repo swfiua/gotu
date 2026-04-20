@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'gotu'
-copyright = '2024, Johnny Gill'
+copyright = '2026, Johnny Gill'
 author = 'Johnny Gill'
 
 # The full version, including alpha/beta/rc tags
