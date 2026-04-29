@@ -2040,39 +2040,6 @@ def tofu(u, theta, phi):
     return t
 
  
-def tofusolver(u, theta, phi):
-    """ Work in natural units, c=G=Hubble Distance=1
-
-    Time in Hubble times.
-    """
-    a = cosh(phi)
-    d = cos(theta)
-    # work with U = e**u and T=e**t
-    A = D = (a - d)/2
-    B = C = (a + d)/2
-
-    # first time visible is tstar given by
-    tstar = log(sqrt(A/B))
-
- 
-    # t for umax is infinite and u for tstar is -infinity
-    umax = log(sqrt(B/A))
- 
-
-    def f(u):
-        u = u[0]
-        if u > umax: return 100
-        return tofu(u, theta, phi) - t
-    try:
-        tval = optimize.fsolve(f, umax/2)[0]
-    except Exception as e:
-        tval=0
-        print(f'XXXXXXXXXXX {e}')
-    t = log(tval)
- 
-    return t
- 
-
 def e2uoft(t, theta, phi):
     """ Work in natural units, c=G=Hubble Distance=1
 

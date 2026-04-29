@@ -100,7 +100,7 @@ np = magic.np
 from gotu.spiral import RandomPhi, Spiral
 
 import bilby
-from bilby.core.prior import Prior, WeightedDiscreteValues
+from bilby.core.prior import Prior, WeightedDiscreteValues, Sine, Cosine, Uniform, Normal, Exponential
 from gwpy.timeseries import TimeSeries
 
 from astropy import units as u
@@ -212,8 +212,6 @@ def time_domain_source_model(
 
     minz = -0.9999
 
-    phi = galaxy.phi
-
     tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration])
     tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration])
 
@@ -237,14 +235,19 @@ def time_domain_source_model(
     # amplitude of wave we see
     zp1 = 1 + zzz
     lum = 1 / (zp1*zp1*xxx*xxx)
-    ringdown = strain*lum/(hubble_time*hubble_time)
+    ringdown = strain*lum
     tb = galaxy.tb()
-    doplot(ttt * hubble_time/zboost, 1/(zp1*zp1*xxx*xxx),
+
+    plots = False
+    if plots:
+        pass
+    
+    doplot(ttt, strain,
            f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-    doplot(ttt * hubble_time/zboost, ringdown,
+    doplot(ttt, ringdown,
            f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
-    doplot(ttt * hubble_time/zboost, np.log(lum).clip(0, 15),
+    doplot(ttt, np.log(lum).clip(0, 15),
            f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
     ####################
@@ -260,25 +263,30 @@ def time_domain_source_model(
     xxx = np.array([zx[1] for zx in zandx])
 
     rr = (1-xxx) * hubble_time
-    
 
-    strain = (scr << u.lightsecond).value / (rr ** 3.0)
+    du = uuu[1:] - uuu[:-1]
+    
+    # fixme: do I need to deal with rr < scr ?
+    strain = scr / (rr ** 3.0)
 
     inspiral = strain * np.sin(2*pi*uuu * hubble_time/scr)
 
-    doplot(ttt * hubble_time/zboost, inspiral.clip(-1e-11, 1e-11),
+    doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
            f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-    
-    doplot(ttt * hubble_time/zboost, uuu.clip(-10,10),
-           f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-    doplot(ttt[1:] * hubble_time/zboost, uuu[1:] - uuu[:-1],
-           f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+
+    if plots:
+        doplot(ttt, uuu.clip(-10,10),
+               f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+        doplot(ttt[1:], du,
+               f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
     
     return dict(foo=inspiral.tolist() + ringdown.tolist())
 
 def doplot(xx, yy, title):
 
     magic.runner(adoplot(xx, yy, title))
+    magic.runner(magic.sleep(.1))
+                 
 
 async def adoplot(xx, yy, title):
 
@@ -509,7 +517,19 @@ class Bilbo(magic.Ball):
         # The prior is printed to the terminal at run-time.
         # You can overwrite this using the syntax below in the file,
         # or choose a fixed value by just providing a float value as the prior.
-        priors = bilby.core.prior.PriorDict(filename=label + ".prior")
+        filename = magic.Path(label + ".prior")
+        if filename.exists():
+            priors = bilby.core.prior.PriorDict(filename=filename.name)
+        else:
+            priors = bilby.core.prior.PriorDict(dict(
+                mass = Exponential(name='mass', mu=1e9),
+                phi = Sinh2(name='phi', maximum=4.),
+                theta =  Sine(name='theta'),
+                dec =  Cosine(name='dec'),
+                ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
+                phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                zboost =  Normal(name='zboost', mu=1e12, sigma=1e1)))
 
         # Add the geocent time prior if it is not already there
         if "geocent_time" not in priors:
@@ -596,6 +616,8 @@ class Bilbo(magic.Ball):
         num = T - [sqrt(x) for x in square]
         den = C - A * T*T
         U = num/den
+
+        print('tstar, sqrt(C/A)', tstar, sqrt(C/A))
 
         await adoplot(tt, [sp.uoft(t+tstar) for t in tt], 't v u')
         await adoplot(tt, square, 't v square')

@@ -20,7 +20,7 @@ becomes increasingly red-shifted as time goes by.
 The actual blue shift period and full details depend on two
 parameters, theta and phi.
 
-theta measures the angle of approach.
+theta measures the angle between the asymptotes of the hyperbola of the geodesic.
 
 phi corresponds to the scale of the hyperbolic rotation.
 
@@ -31,7 +31,7 @@ our time t.
 Because of curvature it is convenient to work in terms of T = e**t and
 U == u**t.
 
-See the code for more information.
+See the code for more information, as well as the paper.
 
 de Sitter Space and the Space Telescope
 =======================================
@@ -51,8 +51,7 @@ de Sitter Space is mentioned briefly in the paper, remarking that it
 was not consistent with the observations.   
 
 I believe Peebles is talking about that sub-space of de Sitter Space,
-restricted to bodies with a common origin if you go back the Hubble
-time.
+restricted to bodies with a common origin.
 
 de Sitter Space appears to disappear from consideration as a model for
 the universe.   
@@ -64,12 +63,12 @@ years ago.
 So what is de Sitter Space?  Imagine a universe, of galaxies, as far
 as the eye can see, and far, far beyond.
 
-Moving in seemingly random directions, at around one thousandth the
-speed of light.
+Moving in seemingly random directions, with local velocities at around
+one thousandth the speed of light.
 
 To transform time at some distant galaxy, to time at our galaxy, we
-have to take account of special relativity, the mixing of space and
-time dimensions.
+have to take account of special relativity, which tells us how to
+account of the relative velocity of an emitter and a receiver.
 
 The result when you measure distance in this way is de Sitter Space.
 
@@ -79,12 +78,14 @@ spacetime.  The lambda in Einstein's General Relativity equation.
 A solution for a universe with no mass, but a constant curvature.
 
 It is the simplest possible model for a universe where special
-relativity holds, and it matches observations extraordinarily well.
+relativity holds, and it matches observations extraordinarily well, so
+long as you look at those observations with the perspective that the
+universe has the Perfect Copernican Principle.
 
 It also explains how an asymptotic redshift-distance relationship
 arises.
 
-The space is highly symmetric, in time as well as space.
+de Sitter Space is highly symmetric, in time as well as space.
 
 Backwards in time, paths separate exponentially, as well as in
 forwards time.
@@ -96,9 +97,6 @@ separates exponentially from then, following a hyperbola.
 Just as there is a first time that the source is visible, there is a
 last time it will be visible, but the observer will have to wait until
 the end of time to see that.
-
-The modulation of a galaxy's arrival depends on the closest distance
-it approaches and the angle of approach.
 
 With this model for a universe there is an explanation for the
 redshift that we see, whilst there being no overall expansion of
@@ -116,7 +114,7 @@ gravity, following Einstein's general relativity.
 
 The current assumption is that light producing regions are far enough
 from any central mass for the gravitational redshift to be
-significant.
+insignificant.
 
 Part of this belief comes from the theory of accretion models and
 over-coming the angular-momentum obstruction to accretion.
@@ -124,19 +122,19 @@ over-coming the angular-momentum obstruction to accretion.
 According to Rourke, once you take account of the frame dragging due
 to the rotation of the central mass, the angular momentum problem goes
 away: the central black hole can absorb angular momentum of in-flowing
-particles.
+particles.   
 
 Distant galaxies we are seeing may in fact be smaller quasars, closer
 to home.  Resolving cosmological and gravitational redshift is
 complex, but the shape of emissions peaks can be helpful here.
 See the `.desi` module for more on this.
 
-JWST is also showing us how much dust is scattered across galaxies and,
-the beautiful dust spirals that emerge.
+JWST is also showing us how much dust is scattered across galaxies
+and, the beautiful dust spirals that emerge.
 
 The observations we have of our universe, show a place that is very
 much in balance, it has had a long time to settle into its current
-state.
+state of equilibrium.
 
 Once we remove the time limit imposed, due to the big bang, it is
 possible to imagine very different galactic timescales and evolution.
@@ -165,7 +163,25 @@ But the Cosmic Microwave Background, what's that? It's the heat from
 billions of billions of distant galaxies, the glowing dust of the
 cosmos.
 
-It's all modulated by the lense of de Sitter Space.
+It's all modulated by the lense of de Sitter Space, but why is it the
+temperature it is, and what of the harmonics?
+
+First, the Hubble radius is important too in de Sitter Space, it is
+the de Sitter Radius, the distance at which things appear and where
+they disappear from view.
+
+The universe is not, however, a pure de Sitter Space. It is also full
+of roations and spherical harmonics.  The 500 million light year
+radius of the Lanakea super cluster, the first harmonic of the Cosmic
+Microwave Background's spherical harmonics.
+
+Which is why the CMB is the temperature it is.  The wobbles mean light
+can rarely get more than a handful of Hubble distances from it's
+source, like a main of hair, it eventually turns in on itself.
+
+6-7 Hubble distances seems to be about the limit, the CMB is 45 times
+brighter than the thermalised energy of all the galaxies in a Hubble
+distance radius sphere.
 
 One criticism of de Sitter Space is that it is a vacuum solution to
 Einstein's equations.  There is no matter and no Mach's Principle.
@@ -203,16 +219,13 @@ The key observation is that when you plot a distant galaxy's distance
 against time we get a rectangular hyperbola.  A hyperbola that is
 embedded in curved space time.
 
-These hyperbolae arise from the Lorentz transformations of special
-relativity.
-
 Most of the sources of light we see are galaxies that are now in the
 rapidly receding part of their hyperbola, since that is where each
 source spends all but a small finite time of the infinite time it is
 visible.
 
 Presumably, under current cosmology, the few exceptions are assumed to
-be smaller objects nearer to our galaxy?   
+be smaller objects nearer to our galaxy?  
 
 To set the scene, consider someone on a planet in a distant galaxy.
 
@@ -298,7 +311,61 @@ from blume import farm as fm
 
 
 class Dss(magic.Ball):
-    """ Coming and going in de Sitter Space """
+    """ Coming and going in de Sitter Space
+
+    An exploration of the equations of the paper.
+
+    There is a path from emitter at time u to the receiver at time t if and only if::
+
+        -a sinh(t) sinh(u) + d cosh(t) cosh(u) = 1
+
+    Here a is cosh(phi) and d is cos(theta)
+
+    Working with U=e**u and T=e**t, this constraint becomes::
+
+            -ATU + BT/U + CU/T - D/TU = 2
+
+    Where A, B, C and D are calculated as shown in `Dss.set_abcd`.
+
+    If we multiply by UT and re-arrange we get::
+
+           -ATTUU + BTT + CUU - D - 2TU = 0
+
+    This can be considered as a quatric in either T or U.
+
+    As a quadratic in T::
+    
+              (B-AUU)TT - 2UT + CUU - D = 0            
+
+              T = (+2U +/- sqrt(4UU - 4 * (B-AUU)(CUU - D))/(2*(B -AUU)
+                =  (U +/- sqrt(UU - (B-AUU)(CUU - D))/(B -AUU)
+                =  (U +/- sqrt(UU + BD + ACUUUU - ADUU - BCUU ))/(B -AUU)
+                =  (U + sqrt(BD + (1-BC-AD)UU + ACUUUU)/(B - AUU)  (1)
+
+    Taking the positive square root as the causal solution.
+
+    (why not the negative?)
+    
+    And for U::
+    
+               (C-ATT)UU - 2UT + BTT - D = 0             
+
+
+              U = (T +/- sqrt(TT - (C-ATT)(BTT-D)))/(C-ATT)
+              U = (T - sqrt(CD + (1-BC-AD)TT + ABTTTT))/(C-ATT)   (2)
+
+    As U tends to zero, T = sqrt(BD)/B = sqrt(D/B)
+
+    So, there is a first time that T sees U, at T = sqrt(D/B).  See `Dss.tstar`.
+
+    Now examine (2) and see that as T tends to infinity, U tends to sqrt(B/A).
+
+    There is a last time U = sqrt(B/A) that the emitter is visible.   See `Dss.umax`.
+
+    There is an interesting situation at T = +/- sqrt(C/A).
+    
+
+    """
     def __init__(self):
         """ initialise """
         super().__init__()
@@ -306,7 +373,6 @@ class Dss(magic.Ball):
         self.theta = math.pi / 4
         self.phi = 0.5
         self.size = 50
-        self.aaa = magic.modes
 
         self.set_abcd()
 
@@ -322,21 +388,25 @@ class Dss(magic.Ball):
 
     def constraints(self):
 
-        print(self.a**2 - self.c**2 >= 1.)
+        assert(self.a**2 - self.c**2 >= 1.)
 
-        print(self.a > 0)
+        assert(self.a > 0)
 
         a, b, c, d = self.A, self.B, self.C, self.D
 
-        print((a * b - c * d)**2 <= (a*a - c*c - 1) * (b*b - d*d +1))
-        print((b*b - d*d +1) >= 0)
-        print(a >= 0)
-        print(b >= 0)
-        print(c >= 0)
-        print(d >= 0)
+        assert((a * b - c * d)**2 <= (a*a - c*c - 1) * (b*b - d*d +1))
+        assert((b*b - d*d +1) >= 0)
+        assert(a >= 0)
+        assert(b >= 0)
+        assert(c >= 0)
+        assert(d >= 0)
 
+    def tb(self):
+        """ Blue shift time """
+        return self.blue_shift_time()
+        
     def blue_shift_time(self, alpha=None, delta=None):
-        """ """
+        """ How long the blue shift period is. """
         a = alpha or self.a
         d = delta or self.d
 
@@ -347,39 +417,6 @@ class Dss(magic.Ball):
 
     def tofu(self, u):
         """ Return t for u
-
-        There is a path from emitter at time u to the receiver at time t if and only if:
-
-        -a sinh(t) sinh(u) + d cosh(t) cosh(u) = 1
-
-        (Here a is cosh(phi) and d is cos(theta))
-
-        working with U=e**u and T=e**t, this constraint becomes:
-
-                -ATU + BT/U + CU/T - D/TU = 2
-
-        Where A, B, C and D are calculated as shown in set_abcd.
-
-        If we multiply by UT and re-arrange we get:
-
-               -ATTUU + BTT + CUU - D - 2TU = 0
-
-        Giving:
-               (B-AUU)TT - 2UT + CUU - D = 0            (1)
-        and 
-               (C-ATT)UU - 2UT + BTT - D = 0             (2)
-
-
-        From 1:
-
-              T = (+2U +/- sqrt(4UU - 4 * (B-AUU)(CUU - D))/(2*(B -AUU)
-                =  (U +/- sqrt(UU - (B-AUU)(CUU - D))/(B -AUU)
-                =  (U +/- sqrt(UU + BD + ACUUUU - ADUU - BCUU ))/(B -AUU)
-                =  (U +/- sqrt(BD + (1-BC-AD)UU + ACUUUU)/(B - AUU)
-
-        From 2:
-              U = (T +/- sqrt(TT - (C-ATT)(BTT-D)))/(C-ATT)
-              U = (T +/- sqrt(CD + (1-BC-AD)TT + ABTTTT))/(C-ATT)
 
         See `.uoft` for more.
 
