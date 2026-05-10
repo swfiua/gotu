@@ -113,7 +113,7 @@ def get_args(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--outdir', default='outdir')
+    parser.add_argument('--outdir')
     parser.add_argument('--label', default='GW150914')
     parser.add_argument('--trigger_time', type=float, default=1126259462.4)
     parser.add_argument('--post_trigger_duration', type=float, default=2.)
@@ -186,23 +186,19 @@ def time_domain_source_model(
         ra=None,
         psi=None,
         phase=None,
-        zboost=None,
+        logzboost=None,
+        logscale=None,
+        logscaleringdown=None,
         post_trigger_duration=None
 ):
-    print('TDSM ******')
-    print(len(gtimes), gtimes[0])
-    print('mass/theta/phi', mass, theta, phi)
 
-    print('gpstimes', geocent_time, post_trigger_duration)
-
+    mass = 10**mass
     galaxy = Spiral()
     galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
     galaxy.phi = phi
     galaxy.theta = theta
 
     hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-
-    print(geocent_time, gtimes[0], gtimes[-1], len(gtimes))
 
     tstar = galaxy.tstar()
 
@@ -217,7 +213,7 @@ def time_domain_source_model(
 
     # now we run into some numeric precision woes.
     # to sidestep this, assume our time runs zboost times faster than this theta/phi
-
+    zboost = 10**logzboost
     ####################
     # calculate ringdown
     ####################
@@ -235,20 +231,18 @@ def time_domain_source_model(
     # amplitude of wave we see
     zp1 = 1 + zzz
     lum = 1 / (zp1*zp1*xxx*xxx)
-    ringdown = strain*lum
+    ringdown = strain*lum*10**logscaleringdown
     tb = galaxy.tb()
 
     plots = False
     if plots:
-        pass
-    
-    doplot(ttt, strain,
-           f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-    doplot(ttt, ringdown,
-           f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-    doplot(ttt, np.log(lum).clip(0, 15),
-           f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+        doplot(ttt, strain,
+               f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+        doplot(ttt, ringdown,
+               f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+        
+        doplot(ttt, np.log(lum).clip(0, 15),
+               f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
     ####################
     # calculate inspiral
@@ -266,15 +260,19 @@ def time_domain_source_model(
 
     du = uuu[1:] - uuu[:-1]
     
-    # fixme: do I need to deal with rr < scr ?
-    strain = scr / (rr ** 3.0)
+    # deal with rr < scr 
+    weight = scr
 
-    inspiral = strain * np.sin(2*pi*uuu * hubble_time/scr)
+    weight = np.where(rr < scr, rr, scr)
+    strain = (10**logscale) * weight / (rr ** 3.0)
 
-    doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
-           f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+    inspiral = strain * np.sin(2*pi*uuu * hubble_time/weight)
 
     if plots:
+
+        doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
+               f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+
         doplot(ttt, uuu.clip(-10,10),
                f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
         doplot(ttt[1:], du,
@@ -285,7 +283,6 @@ def time_domain_source_model(
 def doplot(xx, yy, title):
 
     magic.runner(adoplot(xx, yy, title))
-    magic.runner(magic.sleep(.1))
                  
 
 async def adoplot(xx, yy, title):
@@ -447,14 +444,16 @@ class Bilbo(magic.Ball):
         self.args = args
         super().__init__()
     
-    async def run(self):
         
+    def load_ifos(self):
+        """ Load the list of observations """
         logger = bilby.core.utils.logger
         args = self.args
 
-        outdir = args.outdir
         label = args.label
-        trigger_time = args.trigger_time
+        outdir = args.outdir or label
+        
+        trigger_time = args.trigger_time or datasets.gps_time(label)
 
         # Note you can get trigger times using the gwosc package, e.g.:
         # > from gwosc import datasets
@@ -512,24 +511,69 @@ class Bilbo(magic.Ball):
         bilby.core.utils.check_directory_exists_and_if_not_mkdir(outdir)
         ifo_list.plot_data(outdir=outdir, label=label)
 
+        return ifo_list
+
+    async def start(self):
+
+        self.ifo_list = self.load_ifos()
+        self.priors = self.load_priors()
+
+
+    def load_priors(self):
+        
         # We now define the prior.
         # We have defined our prior distribution in a local file, GW150914.prior
         # The prior is printed to the terminal at run-time.
         # You can overwrite this using the syntax below in the file,
         # or choose a fixed value by just providing a float value as the prior.
+        label = args.label
+
         filename = magic.Path(label + ".prior")
         if filename.exists():
             priors = bilby.core.prior.PriorDict(filename=filename.name)
         else:
             priors = bilby.core.prior.PriorDict(dict(
-                mass = Exponential(name='mass', mu=1e9),
-                phi = Sinh2(name='phi', maximum=4.),
+                mass = Uniform(name='mass', minimum=5, maximum=12),
+                phi = Sinh2(name='phi', maximum=12.),
                 theta =  Sine(name='theta'),
                 dec =  Cosine(name='dec'),
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
-                zboost =  Normal(name='zboost', mu=1e12, sigma=1e1)))
+                logzboost =  Uniform(name='logzboost', minimum=0, maximum=14, boundary='periodic'),
+                logscale = Uniform(name='logscale', minimum=-10, maximum=10, boundary='periodic'),
+                logscaleringdown = Uniform(name='logscaleringdown', minimum=-10, maximum=10, boundary='periodic')))
+
+        return priors
+        
+    async def run(self):
+        
+        logger = bilby.core.utils.logger
+        args = self.args
+
+        label = args.label
+        outdir = args.outdir or label
+        trigger_time = args.trigger_time or datasets.gps_time(label)
+
+        # Note you can get trigger times using the gwosc package, e.g.:
+        # > from gwosc import datasets
+        # > datasets.event_gps("GW150914")
+        detectors = args.detectors
+        maximum_frequency = 512
+        minimum_frequency = 20
+        roll_off = 0.4  # Roll off duration of tukey window in seconds, default is 0.4s
+        duration = args.duration  # Analysis segment duration
+        post_trigger_duration = args.post_trigger_duration  # Time between trigger time and end of segment
+        end_time = trigger_time + post_trigger_duration
+        start_time = end_time - duration
+
+        psd_duration = 32 * duration
+        psd_start_time = start_time - psd_duration
+        psd_end_time = start_time
+
+        ifo_list = self.ifo_list
+        priors = self.priors
+
 
         # Add the geocent time prior if it is not already there
         if "geocent_time" not in priors:
@@ -541,7 +585,6 @@ class Bilbo(magic.Ball):
         priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
                 peak=post_trigger_duration, name="post_trigger_duration"
             )
-        
 
         for key in priors:
             if isinstance(priors[key], Prior):
