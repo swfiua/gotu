@@ -516,10 +516,57 @@ class Bilbo(magic.Ball):
 
     async def start(self):
 
+        label = args.label
+        outdir = args.outdir or label
+
         self.ifo_list = self.load_ifos()
         self.priors = self.load_priors()
 
+        # In this step we define a `waveform_generator`. This is the object which
+        # creates the frequency-domain strain. In this instance, we are using the
+        # the Spiral source model. We also pass other parameters:
+        # the waveform approximant and reference frequency and a parameter conversion
+        # which allows us to sample in chirp mass and ratio rather than component mass
+        self.waveform_generator = bilby.gw.WaveformGenerator(
+            time_domain_source_model=time_domain_source_model,
+            parameter_conversion=identity,
+        )
 
+        # In this step, we define the likelihood. Here we use the standard likelihood
+        # function, passing it the data and the waveform generator.
+        # Note, phase_marginalization is formally invalid with a precessing waveform such as IMRPhenomPv2
+        self.likelihood = bilby.gw.likelihood.GravitationalWaveTransient(
+            self.ifo_list,
+            self.waveform_generator,
+            priors=self.priors,
+            time_marginalization=False,
+            phase_marginalization=False,
+            distance_marginalization=False,
+        )
+
+        from bilby.core.sampler import dynesty
+
+
+        meta_data = dict()
+        self.likelihood.label = label
+        self.likelihood.outdir = outdir
+
+        bcu = bilby.core.utils
+        meta_data["likelihood"] = self.likelihood.meta_data
+        meta_data["loaded_modules"] = bcu.loaded_modules_dict()
+        meta_data["environment_packages"] = bcu.env_package_list(as_dataframe=True)
+        meta_data["global_meta_data"] = bcu.global_meta_data
+
+        self.sampler = dynesty.Dynesty(
+            self.likelihood,
+            priors=self.priors,
+            outdir=outdir,
+            label=label,
+            plot=False,
+            npool=1,
+            meta_data=meta_data,
+        )
+        
     def load_priors(self):
         
         # We now define the prior.
@@ -569,28 +616,8 @@ class Bilbo(magic.Ball):
 
         label = args.label
         outdir = args.outdir or label
-        trigger_time = args.trigger_time or datasets.gps_time(label)
 
-        # Note you can get trigger times using the gwosc package, e.g.:
-        # > from gwosc import datasets
-        # > datasets.event_gps("GW150914")
-        detectors = args.detectors
-        maximum_frequency = 512
-        minimum_frequency = 20
-        roll_off = 0.4  # Roll off duration of tukey window in seconds, default is 0.4s
-        duration = args.duration  # Analysis segment duration
-        post_trigger_duration = args.post_trigger_duration  # Time between trigger time and end of segment
-        end_time = trigger_time + post_trigger_duration
-        start_time = end_time - duration
-
-        psd_duration = 32 * duration
-        psd_start_time = start_time - psd_duration
-        psd_end_time = start_time
-
-        ifo_list = self.ifo_list
         priors = self.priors
-
-
         for key in priors:
             if isinstance(priors[key], Prior):
                 print(key, priors[key].is_fixed)
@@ -599,46 +626,29 @@ class Bilbo(magic.Ball):
         #import pdb
         #pdb.set_trace()
         
-        # In this step we define a `waveform_generator`. This is the object which
-        # creates the frequency-domain strain. In this instance, we are using the
-        # the Spiral source model. We also pass other parameters:
-        # the waveform approximant and reference frequency and a parameter conversion
-        # which allows us to sample in chirp mass and ratio rather than component mass
-        waveform_generator = bilby.gw.WaveformGenerator(
-            time_domain_source_model=time_domain_source_model,
-            parameter_conversion=identity,
-        )
-
-        # In this step, we define the likelihood. Here we use the standard likelihood
-        # function, passing it the data and the waveform generator.
-        # Note, phase_marginalization is formally invalid with a precessing waveform such as IMRPhenomPv2
-        likelihood = bilby.gw.likelihood.GravitationalWaveTransient(
-            ifo_list,
-            waveform_generator,
-            priors=priors,
-            time_marginalization=True,
-            phase_marginalization=False,
-            distance_marginalization=False,
-        )
 
         # Finally, we run the sampler. This function takes the likelihood and prior
         # along with some options for how to do the sampling and how to save the data
-        result = bilby.run_sampler(
-            likelihood,
-            priors,
-            sampler="dynesty",
-            outdir=outdir,
-            label=label,
-            nlive=1000,
-            check_point_delta_t=600,
-            check_point_plot=True,
-            npool=1,
-            plot=False,  # until I give up on blume...
-            #conversion_function=bilby.gw.conversion.generate_all_bbh_parameters,
-            #result_class=bilby.gw.result.CBCResult,
-        )
+        result = self.sampler.run_sampler()
+
         result.plot_corner()
 
+    async def show_waveforms(self):
+
+        gtimes = np.linspace(self.args.trigger_time-self.args.post_trigger_duration,
+                             self.args.trigger_time+self.args.post_trigger_duration,
+                             10000)
+        while True:
+
+            sample = self.priors.sample_subset(self.priors.keys(), size=1)
+
+            waveform = time_domain_source_model(gtimes, **sample)
+
+            ax = await self.get()
+            print(waveform.keys())
+            ax.plot(gtimes, waveform['foo'])
+            ax.show()
+            await magic.sleep(self.sleep)
 
     async def oddity(self):
 
