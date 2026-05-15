@@ -4,6 +4,8 @@ This is Bilbo Bilby, boldly going where no astrophysicist has gone before.
 
 bilby takes priors and waveforms and calculates odds.
 
+https://arxiv.org/pdf/1811.02042
+
 2026/03/27
 ==========
 
@@ -188,7 +190,6 @@ def time_domain_source_model(
         phase=None,
         logzboost=None,
         logscale=None,
-        logscaleringdown=None,
         post_trigger_duration=None
 ):
 
@@ -231,7 +232,7 @@ def time_domain_source_model(
     # amplitude of wave we see
     zp1 = 1 + zzz
     lum = 1 / (zp1*zp1*xxx*xxx)
-    ringdown = strain*lum*10**logscaleringdown
+    ringdown = strain*lum*10**logscale
     tb = galaxy.tb()
 
     plots = False
@@ -527,7 +528,7 @@ class Bilbo(magic.Ball):
         # You can overwrite this using the syntax below in the file,
         # or choose a fixed value by just providing a float value as the prior.
         label = args.label
-
+        trigger_time = args.trigger_time or datasets.gps_time(label)
         filename = magic.Path(label + ".prior")
         if filename.exists():
             priors = bilby.core.prior.PriorDict(filename=filename.name)
@@ -542,7 +543,22 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 logzboost =  Uniform(name='logzboost', minimum=0, maximum=14, boundary='periodic'),
                 logscale = Uniform(name='logscale', minimum=-10, maximum=10, boundary='periodic'),
-                logscaleringdown = Uniform(name='logscaleringdown', minimum=-10, maximum=10, boundary='periodic')))
+            ))
+
+        # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
+        priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
+                peak=args.post_trigger_duration, name="post_trigger_duration",
+            )
+
+        # Add the geocent time prior if it is not already there
+        if "geocent_time" not in priors:
+            priors["geocent_time"] = bilby.core.prior.Uniform(
+                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
+                boundary='periodic'
+            )
+
+        for key, value in priors.items():
+            print(key, value.is_fixed)
 
         return priors
         
@@ -574,17 +590,6 @@ class Bilbo(magic.Ball):
         ifo_list = self.ifo_list
         priors = self.priors
 
-
-        # Add the geocent time prior if it is not already there
-        if "geocent_time" not in priors:
-            priors["geocent_time"] = bilby.core.prior.Uniform(
-                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time"
-            )
-
-        # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
-        priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
-                peak=post_trigger_duration, name="post_trigger_duration"
-            )
 
         for key in priors:
             if isinstance(priors[key], Prior):
