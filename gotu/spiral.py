@@ -1973,9 +1973,6 @@ def zandx(t, u, theta, phi):
 
     z = ((d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))) - 1
 
-    x = ((a-1) * cosh(t)) ** 2
-    x -= ((d-1) * sinh(t)) ** 2
-
     try:
         sinhu = sinh(u)
     except OverflowError:
@@ -1987,12 +1984,6 @@ def zandx(t, u, theta, phi):
     except OverflowError:
         #print("cosh overflow for", u)
         coshu = math.log(sys.float_info.max)
-
-    try:
-        x = sqrt((sinh(t) - sinhu)**2 - (cosh(t) - coshu)**2)
-    except Exception as ee:
-        traceback.print_exception(ee)
-        print('zandx exception', t, u, theta, phi)
 
     x = 1 - (((B/T) - (A*T)) * U)
 

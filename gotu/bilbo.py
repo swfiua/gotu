@@ -660,7 +660,7 @@ class Bilbo(magic.Ball):
 
             sample = self.sample = self.priors.sample_subset(self.priors.keys(), size=1)
 
-            waveform= self.waveform = time_domain_source_model(gtimes, **sample)
+            waveform = self.waveform = self.time_domain_source_model(gtimes, **sample)
 
             ax = await self.get()
 
