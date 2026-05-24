@@ -178,108 +178,6 @@ def find_r(galaxy, tdash, utest=-5., factor=1000):
         if r > 1e50: break
         if r == 0.0: break
 
-def time_domain_source_model(
-        gtimes,
-        geocent_time=None,
-        mass=None,
-        theta=None,
-        phi=None,
-        dec=None,
-        ra=None,
-        psi=None,
-        phase=None,
-        logzboost=None,
-        logscale=None,
-        post_trigger_duration=None
-):
-
-    mass = 10**mass
-    galaxy = Spiral()
-    galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
-    galaxy.phi = phi
-    galaxy.theta = theta
-
-    hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-
-    tstar = galaxy.tstar()
-
-    # two parts to this the inspiral. what is the definition of gps time?
-    # inspiral is up to post_trigger_duration
-    # ringdown is the piece after
-
-    minz = -0.9999
-
-    tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration])
-    tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration])
-
-    # now we run into some numeric precision woes.
-    # to sidestep this, assume our time runs zboost times faster than this theta/phi
-    zboost = 10**logzboost
-    ####################
-    # calculate ringdown
-    ####################
-    ttt = (tringdown - (geocent_time+post_trigger_duration)) * zboost / hubble_time
-
-    uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
-    zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
-    zzz = np.array([zx[0] for zx in zandx])
-    xxx = np.array([zx[1] for zx in zandx])
-
-    # base signal is a sine wave, wavelength schwartzchild radius
-    scr = (galaxy.schwartzchild() << u.lightsecond).value
-    strain = scr * np.sin(2*pi*uuu * hubble_time/scr)
-
-    # amplitude of wave we see
-    zp1 = 1 + zzz
-    lum = 1 / (zp1*zp1*xxx*xxx)
-    ringdown = strain*lum*10**logscale
-    tb = galaxy.tb()
-
-    plots = False
-    if plots:
-        doplot(ttt, strain,
-               f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-        doplot(ttt, ringdown,
-               f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-        
-        doplot(ttt, np.log(lum).clip(0, 15),
-               f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-    ####################
-    # calculate inspiral
-    ####################
-    # now for the inspiral calculate inspiral
-    ttt = (tinspiral - (geocent_time+post_trigger_duration)) * zboost / hubble_time
-
-    # ttt <= 0., flip sign here
-    uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
-    zandx = [galaxy.zandx(t, u) for t, u in zip(ttt, uuu)]
-    zzz = np.array([zx[0] for zx in zandx])
-    xxx = np.array([zx[1] for zx in zandx])
-
-    rr = (1-xxx) * hubble_time
-
-    du = uuu[1:] - uuu[:-1]
-    
-    # deal with rr < scr 
-    weight = scr
-
-    weight = np.where(rr < scr, rr, scr)
-    strain = (10**logscale) * weight / (rr ** 3.0)
-
-    inspiral = strain * np.sin(2*pi*uuu * hubble_time/weight)
-
-    if plots:
-
-        doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
-               f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-        doplot(ttt, uuu.clip(-10,10),
-               f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-        doplot(ttt[1:], du,
-               f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-    
-    return dict(foo=inspiral.tolist() + ringdown.tolist())
 
 def doplot(xx, yy, title):
 
@@ -443,6 +341,10 @@ class Bilbo(magic.Ball):
     def __init__(self, args):
 
         self.args = args
+
+        self.showtable = False
+        self.galaxy = Spiral()
+        
         super().__init__()
     
         
@@ -528,7 +430,7 @@ class Bilbo(magic.Ball):
         # the waveform approximant and reference frequency and a parameter conversion
         # which allows us to sample in chirp mass and ratio rather than component mass
         self.waveform_generator = bilby.gw.WaveformGenerator(
-            time_domain_source_model=time_domain_source_model,
+            time_domain_source_model=self.time_domain_source_model,
             parameter_conversion=identity,
         )
 
@@ -582,14 +484,14 @@ class Bilbo(magic.Ball):
         else:
             priors = bilby.core.prior.PriorDict(dict(
                 mass = Uniform(name='mass', minimum=5, maximum=12),
-                phi = Sinh2(name='phi', maximum=12.),
+                phi = Sinh2(name='phi', maximum=6.),
                 theta =  Sine(name='theta'),
                 dec =  Cosine(name='dec'),
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
-                logzboost =  Uniform(name='logzboost', minimum=0, maximum=14, boundary='periodic'),
-                logscale = Uniform(name='logscale', minimum=-10, maximum=10, boundary='periodic'),
+                logzboost =  Uniform(name='logzboost', minimum=9, maximum=10, boundary='periodic'),
+                logscale = Uniform(name='logscale', minimum=0, maximum=1e-10, boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -608,6 +510,122 @@ class Bilbo(magic.Ball):
             print(key, value.is_fixed)
 
         return priors
+    
+    def time_domain_source_model(
+            self,
+            gtimes,
+            geocent_time=None,
+            mass=None,
+            theta=None,
+            phi=None,
+            dec=None,
+            ra=None,
+            psi=None,
+            phase=None,
+            logzboost=None,
+            logscale=None,
+            post_trigger_duration=None):
+
+        mass = 10**mass
+        galaxy = self.galaxy
+        galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
+        galaxy.phi = phi
+        galaxy.theta = theta
+
+        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+
+        tstar = galaxy.tstar()
+
+        # two parts to this the inspiral. what is the definition of gps time?
+        # inspiral is up to post_trigger_duration
+        # ringdown is the piece after
+
+        minz = -0.9999
+
+        tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration])
+        tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration])
+
+        # now we run into some numeric precision woes.
+        # to sidestep this, assume our time runs zboost times faster than this theta/phi
+        zboost = 10**logzboost
+        ####################
+        # calculate ringdown
+        ####################
+        ttt = (tringdown - geocent_time) * zboost / hubble_time
+
+        uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
+        zandx = [galaxy.zandx(tstar+t, u) for t, u in zip(ttt, uuu)]
+        zzz = np.array([zx[0] for zx in zandx])
+        xxx = np.array([zx[1] for zx in zandx])
+
+        # base signal is a sine wave, wavelength schwartzchild radius
+        scr = (galaxy.schwartzchild() << u.lightsecond).value
+
+        # should add in phase here -- need to check how used in black hole merger code
+        strain = scr * np.sin(2*pi*uuu * hubble_time/scr)
+
+        # amplitude of wave we see
+        zp1 = zzz
+        lum = 1 / (zp1*zp1*xxx*xxx)
+        #ringdown = strain*lum*10**logscale
+        #ringdown = strain*10**logscale
+        ringdown = lum*10**logscale
+        ringdown = uuu
+        info = magic.describe(uuu)
+        if info:
+            info['tstar'] = tstar
+            info['umax'] = galaxy.umax()
+            magic.pp(info)
+        tb = galaxy.tb()
+
+        plots = False
+        if plots:
+            doplot(ttt, strain,
+                   f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+            doplot(ttt, ringdown,
+                   f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+            
+            doplot(ttt, np.log(lum).clip(0, 15),
+                   f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+
+        ####################
+        # calculate inspiral
+        ####################
+        # now for the inspiral calculate inspiral
+        ttt = (tinspiral - geocent_time) * zboost / hubble_time
+
+        # ttt <= 0., flip sign here
+        uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
+        zandx = [galaxy.zandx(tstar-t, u) for t, u in zip(ttt, uuu)]
+        zzz = np.array([zx[0] for zx in zandx])
+        xxx = np.array([zx[1] for zx in zandx])
+
+        rr = (1-xxx) * hubble_time
+
+        du = uuu[1:] - uuu[:-1]
+        
+        # deal with rr < scr 
+        weight = scr
+
+        weight = np.where(rr < scr, rr, scr)
+        strain = (10**logscale) * weight / (rr ** 3.0)
+
+        inspiral = strain * np.sin(2*pi*uuu * hubble_time/weight)
+
+        if plots:
+
+            doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
+                   f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+
+            doplot(ttt, uuu.clip(-10,10),
+                   f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+            doplot(ttt[1:], du,
+                   f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
+
+        ringdown[:] = 0.
+        #inspiral[:] = 0.
+        return dict(foo=inspiral.tolist() + ringdown.tolist())
+
         
     async def run(self):
         
@@ -640,14 +658,17 @@ class Bilbo(magic.Ball):
                              10000)
         while True:
 
-            sample = self.priors.sample_subset(self.priors.keys(), size=1)
+            sample = self.sample = self.priors.sample_subset(self.priors.keys(), size=1)
 
-            waveform = time_domain_source_model(gtimes, **sample)
+            waveform= self.waveform = time_domain_source_model(gtimes, **sample)
 
             ax = await self.get()
-            print(waveform.keys())
+
             ax.plot(gtimes, waveform['foo'])
             ax.show()
+
+            if self.showtable:
+                self.put_nowait(sorted(sample.items()), 'help')
             await magic.sleep(self.sleep)
 
     async def oddity(self):
