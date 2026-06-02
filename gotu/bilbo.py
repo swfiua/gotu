@@ -422,7 +422,8 @@ class Bilbo(magic.Ball):
         outdir = args.outdir or label
 
         self.ifo_list = self.load_ifos()
-        self.priors = self.load_priors()
+        if not hasattr(self, 'priors'):
+            self.priors = self.load_priors()
 
         # In this step we define a `waveform_generator`. This is the object which
         # creates the frequency-domain strain. In this instance, we are using the
@@ -485,13 +486,15 @@ class Bilbo(magic.Ball):
             priors = bilby.core.prior.PriorDict(dict(
                 mass = Uniform(name='mass', minimum=5, maximum=12),
                 phi = Sinh2(name='phi', maximum=6.),
-                theta =  Sine(name='theta'),
+                #theta =  Sine(name='theta'),
+                theta =  0.001,
                 dec =  Cosine(name='dec'),
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
-                logzboost =  Uniform(name='logzboost', minimum=9, maximum=10, boundary='periodic'),
-                logscale = Uniform(name='logscale', minimum=0, maximum=1e-10, boundary='periodic'),
+                logzboost =  Uniform(name='logzboost', minimum=8, maximum=17.5, boundary='periodic'),
+                logscale = Uniform(name='logscale', minimum=0, maximum=8, boundary='periodic'),
+                maxage = Normal(name='maxage', mu=4., sigma=2., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -524,6 +527,7 @@ class Bilbo(magic.Ball):
             phase=None,
             logzboost=None,
             logscale=None,
+            maxage=None,
             post_trigger_duration=None):
 
         mass = 10**mass
@@ -542,8 +546,8 @@ class Bilbo(magic.Ball):
 
         minz = -0.9999
 
-        tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time + post_trigger_duration])
-        tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time + post_trigger_duration])
+        tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time])
+        tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time])
 
         # now we run into some numeric precision woes.
         # to sidestep this, assume our time runs zboost times faster than this theta/phi
@@ -562,21 +566,27 @@ class Bilbo(magic.Ball):
         scr = (galaxy.schwartzchild() << u.lightsecond).value
 
         # should add in phase here -- need to check how used in black hole merger code
-        strain = scr * np.sin(2*pi*uuu * hubble_time/scr)
+        strain = scr * np.sin((2*pi*uuu * hubble_time/scr)+phase)
 
         # amplitude of wave we see
-        zp1 = zzz
-        lum = 1 / (zp1*zp1*xxx*xxx)
-        #ringdown = strain*lum*10**logscale
+        zp1 = zzz + 1
+        lum = 1 / (zp1*zp1*xxx*xxx*hubble_time*hubble_time)
+        ringdown = strain*lum*10**logscale
         #ringdown = strain*10**logscale
-        ringdown = lum*10**logscale
-        ringdown = uuu
-        info = magic.describe(uuu)
+        #ringdown = lum*10**logscale
+
+        info = magic.describe(uuu, 20)
+        info = None
         if info:
             info['tstar'] = tstar
             info['umax'] = galaxy.umax()
             magic.pp(info)
         tb = galaxy.tb()
+
+        # adjust for range of uuu
+        uage = uuu[-1] - uuu
+
+        ringdown = np.where(uage > maxage, 0., ringdown)
 
         plots = False
         if plots:
@@ -592,7 +602,10 @@ class Bilbo(magic.Ball):
         # calculate inspiral
         ####################
         # now for the inspiral calculate inspiral
+        zmin = min(np.where(uage > maxage, 0., zzz))
+
         ttt = (tinspiral - geocent_time) * zboost / hubble_time
+
 
         # ttt <= 0., flip sign here
         uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
@@ -605,12 +618,17 @@ class Bilbo(magic.Ball):
         du = uuu[1:] - uuu[:-1]
         
         # deal with rr < scr 
+        weight = np.where(rr < scr, rr, scr)
         weight = scr
 
-        weight = np.where(rr < scr, rr, scr)
         strain = (10**logscale) * weight / (rr ** 3.0)
 
         inspiral = strain * np.sin(2*pi*uuu * hubble_time/weight)
+
+        # adjust for range of uuu
+        uage = uuu - uuu[0]
+
+        inspiral = np.where(uage>maxage, 0., inspiral)
 
         if plots:
 
@@ -622,8 +640,8 @@ class Bilbo(magic.Ball):
             doplot(ttt[1:], du,
                    f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
 
-        ringdown[:] = 0.
-        #inspiral[:] = 0.
+        ringdown[:] = max(inspiral)
+        #inspiral[:] = max(ringdown)
         return dict(foo=inspiral.tolist() + ringdown.tolist())
 
         
