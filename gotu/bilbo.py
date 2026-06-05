@@ -6,6 +6,41 @@ bilby takes priors and waveforms and calculates odds.
 
 https://arxiv.org/pdf/1811.02042
 
+2026/06/05
+==========
+
+Lots of thrashing around with the ringdown and inspirals.
+
+I am now happy with the ringdown and back to thinking about inspirals.
+
+I have added a *maxage* to the prior to model Rourke's idea that the
+intensity of arrivals is reduced because light (and gravitational waves).
+
+This in effect gives a maximum blue-shift for the new arrival.
+
+Now, for the inspiral the whole wavefront arrives with this blue-shift.
+
+I had been thinking that the theta and phi are what give rise to the
+interesting modulations in the inspiral, it is not just a simple
+1/r**3 curve.
+
+Of course, the real reason is that the wavefront is the sum of
+contributions from all masses in the system.
+
+The solution is to add a second mass to the model and then the curve
+is the combination of the two.
+
+Presumably the ratios of the masses that produce the best match will
+be the same as the ratio of masses of two merged black holes that
+provide the best match in the merging black hole theory.
+
+If this is the case it will speed up my model fitting!
+
+Theta and phi may not be needed as Rourke notes that for a short time
+after arrival t-t* = 1+z.
+
+Now to fix up the code.
+
 2026/03/27
 ==========
 
@@ -603,6 +638,8 @@ class Bilbo(magic.Ball):
         ####################
         # now for the inspiral calculate inspiral
         zmin = min(np.where(uage > maxage, 0., zzz))
+
+        # assume the wavefront arrives with zmin
 
         ttt = (tinspiral - geocent_time) * zboost / hubble_time
 
