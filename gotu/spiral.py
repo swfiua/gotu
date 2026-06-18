@@ -1959,6 +1959,59 @@ class Spiral(magic.Ball):
         ax.plot(rr, tvalues)
         ax.show()
 
+    def zgrav(self, r):
+        """ Gravitational redshift at radius r
+
+        r in hubble times
+
+        eddington tells us the radius given z in terms of the
+        schwartzchild radius, s.
+
+        r = s / (1 - (1+z)**-2)
+
+        so:
+
+        1-(1+z)**-2 = s/r
+
+        1-(s/r) = 1/((1+z) **2)
+
+        1/(1-s/r) = (1+z)**2 = 1 + 2z + z*z)
+        0 = 1 - 1/(1-s/r) + 2z + z * z 
+        """
+        r = (r * self.cosmo.hubble_distance) << u.lyr
+        soverr = self.schwartzchild()/r
+
+        c = 1 - 1/(1-soverr)
+        a = 1
+        b = 2
+
+        # there are two square 
+        z1 = (-2 + sqrt(b*b - 4*a*c))/(2*a)
+        z2 = (-2 - sqrt(b*b - 4*a*c))/(2*a)
+
+        #print(z1, z2)
+        # check why positive square root is the causal one..
+        return z1
+
+    def inspiral(self, tt):
+        """ The gravitational wave this galaxy arriving could generate
+
+        Provides a time domain model.
+
+        tt are the times in seconds before the peak of the wave.
+
+        
+        """
+        return [0] * len(tt)
+
+    def ringdown(self, tt, zboost=0):
+        """ The gravitational wave this galaxy arriving could generate
+
+        tt are the times in seconds before the peak of the wave.
+        """
+        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+        tstar = galaxy.tstar()
+
 
 def zandx(t, u, theta, phi):
 

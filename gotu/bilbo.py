@@ -579,7 +579,7 @@ class Bilbo(magic.Ball):
         tstar = galaxy.tstar()
 
         # two parts to this the inspiral. what is the definition of gps time?
-        # inspiral is up to post_trigger_duration
+        # inspiral is up to geocent_time
         # ringdown is the piece after
 
         minz = -0.9999
@@ -648,6 +648,7 @@ class Bilbo(magic.Ball):
         
         # assume the wavefront arrives with zmin
 
+        # at small r, need to adjust for gravitational redshift.
         ttt = tinspiral - geocent_time
         uuu = -ttt / (1+zmin)
 
