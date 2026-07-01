@@ -2000,17 +2000,44 @@ class Spiral(magic.Ball):
 
         tt are the times in seconds before the peak of the wave.
 
+        This part is tricky.
+
         
         """
         return [0] * len(tt)
 
-    def ringdown(self, tt, zboost=0):
-        """ The gravitational wave this galaxy arriving could generate
+    def ringdown(self, ttt, phase=0):
+        """ The ringdown for the gravitational wave this galaxy arriving could generate
 
-        tt are the times in seconds before the peak of the wave.
+        ttt are the times in seconds after the peak of the wave.
         """
-        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-        tstar = galaxy.tstar()
+        hubble_time = (self.cosmo.cosmo.hubble_time << u.s).value
+        tstar = self.tstar()
+
+        uuu = np.array([self.uoft(tstar + t) for t in ttt])
+        zandx = [self.zandx(tstar+t, u) for t, u in zip(ttt, uuu)]
+        zzz = np.array([zx[0] for zx in zandx])
+        xxx = np.array([zx[1] for zx in zandx])
+
+        # base signal is a sine wave, wavelength schwartzchild radius
+        scr = (self.schwartzchild() << u.lightsecond).value
+
+        # should add in phase here -- need to check how used in black hole merger code
+        strain = scr * np.sin((2*pi*uuu * hubble_time/scr)+phase)
+
+        # amplitude of wave we see
+        zp1 = zzz + 1
+        lum = 1 / (zp1*zp1*xxx*xxx*hubble_time*hubble_time)
+        ringdown = strain*lum*10**logscale
+        #ringdown = strain*10**logscale
+        #ringdown = lum*10**logscale
+
+        # adjust for range of uuu
+        uage = uuu[-1] - uuu
+
+        ringdown = np.where(uage > maxage, 0., ringdown)
+
+        return ringdown
 
 
 def zandx(t, u, theta, phi):
