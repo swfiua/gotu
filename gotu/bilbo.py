@@ -2,44 +2,57 @@
 
 This is Bilbo Bilby, boldly going where no astrophysicist has gone before.
 
-bilby takes priors and waveforms and calculates odds.
+`bilby`_ takes priors and waveforms and calculates odds.
 
-https://arxiv.org/pdf/1811.02042
+It is a general Bayesian inference library primarily designed for
+inference of compact binary coalescence events in interferometric
+data.  This `bilby paper`_ is an excellent guide.
 
-2026/06/05
+Armed with Bilby it is just necessary to specify prior distributions
+for parameters and a function that takes those parameters and creates
+the waveform given the parameters.
+
+Bilby also allows for a parameter conversion function to be applied to
+the sample before calling the waveform generator.
+
+.. _bilby paper: https://arxiv.org/pdf/1811.02042
+.. _bilby: https://pypi.org/project/bilby/
+
+
+2026/07/03
 ==========
 
-Lots of thrashing around with the ringdown and inspirals.
+The inspiral phase is still causing some headaches.  This caused me to
+explore the calculations for the merging black hole waveforms.
 
-I am now happy with the ringdown and back to thinking about inspirals.
+This leads to the world of post-Newtonian gravity and approximations to General Relativity.
 
-I have added a *maxage* to the prior to model Rourke's idea that the
-intensity of arrivals is reduced because light (and gravitational waves).
+In the arriving galaxy model there are some adjustments we need to
+make, compared to merging black holes:
 
-This in effect gives a maximum blue-shift for the new arrival.
+* the arrivals are all at the Hubble distance, they are just entering our visible universe.
 
-Now, for the inspiral the whole wavefront arrives with this blue-shift.
+* they arrive at extreme blueshift, rather than the redshift of the distant black hole mergers.
 
-I had been thinking that the theta and phi are what give rise to the
-interesting modulations in the inspiral, it is not just a simple
-1/r**3 curve.
+* no black holes are merging, rather the wavefront arrives like a tsunami
 
-Of course, the real reason is that the wavefront is the sum of
-contributions from all masses in the system.
+The wavefront has the essential 1/r**3 shape of the Kerr metric, but
+this is distorted due to the curvature of space time.
 
-The solution is to add a second mass to the model and then the curve
-is the combination of the two.
+The switch from redshift to blueshift means that a. the masses have to
+be proportionately larger to create a wave of the same frequency.
+After taking acount in the change from redshift to blueshift and the
+change in distance, we get a signal many orders of magnitude larger.
 
-Presumably the ratios of the masses that produce the best match will
-be the same as the ratio of masses of two merged black holes that
-provide the best match in the merging black hole theory.
+This is what we would get if two black holes just happened to merge as
+they entered our visible universe, but that is not what is happening.
 
-If this is the case it will speed up my model fitting!
+Remember, black holes do not merge in this story.
 
-Theta and phi may not be needed as Rourke notes that for a short time
-after arrival t-t* = 1+z.
+We can however compare the Kerr wave that the black holes in the
+merger would make, to the wave detected.  This will give a scale
+factor to apply to convert from one to the other.
 
-Now to fix up the code.
 
 2026/03/27
 ==========
@@ -127,6 +140,41 @@ uoft().
 I recall that originally I thought there may be no such formula, and
 the code used a solver instead.  I thought I tested the new version
 against the solver, but I need to re-check.
+
+2026/06/05
+==========
+
+Lots of thrashing around with the ringdown and inspirals.
+
+I am now happy with the ringdown and back to thinking about inspirals.
+
+I have added a *maxage* to the prior to model Rourke's idea that the
+intensity of arrivals is reduced because light (and gravitational waves).
+
+This in effect gives a maximum blue-shift for the new arrival.
+
+Now, for the inspiral the whole wavefront arrives with this blue-shift.
+
+I had been thinking that the theta and phi are what give rise to the
+interesting modulations in the inspiral, it is not just a simple
+1/r**3 curve.
+
+The wavefront is the sum of contributions from all masses in the
+system.
+
+A solution is to add a second mass to the model and then the curve
+is the combination of the two.
+
+Presumably the ratios of the masses that produce the best match will
+be the same as the ratio of masses of two merged black holes that
+provide the best match in the merging black hole theory.
+
+If this is the case it will speed up my model fitting!
+
+Theta and phi may not be needed as Rourke notes that for a short time
+after arrival t-t* = 1+z.
+
+Now to fix up the code.
 
 """
 import sys
