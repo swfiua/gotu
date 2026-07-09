@@ -515,7 +515,7 @@ class Bilbo(magic.Ball):
         # which allows us to sample in chirp mass and ratio rather than component mass
         self.waveform_generator = bilby.gw.WaveformGenerator(
             time_domain_source_model=self.time_domain_source_model,
-            parameter_conversion=identity,
+            parameter_conversion=self.conversion,
         )
 
         # In this step, we define the likelihood. Here we use the standard likelihood
@@ -597,6 +597,19 @@ class Bilbo(magic.Ball):
             print(key, value.is_fixed)
 
         return priors
+
+    def conversion(self, priors):
+
+        resilt = priors
+
+        result['m1'] = priors['m1']**10
+        result['m2'] = priors['m2']**10
+
+        if result['m1'] < result['m2']:
+            result['m1'], result['m2'] = result['m2'], result['m1']
+        
+
+        return result, None
     
     def time_domain_source_model(
             self,
@@ -615,8 +628,6 @@ class Bilbo(magic.Ball):
             maxage=None,
             post_trigger_duration=None):
 
-        m1 = 10**m1
-        m2 = 10**m2
         galaxy = self.galaxy
         galaxy.set_mcent((m1 * 3.0 * u.km << u.lyr).value)
         galaxy.phi = phi
