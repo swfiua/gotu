@@ -417,6 +417,7 @@ class Sinh2(WeightedDiscreteValues):
 
 
 def identity(arg):
+    print(arg)
     return arg, None
 
 class Bilbo(magic.Ball):
@@ -514,9 +515,11 @@ class Bilbo(magic.Ball):
         # the waveform approximant and reference frequency and a parameter conversion
         # which allows us to sample in chirp mass and ratio rather than component mass
         self.waveform_generator = bilby.gw.WaveformGenerator(
-            time_domain_source_model=self.time_domain_source_model,
+            time_domain_source_model=self.tdsm,
             parameter_conversion=self.conversion,
         )
+
+    def pre_run(self):
 
         # In this step, we define the likelihood. Here we use the standard likelihood
         # function, passing it the data and the waveform generator.
@@ -534,8 +537,8 @@ class Bilbo(magic.Ball):
 
 
         meta_data = dict()
-        self.likelihood.label = label
-        self.likelihood.outdir = outdir
+        self.likelihood.label = args.label
+        self.likelihood.outdir = args.outdir
 
         bcu = bilby.core.utils
         meta_data["likelihood"] = self.likelihood.meta_data
@@ -600,7 +603,7 @@ class Bilbo(magic.Ball):
 
     def conversion(self, priors):
 
-        resilt = priors
+        result = priors
 
         result['m1'] = priors['m1']**10
         result['m2'] = priors['m2']**10
@@ -757,8 +760,108 @@ class Bilbo(magic.Ball):
         #inspiral[:] = max(ringdown)
         return dict(foo=inspiral.tolist() + ringdown.tolist())
 
+
+    def tstar1000(self, galaxy, zz=-0.999):
+
+        tstar = galaxy.tstar()
+
+        tb = galaxy.tb()
+
+        tguess = tb/2
+        offset = tguess/2
+
+        z, x = galaxy.zandx(tstar+tguess)
+
+        count = 0
+        while z != zz:
+            #print(z, x, tb, tguess, offset)
+            if z < zz:
+                tguess += offset
+            else:
+                tguess -= offset
+            offset /= 2
+            z, x = galaxy.zandx(tstar+tguess)
+            if offset == 0: break
+            if count > 100: break
+            count += 1
+
+        return tstar + tguess
+
+    def tdsm(self,
+            gtimes,
+            geocent_time=None,
+            m1=None,
+            m2=None,
+            theta=None,
+            phi=None,
+            dec=None,
+            ra=None,
+            psi=None,
+            phase=None,
+            logzboost=None,
+            logscale=None,
+            maxage=None,
+            post_trigger_duration=None):
+
+        galaxy = self.galaxy
+        galaxy.set_mcent((m1 * 3.0 * u.km << u.lyr).value)
+        galaxy.phi = phi
+        galaxy.theta = theta
+        scr = (galaxy.schwartzchild() << u.lightsecond).value 
+        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
+
+        #tstar = galaxy.tstar()
+
+        # use time for z = -0.999 as start of event
+        zmin = -0.999
+        tstar = self.tstar1000(galaxy, zmin)
+
+        # calculate some values based on theta/phi
+        ttt = (gtimes - gtimes[0]) / hubble_time
+
+        uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
+        zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
+
+        zzz = np.array([zx[0] for zx in zandx])
+        xxx = np.array([zx[1] for zx in zandx])
+        
+        strain = np.zeros((len(ttt)))
+
+        xx0 = xxx[0]
+        xdist = abs((xx0 - xxx) * hubble_time)
+        xdist = xdist.clip(scr)
+        kerr  = hubble_time / ((xdist ** 3.0) * (((1+zzz)*xxx)**2))
+
+        masses = m1, m2
+        for ix, tt in enumerate(gtimes):
+            if tt > geocent_time:
+                break
+
+            itime = (geocent_time - tt) / hubble_time
+
+            # calculate time to geocent_time
+            tgeo = geocent_time - tt
+
+            if ix:
+                ss = strain[ix:]
+                zz = zzz[:-ix]
+                xx = xxx[:-ix]
+                uu = uuu[:-ix]
+                kk = kerr[:-ix]
+            else:
+                ss, zz, xx, uu, kk = strain, zzz, xxx, uuu, kerr
+
+            print(kk.shape, uu.shape, ix)
+            for mass in masses:
+                radius = mass * scr/m1
+
+                ss += radius * kk * np.sin((2*pi*uu * hubble_time/scr) + phase)
+
+        return dict(foo=strain)
         
     async def run(self):
+
+        self.pre_run()
         
         logger = bilby.core.utils.logger
         args = self.args
@@ -791,7 +894,9 @@ class Bilbo(magic.Ball):
 
             sample = self.sample = self.sample_prior()
 
-            waveform = self.waveform = self.time_domain_source_model(gtimes, **sample)
+            sample = self.conversion(sample)[0]
+
+            waveform = self.waveform = self.tdsm(gtimes, **sample)
 
             ax = await self.get()
 
