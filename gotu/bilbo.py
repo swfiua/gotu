@@ -837,11 +837,6 @@ class Bilbo(magic.Ball):
             if tt > geocent_time:
                 break
 
-            itime = (geocent_time - tt) / hubble_time
-
-            # calculate time to geocent_time
-            tgeo = geocent_time - tt
-
             if ix:
                 ss = strain[ix:]
                 zz = zzz[:-ix]
@@ -851,11 +846,14 @@ class Bilbo(magic.Ball):
             else:
                 ss, zz, xx, uu, kk = strain, zzz, xxx, uuu, kerr
 
-            print(kk.shape, uu.shape, ix)
+            #print(kk.shape, uu.shape, ix)
             for mass in masses:
                 radius = mass * scr/m1
 
                 ss += radius * kk * np.sin((2*pi*uu * hubble_time/scr) + phase)
+
+            # update phase by delta-u
+            phase += (uu[1] - uu[0]) * hubble_time/scr
 
         return dict(foo=strain)
         
