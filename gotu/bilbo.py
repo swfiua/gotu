@@ -204,6 +204,7 @@ def get_args(args=None):
     parser.add_argument('--post_trigger_duration', type=float, default=2.)
     parser.add_argument('--duration', type=float, default=4.)
     parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
+    parser.add_argument('--chirp', action='store_true', default=False)
 
     return parser.parse_args(args)
 
