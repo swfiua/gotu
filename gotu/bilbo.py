@@ -611,6 +611,15 @@ class Bilbo(magic.Ball):
 
         if result['m1'] < result['m2']:
             result['m1'], result['m2'] = result['m2'], result['m1']
+
+        if self.args.chirp:
+            m1 = result['m1']
+            m2 = result['m2']
+
+            chirp = (m1*m2)**0.6/((m1+m2)**.2)
+
+            result['m1'] = chirp
+            result['m2'] = 0
         
 
         return result, None
@@ -717,7 +726,8 @@ class Bilbo(magic.Ball):
 
         inspiral = ttt * 0.
         for mass in m1, m2:
-
+            if mass == 0:
+                continue
             radius = mass * scr/m1
             #weight = maxage * hubble_time / radius
             strain = radius * maxage * hubble_time / (uuu ** 3.0)
