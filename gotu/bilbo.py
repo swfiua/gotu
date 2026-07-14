@@ -835,7 +835,7 @@ class Bilbo(magic.Ball):
 
         zzz = np.array([zx[0] for zx in zandx])
         xxx = np.array([zx[1] for zx in zandx])
-        
+        ringdown = 1 / ((1+zzz)*xxx)**2
         strain = np.zeros((len(ttt)))
 
         xx0 = xxx[0]
@@ -844,9 +844,12 @@ class Bilbo(magic.Ball):
 
         kerrs = []
         for mass in m1, m2:
+            if not mass: continue
             radius = mass * scr/m1
-            kerr  = (radius / hubble_time) / (((ttt.clip(radius)/(1+zmin)) ** 3.0) * (((1+zzz)*xxx)**2))
+
+            kerr  = (radius / hubble_time) / ((ttt.clip(radius)/(1+zmin)) ** 3.0)
             kerrs.append(kerr)
+            masses.append(radius)
             
         for ix, tt in enumerate(gtimes):
             if tt > geocent_time:
@@ -860,14 +863,12 @@ class Bilbo(magic.Ball):
             else:
                 ss, zz, xx, uu = strain, zzz, xxx, uuu
 
-            for kerr, radius in zip(kerrs, (m1, m2)) :
+            for kerr, radius in zip(kerrs, masses) :
                 if ix:
                     kk = kerr[:-ix]
                 else:
                     kk = kerr
                 
-                radius = radius * scr/m1
-
                 ss += kk * np.sin((2*pi*uu*hubble_time/(radius*(1+zmin))) + phase)
             phase += uu[0]
             #print(kk.shape, uu.shape, ix)
