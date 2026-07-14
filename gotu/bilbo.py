@@ -582,7 +582,7 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 logscale = Uniform(name='logscale', minimum=0, maximum=8, boundary='periodic'),
-                maxage = Normal(name='maxage', mu=3., sigma=2., boundary='periodic'),
+                minz = Uniform(name='minz', minimum=-9, maximum=-2, boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -604,10 +604,11 @@ class Bilbo(magic.Ball):
 
     def conversion(self, priors):
 
-        result = priors
+        result = priors.copy()
 
-        result['m1'] = priors['m1']**10
-        result['m2'] = priors['m2']**10
+        result['minz'] = -1 + 10**priors['minz']
+        result['m1'] = 10**priors['m1']
+        result['m2'] = 10**priors['m2']
 
         if result['m1'] < result['m2']:
             result['m1'], result['m2'] = result['m2'], result['m1']
@@ -811,7 +812,7 @@ class Bilbo(magic.Ball):
             phase=None,
             logzboost=None,
             logscale=None,
-            maxage=None,
+            minz=None,
             post_trigger_duration=None):
 
         galaxy = self.galaxy
@@ -820,15 +821,14 @@ class Bilbo(magic.Ball):
         galaxy.theta = theta
         scr = (galaxy.schwartzchild() << u.lightsecond).value 
         hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-
+        zboost = 10**logzboost
         #tstar = galaxy.tstar()
 
         # use time for z = -0.999 as start of event
-        zmin = -0.999
-        tstar = self.tstar1000(galaxy, zmin)
+        tstar = self.tstar1000(galaxy, minz)
 
         # calculate some values based on theta/phi
-        ttt = (gtimes - gtimes[0]) / hubble_time
+        ttt = (gtimes - gtimes[0]) * zboost / hubble_time
 
         uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
@@ -843,37 +843,34 @@ class Bilbo(magic.Ball):
         xdist = xdist.clip(scr)
 
         kerrs = []
+        
+        tins = ttt[gtimes < geocent_time]
+
         for mass in m1, m2:
             if not mass: continue
             radius = mass * scr/m1
 
-            kerr  = (radius / hubble_time) / ((ttt.clip(radius)/(1+zmin)) ** 3.0)
-            kerrs.append(kerr)
-            masses.append(radius)
+            kerr  = (radius / hubble_time) / ((tins[::-1].clip(radius)/(1+minz)) ** 3.0)
+            kerrs.append([kerr, radius])
             
-        for ix, tt in enumerate(gtimes):
-            if tt > geocent_time:
-                break
+        for ix, tt in enumerate(tins):
 
             if ix:
                 ss = strain[ix:]
-                zz = zzz[:-ix]
-                xx = xxx[:-ix]
+                rd = ringdown[:-ix]
                 uu = uuu[:-ix]
             else:
-                ss, zz, xx, uu = strain, zzz, xxx, uuu
+                ss, rd, uu = strain, ringdown, uuu
 
-            for kerr, radius in zip(kerrs, masses) :
-                if ix:
-                    kk = kerr[:-ix]
-                else:
-                    kk = kerr
-                
-                ss += kk * np.sin((2*pi*uu*hubble_time/(radius*(1+zmin))) + phase)
+            for kerr, radius in kerrs:
+                weight = kerr[ix]
+
+                ss += weight * rd * np.sin((2*pi*uu*hubble_time/(radius*(1+minz))) + phase)
+
             phase += uu[0]
             #print(kk.shape, uu.shape, ix)
 
-        return dict(foo=kerrs[0])
+        return dict(foo=strain)
         
     async def run(self):
 
