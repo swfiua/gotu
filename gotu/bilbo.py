@@ -841,9 +841,13 @@ class Bilbo(magic.Ball):
         xx0 = xxx[0]
         xdist = abs((xx0 - xxx) * hubble_time)
         xdist = xdist.clip(scr)
-        kerr  = hubble_time / ((xdist ** 3.0) * (((1+zzz)*xxx)**2))
 
-        masses = m1, m2
+        kerrs = []
+        for mass in m1, m2:
+            radius = mass * scr/m1
+            kerr  = (radius / hubble_time) / (((ttt.clip(radius)/(1+zmin)) ** 3.0) * (((1+zzz)*xxx)**2))
+            kerrs.append(kerr)
+            
         for ix, tt in enumerate(gtimes):
             if tt > geocent_time:
                 break
@@ -853,20 +857,22 @@ class Bilbo(magic.Ball):
                 zz = zzz[:-ix]
                 xx = xxx[:-ix]
                 uu = uuu[:-ix]
-                kk = kerr[:-ix]
             else:
-                ss, zz, xx, uu, kk = strain, zzz, xxx, uuu, kerr
+                ss, zz, xx, uu = strain, zzz, xxx, uuu
 
+            for kerr, radius in zip(kerrs, (m1, m2)) :
+                if ix:
+                    kk = kerr[:-ix]
+                else:
+                    kk = kerr
+                
+                radius = radius * scr/m1
+
+                ss += kk * np.sin((2*pi*uu*hubble_time/(radius*(1+zmin))) + phase)
+            phase += uu[0]
             #print(kk.shape, uu.shape, ix)
-            for mass in masses:
-                radius = mass * scr/m1
 
-                ss += radius * kk * np.sin((2*pi*uu * hubble_time/scr) + phase)
-
-            # update phase by delta-u
-            phase += (uu[1] - uu[0]) * hubble_time/scr
-
-        return dict(foo=strain)
+        return dict(foo=kerrs[0])
         
     async def run(self):
 
