@@ -870,7 +870,7 @@ class Bilbo(magic.Ball):
             for kerr, radius in kerrs:
                 weight = kerr[ix]
 
-                ss += weight * rd * np.sin((2*pi*uu*hubble_time/(radius*(1+minz))) + phase)
+                ss += weight * rd * np.sin((2*pi*uu*hubble_time/radius) + phase)
 
             phase += uu[0]
             #print(kk.shape, uu.shape, ix)
