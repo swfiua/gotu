@@ -624,7 +624,7 @@ class Bilbo(magic.Ball):
             result['m1'] = chirp
             result['m2'] = 0
         
-
+            result['logzboost'] = 0
         return result, None
     
     def time_domain_source_model(
@@ -852,7 +852,7 @@ class Bilbo(magic.Ball):
             if not mass: continue
             radius = mass * scr/m1
 
-            kerr  = (radius / hubble_time) / (((tins[::-1]/zboost).clip(radius/hubble_time)/(1+minz)) ** 3.0)
+            kerr  = (radius / hubble_time) / (tins[::-1].clip(radius/hubble_time) ** 3.0)
             kerrs.append([kerr, radius])
             
         for ix, tt in enumerate(tins):
