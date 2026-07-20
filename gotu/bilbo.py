@@ -912,7 +912,7 @@ class Bilbo(magic.Ball):
 
             parms = {k: v[0] for k,v in sample.items()}
 
-            waveform = self.waveform = self.tdsm(gtimes, **sample)
+            waveform = self.waveform = self.tdsm(gtimes, **parms)
 
             for key in waveform.keys():
                 ax = await self.get()
