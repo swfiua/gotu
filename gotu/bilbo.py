@@ -850,7 +850,7 @@ class Bilbo(magic.Ball):
             if not mass: continue
             radius = mass * scr/m1
 
-            kerr  = (radius / hubble_time) / ((tins[::-1].clip(radius)/(1+minz)) ** 3.0)
+            kerr  = (radius / hubble_time) / (((tins[::-1]/zboost).clip(radius/hubble_time)/(1+minz)) ** 3.0)
             kerrs.append([kerr, radius])
             
         for ix, tt in enumerate(tins):
@@ -870,7 +870,9 @@ class Bilbo(magic.Ball):
             phase += uu[0]
             #print(kk.shape, uu.shape, ix)
 
-        return dict(foo=strain)
+        kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
+        return dict(strain=strain, ringdown=ringdown, kerr=kerr)
+        #return dict(foo=strain)
         
     async def run(self):
 
@@ -911,10 +913,12 @@ class Bilbo(magic.Ball):
 
             waveform = self.waveform = self.tdsm(gtimes, **sample)
 
-            ax = await self.get()
+            for key in waveform.keys():
+                ax = await self.get()
 
-            ax.plot(gtimes, waveform['foo'])
-            ax.show()
+                ax.plot(gtimes, waveform[key])
+                ax.set_title(key)
+                ax.show()
 
             if self.showtable:
                 self.put_nowait(sorted(sample.items()), 'help')

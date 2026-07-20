@@ -1,5 +1,9 @@
-"""
-The James Webb Space Telescope has revealed large numbers of so-called Little Red Dots (LRD).
+"""The James Webb Space Telescope has revealed large numbers of so-called Little Red Dots (LRD).
+
+JWST is showing large numbers of these little red dots.  Small, high
+redshift (z=objects, with spectra similar to quasars: broad emission peaks.
+
+Evidence of very fast moving acretion disks.
 
 Spectra.
 

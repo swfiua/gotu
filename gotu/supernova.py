@@ -41,6 +41,40 @@ be and give a detectable gamma ray?
 Can we estimate where the cut-off is and get a better handle on
 distribution of gravitational waves un-accompanied by GRB?
 
+2026/07/16
+==========
+
+Dr Becky Smedhurst created a video on evidence that supernovae in small galaxies tend to be less bright.
+
+This is what you might expect if the de Sitter Space is the correct model and we instead assume a big bang.
+
+In de Sitter Space galaxies only approach a Hubble law asymptotically.
+For any redshift, there are galaxies at a range of distances.
+
+Galaxies that are more distant thann the redshift indicates will
+appear smaller and their supernovae fainter than you would expect
+given the redshift.
+
+
+https://www.youtube.com/watch?v=mlE5dhFMsn0
+
+Papers mentioned:
+Tripp (1998) - https://adsabs.harvard.edu/pdf/1998A&...
+Reiss et al. (1998) - https://arxiv.org/pdf/astro-ph/9805201
+Chung et al. (2025) - https://arxiv.org/pdf/2411.05299
+Son et al. (2025) - https://arxiv.org/pdf/2510.13121
+Wiseman et al. (2026) - https://arxiv.org/pdf/2601.13785
+Murakami et al. (2026) - https://arxiv.org/pdf/2604.16597
+Chung et al. (2026) - https://arxiv.org/pdf/2605.21586
+Sah et al. (2026) - https://arxiv.org/pdf/2606.09650
+Lampeitl et al. (2010) - https://lss.fnal.gov/archive/2010/pub...
+Sulivan et al. (2010) - https://arxiv.org/pdf/1003.5119
+Rose et al. (2019) - https://arxiv.org/pdf/1902.01433
+Tremonti et al. (2004) - https://arxiv.org/abs/astro-ph/0405537
+Perlmutter et al. (1999) - https://arxiv.org/pdf/astro-ph/9812133
+Cooke et al. (2012) - https://arxiv.org/pdf/1211.2003
+Chandrasekhar limit - https://academic.oup.com/mnras/articl...
+
 """
 
 import requests
