@@ -536,10 +536,12 @@ class Bilbo(magic.Ball):
 
         from bilby.core.sampler import dynesty
 
+        label = args.label
+        outdir = args.outdir or label
 
         meta_data = dict()
-        self.likelihood.label = args.label
-        self.likelihood.outdir = args.outdir
+        self.likelihood.label = label
+        self.likelihood.outdir = outdir
 
         bcu = bilby.core.utils
         meta_data["likelihood"] = self.likelihood.meta_data
@@ -881,9 +883,6 @@ class Bilbo(magic.Ball):
         logger = bilby.core.utils.logger
         args = self.args
 
-        label = args.label
-        outdir = args.outdir or label
-
         priors = self.priors
         for key in priors:
             if isinstance(priors[key], Prior):
@@ -910,6 +909,8 @@ class Bilbo(magic.Ball):
             sample = self.sample = self.sample_prior()
 
             sample = self.conversion(sample)[0]
+
+            parms = {k: v[0] for k,v in sample.items()}
 
             waveform = self.waveform = self.tdsm(gtimes, **sample)
 
