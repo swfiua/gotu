@@ -608,12 +608,15 @@ class Bilbo(magic.Ball):
 
         result = priors.copy()
 
+        result['logzboost'] = result['logzboost'] * 0
         result['minz'] = -1 + 10**priors['minz']
         result['m1'] = 10**priors['m1']
         result['m2'] = 10**priors['m2']
 
-        if result['m1'] < result['m2']:
-            result['m1'], result['m2'] = result['m2'], result['m1']
+        
+        m2 = np.where(result['m1'] < result['m2'], result['m2'], result['m1'])
+        m1 = np.where(result['m1'] < result['m2'], result['m1'], result['m2'])
+        result['m1'], result['m2'] = m1, m2
 
         if self.args.chirp:
             m1 = result['m1']
@@ -622,9 +625,9 @@ class Bilbo(magic.Ball):
             chirp = (m1*m2)**0.6/((m1+m2)**.2)
 
             result['m1'] = chirp
-            result['m2'] = 0
+            result['m2'] = chirp * 0
         
-            result['logzboost'] = 0
+        
         return result, None
     
     def time_domain_source_model(
@@ -846,13 +849,13 @@ class Bilbo(magic.Ball):
 
         kerrs = []
         
-        tins = ttt[gtimes < geocent_time]
+        tins = ttt[gtimes < geocent_time] * hubble_time
 
         for mass in m1, m2:
             if not mass: continue
             radius = mass * scr/m1
 
-            kerr  = (radius / hubble_time) / (tins[::-1].clip(radius/hubble_time) ** 3.0)
+            kerr  = radius / ((tins[::-1]/(1+minz)).clip(radius) ** 3.0)
             kerrs.append([kerr, radius])
             
         for ix, tt in enumerate(tins):
