@@ -873,7 +873,8 @@ class Bilbo(magic.Ball):
             #print(kk.shape, uu.shape, ix)
 
         kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
-        return dict(strain=strain, ringdown=ringdown, kerr=kerr)
+        return dict(strain=strain, ringdown=ringdown, kerr=kerr,
+                    uuu=uuu, zzz=zzz, xxx=xxx)
         #return dict(foo=strain)
         
     async def run(self):
