@@ -2039,6 +2039,18 @@ class Spiral(magic.Ball):
 
         return ringdown
 
+    def mxzandx(self, t, u, x):
+
+        a = cosh(self.phi)
+        d = cos(self.theta)
+
+        mx = np.array([[a, 0],[0, d]])
+
+        print(mx @ np.array([u, 0]).T)
+        print(mx @ np.array([u, x]).T)
+
+
+
 
 def zandx(t, u, theta, phi):
 

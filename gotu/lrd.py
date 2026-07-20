@@ -3,7 +3,28 @@
 JWST is showing large numbers of these little red dots.  Small, high
 redshift (z=objects, with spectra similar to quasars: broad emission peaks.
 
-Evidence of very fast moving acretion disks.
+Evidence of very fast moving acretion disks, since the broad peaks can
+be explained by a fast rotating disk where one edge is moving away and
+the other approaches.
+
+An alternative explanation is that the Eddington sphere for these
+objects is close enough to the central mass that the light is
+significantly red-shifted.
+
+Pacucci and Loeb [4] describe Little Red dots as follows::
+
+    The little red dots (LRDs) are high-redshift galaxies uncovered by
+    JWST, characterized by small effective radii (Reff ∼ 80–300 pc),
+    number densities intermediate between typical galaxies and
+    quasars, and a redshift distribution peaked at z ∼ 5.
+
+
+In Rourke's quasar-galaxy spectrum this would place them as large
+quasars, on their way to becoming typical galaxies.
+
+
+Why have we not seen these before?
+==================================
 
 Spectra.
 
@@ -19,6 +40,8 @@ References
 [2] estimate of mass of central black holes, surrounded by dust
 
 [3] quasar-like features
+
+[4] number densities of LRD https://iopscience.iop.org/article/10.3847/2041-8213/ade871
 
 """
 
