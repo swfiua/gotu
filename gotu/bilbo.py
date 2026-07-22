@@ -189,6 +189,8 @@ from bilby.core.prior import Prior, WeightedDiscreteValues, Sine, Cosine, Unifor
 from gwpy.timeseries import TimeSeries
 
 from astropy import units as u
+from mpmath import mp, mpf
+mp.dps = 70
 
 import argparse
 
@@ -384,12 +386,12 @@ async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
             xx = xxx[ix]
             lum.append(1/(xx*xx*(1+zz)*(1+zz)))
 
-        ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        lax.plot(ttt, np.clip(np.log10(lum), 0, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
-        llum = np.clip(np.log10(lum), 0, 15)
+        ax.plot(ttt, np.clip(zdash, 0, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:6g}')
+        xax.plot(ttt, np.clip(xxx, 0, 2.), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.6g}')
+        lax.plot(ttt, np.clip([mp.log10(lll) for lll in lum], 0, 15), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.6g}')
+        llum = np.array([log10(lll) for lll in lum]).clip(0, 15)
         dllum = llum[1:] - llum[0:-1]
-        uax.plot(ttt[1:], np.clip(dllum, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.4f}')
+        uax.plot(ttt[1:], np.clip(dllum, -1000, 1000), label=f'phi={aphi:.4f} theta={atheta:.4f} tb={tb:.6g}')
 
         
     xax.set_title('Distance v time')
@@ -582,7 +584,8 @@ class Bilbo(magic.Ball):
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
-                logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
+                #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
+                logzboost = 0,
                 logscale = Uniform(name='logscale', minimum=0, maximum=8, boundary='periodic'),
                 minz = Uniform(name='minz', minimum=-9, maximum=-2, boundary='periodic'),
             ))
@@ -608,7 +611,6 @@ class Bilbo(magic.Ball):
 
         result = priors.copy()
 
-        result['logzboost'] = result['logzboost'] * 0
         result['minz'] = -1 + 10**priors['minz']
         result['m1'] = 10**priors['m1']
         result['m2'] = 10**priors['m2']
@@ -789,6 +791,7 @@ class Bilbo(magic.Ball):
 
         z, x = galaxy.zandx(tstar+tguess)
 
+        zz = mpf(zz)
         count = 0
         while z != zz:
             #print(z, x, tb, tguess, offset)
@@ -819,6 +822,21 @@ class Bilbo(magic.Ball):
             logscale=None,
             minz=None,
             post_trigger_duration=None):
+        """Waveform generator
+
+        Events are known to be strongly biassed to short blueshift
+        period, but these have very large phi.
+
+        We are also interested in just the a few seconds of time, when
+        the radius of curvature is of the order 1e18 seconds.
+
+        The problem here is that the events we are seeing are
+        for large (10-100) phi and there are numerical precision errors.
+
+        This affects the calculation of z and x for the ringdown.
+
+        hifi_zandx tries to get around this
+        """
 
         galaxy = self.galaxy
         galaxy.set_mcent((m1 * 3.0 * u.km << u.lyr).value)
@@ -835,12 +853,15 @@ class Bilbo(magic.Ball):
         # calculate some values based on theta/phi
         ttt = (gtimes - gtimes[0]) * zboost / hubble_time
 
-        uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
+        uuu = [galaxy.uoft(tstar + t) for t in ttt]
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
 
-        zzz = np.array([zx[0] for zx in zandx])
-        xxx = np.array([zx[1] for zx in zandx])
-        ringdown = 1 / ((1+zzz)*xxx)**2
+        zzz = np.array([float(zx[0]) for zx in zandx])
+        zz1 = np.array([float(1+zx[0]) for zx in zandx])
+        xxx = np.array([float(zx[1]) for zx in zandx])
+
+        ringdown = 1. / (zz1.clip(1+minz)*xxx)**2
+
         strain = np.zeros((len(ttt)))
 
         xx0 = xxx[0]
@@ -851,11 +872,15 @@ class Bilbo(magic.Ball):
         
         tins = ttt[gtimes < geocent_time] * hubble_time
 
+        uuu0 = np.array([float(uu - uuu[0]) for uu in uuu])
+        
         for mass in m1, m2:
             if not mass: continue
             radius = mass * scr/m1
 
-            kerr  = radius / ((tins[::-1]/(1+minz)).clip(radius) ** 3.0)
+            # kerr depends on distance
+            distance = tins[::-1]/(1+minz).clip(radius/1000.)
+            kerr = np.where(distance > radius, (radius**4)/(distance**3.), distance)
             kerrs.append([kerr, radius])
             
         for ix, tt in enumerate(tins):
@@ -863,23 +888,45 @@ class Bilbo(magic.Ball):
             if ix:
                 ss = strain[ix:]
                 rd = ringdown[:-ix]
-                uu = uuu[:-ix]
+                uu = uuu0[:-ix]
             else:
-                ss, rd, uu = strain, ringdown, uuu
+                ss, rd, uu = strain, ringdown, uuu0
 
             for kerr, radius in kerrs:
                 weight = kerr[ix]
 
                 ss += weight * rd * np.sin((2*pi*uu*hubble_time/radius) + phase)
 
-            phase += uu[0]
+            #phase += uu[0]
             #print(kk.shape, uu.shape, ix)
 
         kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
         return dict(strain=strain, ringdown=ringdown, kerr=kerr,
                     uuu=uuu, zzz=zzz, xxx=xxx)
         #return dict(foo=strain)
-        
+
+
+    def hifi_zandx(self, ttt):
+        """ Approximate zandx for large phi
+
+        Take square root and look at ratio of tb
+        """
+        galaxy = self.galaxy
+        phi = galaxy.phi
+        theta = galaxy.theta
+        tb = galaxy.tb()
+
+        galaxy.phi = sqrt(phi)
+        galaxy.theta = sqrt(theta)
+
+        tb2 = galaxy.tb()
+
+        print(tb2, tb, tb/tb2)
+
+        # put original values back
+        galaxy.phi = phi
+        galaxy.theta = theta
+
     async def run(self):
 
         self.pre_run()

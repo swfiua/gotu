@@ -338,6 +338,8 @@ import astropy.constants as c
 import astropy.coordinates as coord
 from astropy import cosmology
 
+from mpmath import mp, mpf
+
 from blume import magic
 from blume import farm as fm
 from blume import taybell
@@ -2054,25 +2056,27 @@ class Spiral(magic.Ball):
 
 def zandx(t, u, theta, phi):
 
-    a = cosh(phi)
-    d = cos(theta)
+    theta = mpf(theta)
+    phi = mpf(phi)
+    a = mp.cosh(phi)
+    d = mp.cos(theta)
 
     # work with U = e**u and T=e**t
-    U = e ** u
-    T = e ** t
+    U = mp.e ** u
+    T = mp.e ** t
     A = D = (a - d)/2
     B = C = (a + d)/2
 
-    z = ((d * tanh(u) - a * tanh(t)) / (a  * tanh(u) - d * tanh(t))) - 1
+    z = ((d * mp.tanh(u) - a * mp.tanh(t)) / (a  * mp.tanh(u) - d * mp.tanh(t))) - 1
 
     try:
-        sinhu = sinh(u)
+        sinhu = mp.sinh(u)
     except OverflowError:
         #print("sinh overflow for", u)
         sinhu = math.log(sys.float_info.max)
 
     try:
-        coshu = cosh(u)
+        coshu = mp.cosh(u)
     except OverflowError:
         #print("cosh overflow for", u)
         coshu = math.log(sys.float_info.max)
@@ -2128,24 +2132,24 @@ def e2uoft(t, theta, phi):
 
     Time in Hubble times.
     """
-    a = cosh(phi)
-    d = cos(theta)
+    a = mp.cosh(phi)
+    d = mp.cos(theta)
 
     # work with U = e**u and T=e**t
     A = D = (a - d)/2
     B = C = (a + d)/2
 
     # first time visible is tstar given by
-    ustar = log(sqrt(A/C))
+    ustar = mp.log(mp.sqrt(A/C))
 
     # the last time u that the source can be seen
     # notice e^umax = 1/(e**tstar = e**(-tstar)
     # so umax = -1 * tstar.
     # t for umax is infinite and u for tstar is -infinity
-    tmax = log(sqrt(C/A))
+    tmax = mp.log(mp.sqrt(C/A))
 
-    T = e**t
-    U = ((T - sqrt(C*D + ((1 - B*C - A*D) * T*T) + A * B * T*T*T*T))
+    T = mp.e**t
+    U = ((T - mp.sqrt(C*D + ((1 - B*C - A*D) * T*T) + A * B * T*T*T*T))
          / (C - A * T*T))
 
     return U
@@ -2155,7 +2159,7 @@ def uoft(t, theta, phi):
 
     U = e2uoft(t, theta, phi)
     try:
-        u = log(U)
+        u = mp.log(U)
     except:
         u = -sys.float_info.max
 
