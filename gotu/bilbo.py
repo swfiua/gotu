@@ -870,13 +870,20 @@ class Bilbo(magic.Ball):
 
         kerrs = []
         
-        tins = ttt[gtimes < geocent_time] * hubble_time
+        tins = ttt[gtimes < geocent_time] * hubble_time * cos(theta)
 
         uuu0 = np.array([float(uu - uuu[0]) for uu in uuu])
         
         for mass in m1, m2:
             if not mass: continue
             radius = mass * scr/m1
+
+            # gravitational length contraction near black hole this
+            # increases the frequency as tge event horizon approaches
+            # enhancing the effect of blueshift.
+            
+            lc = np.sqrt(1-radius/tins) * (1+minz)
+
 
             # kerr depends on distance
             distance = tins[::-1]/(1+minz).clip(radius/1000.)
