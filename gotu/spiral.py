@@ -2083,7 +2083,7 @@ def zandx(t, u, theta, phi):
 
     x = 1 - (((B/T) - (A*T)) * U)
 
-    return z, x
+    return z.real, x.real
 
 
 def e2tofu(u, theta, phi):

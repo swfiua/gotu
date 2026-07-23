@@ -190,7 +190,7 @@ from gwpy.timeseries import TimeSeries
 
 from astropy import units as u, constants as c
 from mpmath import mp, mpf
-mp.dps = 70
+mp.dps = 40
 
 import argparse
 
@@ -575,10 +575,12 @@ class Bilbo(magic.Ball):
             priors = bilby.core.prior.PriorDict(filename=filename.name)
         else:
             priors = bilby.core.prior.PriorDict(dict(
-                m1 = Uniform(name='m1', minimum=5, maximum=12),
-                m2 = Uniform(name='m2', minimum=5, maximum=12),
-                phi = Sinh2(name='phi', maximum=55., minimum=54.9999, n=1000),
-                theta =  Sine(name='theta'),
+                m1 = Uniform(name='m1', minimum=4, maximum=7),
+                m2 = Uniform(name='m2', minimum=4, maximum=7),
+                #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
+                phi = Uniform(name='phi', maximum=42., minimum=38),
+                #theta =  Sine(name='theta'),
+                theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
                 #theta =  0.001,
                 dec =  Cosine(name='dec'),
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
@@ -587,7 +589,7 @@ class Bilbo(magic.Ball):
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 logzboost = 0,
                 logscale = 0.,
-                minz = Uniform(name='minz', minimum=-10, maximum=-4, boundary='periodic'),
+                minz = Uniform(name='minz', minimum=-18, maximum=-16., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -602,16 +604,13 @@ class Bilbo(magic.Ball):
                 boundary='periodic'
             )
 
-        for key, value in priors.items():
-            print(key, value.is_fixed)
-
         return priors
 
     def conversion(self, priors):
 
         result = priors.copy()
 
-        result['minz'] = -1 + 10**priors['minz']
+        result['minz'] = 10**priors['minz']
         result['m1'] = 10**priors['m1']
         result['m2'] = 10**priors['m2']
 
@@ -639,26 +638,29 @@ class Bilbo(magic.Ball):
 
         tb = galaxy.tb()
 
-        tguess = tb/2
-        offset = tguess/2
+        tguess = mpf(tb/2)
+        offset = mpf(tguess/2)
 
         z, x = galaxy.zandx(tstar+tguess)
 
         zz = mpf(zz)
         count = 0
-        while z != zz:
-            #print(z, x, tb, tguess, offset)
-            if z < zz:
-                tguess += offset
-            else:
-                tguess -= offset
-            offset /= 2
-            z, x = galaxy.zandx(tstar+tguess)
-            if offset == 0: break
-            if count > 100: break
-            count += 1
+        try:
+            while z != zz:
+                #print(z, x, tb, tguess, offset)
+                if z < zz:
+                    tguess += offset
+                else:
+                    tguess -= offset
+                offset /= 2
+                z, x = galaxy.zandx(tstar+tguess)
+                if offset == 0: break
+                if count > 100: break
+                count += 1
+        except:
+            print(z, zz, type(z), type(zz))
 
-        return tstar + tguess
+        return float(tstar + tguess)
 
     def tdsm(self,
             gtimes,
@@ -701,7 +703,8 @@ class Bilbo(magic.Ball):
         #tstar = galaxy.tstar()
 
         # use time for z = -0.999 as start of event
-        tstar = self.tstar1000(galaxy, minz)
+        # minz is actually z+1
+        tstar = self.tstar1000(galaxy, minz-1)
 
         # calculate some values based on theta/phi
         ttt = (gtimes - gtimes[0]) * zboost / hubble_time
@@ -723,7 +726,7 @@ class Bilbo(magic.Ball):
 
         # distance from event horizon in seconds
 
-        uuu0 = np.array([float(uu - uuu[0]) for uu in uuu])
+        uuu0 = np.array([float(uu.real - uuu[0].real) for uu in uuu]) * 2 * pi * hubble_time
         
         tins = tins[::-1]
         delta_t = tins[1] - tins[0]
@@ -738,7 +741,7 @@ class Bilbo(magic.Ball):
             
             # kerr depends on distance from the black hole centre
             distance = tins + radius
-            kerr = (radius**4)/(distance**3.)
+            kerr = ((radius**4)/(distance**3.) * c.c).value
             kerrs.append([kerr, radius])
 
         for ix, tt in enumerate(tins):
@@ -753,11 +756,11 @@ class Bilbo(magic.Ball):
             for kerr, radius in kerrs:
                 weight = kerr[ix]
 
-                lc = np.sqrt(1-radius/(tt+radius+epsilon)) * (1+minz)
+                lc = np.sqrt(1-radius/(tt+radius+epsilon)) * minz
 
                 wavelength = radius * lc
             
-                ss += ((weight * rd * np.sin((2*pi*uu*hubble_time/wavelength) + phase)) * c.c).value
+                ss += weight * rd * np.sin((uu/wavelength) + phase)
 
             phase += delta_t / wavelength
             #print(kk.shape, uu.shape, ix)
