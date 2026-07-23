@@ -864,13 +864,12 @@ class Bilbo(magic.Ball):
 
         strain = np.zeros((len(ttt)))
 
-        xx0 = xxx[0]
-        xdist = abs((xx0 - xxx) * hubble_time)
-        xdist = xdist.clip(scr)
 
         kerrs = []
-        
-        tins = ttt[gtimes < geocent_time] * hubble_time * cos(theta)
+        tins = ttt[gtimes < geocent_time] * hubble_time / cos(theta)
+
+        # distance from event horizon in seconds
+        tins = tins[::-1]
 
         uuu0 = np.array([float(uu - uuu[0]) for uu in uuu])
         
@@ -882,14 +881,12 @@ class Bilbo(magic.Ball):
             # increases the frequency as tge event horizon approaches
             # enhancing the effect of blueshift.
             
-            lc = np.sqrt(1-radius/tins) * (1+minz)
-
-
-            # kerr depends on distance
-            distance = tins[::-1]/(1+minz).clip(radius/1000.)
-            kerr = np.where(distance > radius, (radius**4)/(distance**3.), distance)
+            # kerr depends on distance from the black hole centre
+            distance = tins + radius
+            kerr = (radius**4)/(distance**3.)
             kerrs.append([kerr, radius])
-            
+
+        delta_t = tins[1] - tins[0]
         for ix, tt in enumerate(tins):
 
             if ix:
@@ -902,9 +899,13 @@ class Bilbo(magic.Ball):
             for kerr, radius in kerrs:
                 weight = kerr[ix]
 
-                ss += weight * rd * np.sin((2*pi*uu*hubble_time/radius) + phase)
+                lc = np.sqrt(1-radius/(tt+radius)) * (1+minz)
 
-            #phase += uu[0]
+                wavelength = radius * lc
+            
+                ss += weight * rd * np.sin((2*pi*uu*hubble_time/wavelength) + phase)
+
+            phase += delta_t / wavelength
             #print(kk.shape, uu.shape, ix)
 
         kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
