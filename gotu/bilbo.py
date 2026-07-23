@@ -188,7 +188,7 @@ import bilby
 from bilby.core.prior import Prior, WeightedDiscreteValues, Sine, Cosine, Uniform, Normal, Exponential
 from gwpy.timeseries import TimeSeries
 
-from astropy import units as u
+from astropy import units as u, constants as c
 from mpmath import mp, mpf
 mp.dps = 70
 
@@ -412,9 +412,9 @@ async def pow_show(theta=0.1, phi=5., powers=[0.5], tbfactor=1, samples=1000):
 
 class Sinh2(WeightedDiscreteValues):
 
-    def __init__(self, name=None, maximum=None):
+    def __init__(self, name=None, maximum=None, minimum=None, n=10000):
 
-        random_phi = RandomPhi(max_phi=maximum)
+        random_phi = RandomPhi(max_phi=maximum, min_phi=maximum, n=n)
 
         super().__init__(random_phi.values[1:], random_phi.counts, name=name)
 
@@ -577,7 +577,7 @@ class Bilbo(magic.Ball):
             priors = bilby.core.prior.PriorDict(dict(
                 m1 = Uniform(name='m1', minimum=5, maximum=12),
                 m2 = Uniform(name='m2', minimum=5, maximum=12),
-                phi = Sinh2(name='phi', maximum=5.),
+                phi = Sinh2(name='phi', maximum=55., minimum=54.9999, n=1000),
                 theta =  Sine(name='theta'),
                 #theta =  0.001,
                 dec =  Cosine(name='dec'),
@@ -586,8 +586,8 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 logzboost = 0,
-                logscale = Uniform(name='logscale', minimum=0, maximum=8, boundary='periodic'),
-                minz = Uniform(name='minz', minimum=-9, maximum=-2, boundary='periodic'),
+                logscale = 0.,
+                minz = Uniform(name='minz', minimum=-10, maximum=-4, boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -632,153 +632,6 @@ class Bilbo(magic.Ball):
         
         return result, None
     
-    def time_domain_source_model(
-            self,
-            gtimes,
-            geocent_time=None,
-            m1=None,
-            m2=None,
-            theta=None,
-            phi=None,
-            dec=None,
-            ra=None,
-            psi=None,
-            phase=None,
-            logzboost=None,
-            logscale=None,
-            maxage=None,
-            post_trigger_duration=None):
-
-        galaxy = self.galaxy
-        galaxy.set_mcent((m1 * 3.0 * u.km << u.lyr).value)
-        galaxy.phi = phi
-        galaxy.theta = theta
-
-        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-
-        tstar = galaxy.tstar()
-
-        # two parts to this the inspiral. what is the definition of gps time?
-        # inspiral is up to geocent_time
-        # ringdown is the piece after
-
-        minz = -0.9999
-
-        tinspiral = np.array([gtime for gtime in gtimes if gtime < geocent_time])
-        tringdown= np.array([gtime for gtime in gtimes if gtime >= geocent_time])
-
-        # now we run into some numeric precision woes.
-        # to sidestep this, assume our time runs zboost times faster than this theta/phi
-        zboost = 10**logzboost
-        ####################
-        # calculate ringdown
-        ####################
-        ttt = (tringdown - geocent_time) * zboost / hubble_time
-
-        uuu = np.array([galaxy.uoft(tstar + t) for t in ttt])
-        zandx = [galaxy.zandx(tstar+t, u) for t, u in zip(ttt, uuu)]
-        zzz = np.array([zx[0] for zx in zandx])
-        xxx = np.array([zx[1] for zx in zandx])
-
-        # base signal is a sine wave, wavelength schwartzchild radius
-        scr = (galaxy.schwartzchild() << u.lightsecond).value
-        scr2 = m2 * scr / m1
-
-        # should add in phase here -- need to check how used in black hole merger code
-        strain = scr * np.sin((2*pi*uuu * hubble_time/scr)+phase)
-        strain += scr2 * np.sin(2*pi*uuu * hubble_time/scr2)
-
-        # amplitude of wave we see
-        zp1 = zzz + 1
-        lum = 1 / (zp1*zp1*xxx*xxx*hubble_time*hubble_time)
-        ringdown = strain*lum*10**logscale
-        #ringdown = strain*10**logscale
-        #ringdown = lum*10**logscale
-
-        info = magic.describe(uuu, 20)
-        info = None
-        if info:
-            info['tstar'] = tstar
-            info['umax'] = galaxy.umax()
-            magic.pp(info)
-        tb = galaxy.tb()
-
-        # adjust for range of uuu
-        uage = uuu[-1] - uuu
-
-        ringdown = np.where(uage > maxage, 0., ringdown)
-
-        plots = False
-        if plots:
-            doplot(ttt, strain,
-                   f'strain tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-            doplot(ttt, ringdown,
-                   f'ringdown tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-            
-            doplot(ttt, np.log(lum).clip(0, 15),
-                   f'luminosity tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-        ####################
-        # calculate inspiral
-        ####################
-        # now for the inspiral calculate inspiral
-        zmin = min(np.where(uage > maxage, 0., zzz))
-        #print("1+zmin:", 1+zmin)
-
-        
-        # assume the wavefront arrives with zmin
-
-        # at small r, need to adjust for gravitational redshift.
-        ttt = tinspiral - geocent_time
-        uuu = -ttt / (1+zmin)
-
-        inspiral = ttt * 0.
-        for mass in m1, m2:
-            if mass == 0:
-                continue
-            radius = mass * scr/m1
-            #weight = maxage * hubble_time / radius
-            strain = radius * maxage * hubble_time / (uuu ** 3.0)
-
-            angle = 2*pi*uuu/radius
-            inspiral += strain * np.sin(angle) / (((1+zmin) * hubble_time)**2)
-
-            
-        if False:
-            # ttt <= 0., flip sign here
-            uuu = np.array([galaxy.uoft(tstar - t) for t in ttt])
-            zandx = [galaxy.zandx(tstar-t, u) for t, u in zip(ttt, uuu)]
-            zzz = np.array([zx[0] for zx in zandx])
-            xxx = np.array([zx[1] for zx in zandx])
-
-            rr = (1-xxx) * hubble_time
-
-            du = uuu[1:] - uuu[:-1]
-        
-            # deal with rr < scr 
-            weight = np.where(rr < scr, rr, scr)
-            #weight = scr
-
-            strain = (10**logscale) * maxage * hubble_time * weight / (rr ** 3.0)
-            
-            inspiral = strain * np.sin(2*pi*uuu * hubble_time/weight)
-
-            inspiral = np.where(uage>maxage, 0., inspiral)
-
-        if plots:
-
-            doplot(ttt * hubble_time/zboost, inspiral.clip(-2e-11, 2e-11),
-                   f'inspiral tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-            doplot(ttt, uuu.clip(-10,10),
-                   f'u v t, tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-            doplot(ttt[1:], du,
-                   f'delta-u tb,theta,phi={tb:.4},{theta:.2},{phi:.2}')
-
-        #ringdown[:] = 0
-        #inspiral[:] = max(ringdown)
-        return dict(foo=inspiral.tolist() + ringdown.tolist())
-
 
     def tstar1000(self, galaxy, zz=-0.999):
 
@@ -860,7 +713,7 @@ class Bilbo(magic.Ball):
         zz1 = np.array([float(1+zx[0]) for zx in zandx])
         xxx = np.array([float(zx[1]) for zx in zandx])
 
-        ringdown = 1. / (zz1.clip(1+minz)*xxx)**2
+        ringdown = 1. / (zz1.clip(1+minz)*xxx*hubble_time)**2
 
         strain = np.zeros((len(ttt)))
 
@@ -869,10 +722,12 @@ class Bilbo(magic.Ball):
         tins = ttt[gtimes < geocent_time] * hubble_time / cos(theta)
 
         # distance from event horizon in seconds
-        tins = tins[::-1]
 
         uuu0 = np.array([float(uu - uuu[0]) for uu in uuu])
         
+        tins = tins[::-1]
+        delta_t = tins[1] - tins[0]
+        epsilon = 1e9
         for mass in m1, m2:
             if not mass: continue
             radius = mass * scr/m1
@@ -886,7 +741,6 @@ class Bilbo(magic.Ball):
             kerr = (radius**4)/(distance**3.)
             kerrs.append([kerr, radius])
 
-        delta_t = tins[1] - tins[0]
         for ix, tt in enumerate(tins):
 
             if ix:
@@ -899,19 +753,19 @@ class Bilbo(magic.Ball):
             for kerr, radius in kerrs:
                 weight = kerr[ix]
 
-                lc = np.sqrt(1-radius/(tt+radius)) * (1+minz)
+                lc = np.sqrt(1-radius/(tt+radius+epsilon)) * (1+minz)
 
                 wavelength = radius * lc
             
-                ss += weight * rd * np.sin((2*pi*uu*hubble_time/wavelength) + phase)
+                ss += ((weight * rd * np.sin((2*pi*uu*hubble_time/wavelength) + phase)) * c.c).value
 
             phase += delta_t / wavelength
             #print(kk.shape, uu.shape, ix)
 
         kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
-        return dict(strain=strain, ringdown=ringdown, kerr=kerr,
-                    uuu=uuu, zzz=zzz, xxx=xxx)
-        #return dict(foo=strain)
+        #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
+        #            uuu=uuu, zzz=zzz, xxx=xxx)
+        return dict(strain=strain)
 
 
     def hifi_zandx(self, ttt):

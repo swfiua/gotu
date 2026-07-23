@@ -2457,7 +2457,7 @@ class RandomPhi:
             sample.append(result[0])
             lastx = x
 
-        zval = sample[0]
+        zval = sample[0] or 1
         self.counts = [int(s/zval) for s in sample]
 
 
