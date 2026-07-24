@@ -579,8 +579,8 @@ class Bilbo(magic.Ball):
                 m2 = Uniform(name='m2', minimum=4, maximum=7),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
-                #theta =  Sine(name='theta'),
-                theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
+                theta =  Sine(name='theta'),
+                #theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
                 #theta =  0.001,
                 dec =  Cosine(name='dec'),
                 ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
@@ -768,7 +768,7 @@ class Bilbo(magic.Ball):
         kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
         #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
         #            uuu=uuu, zzz=zzz, xxx=xxx)
-        return dict(strain=strain)
+        return dict(strain=strain, kerr=kerr, ringdown=ringdown)
 
 
     def hifi_zandx(self, ttt):
