@@ -879,6 +879,23 @@ class Bilbo(magic.Ball):
         await adoplot(tt, U, 't v U')
 
 
+class Frodo(Bilbo):
+
+    def __init__(self, args=None):
+
+        super.__init__(args)
+
+    def conversion(self, prior):
+        pass
+
+    def load_prior(self):
+        pass
+
+    #tdsm = bilby.gw.
+
+        
+
+
 
 
 if __name__ == '__main__':
