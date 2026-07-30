@@ -185,7 +185,8 @@ np = magic.np
 from gotu.spiral import RandomPhi, Spiral
 
 import bilby
-from bilby.core.prior import Prior, WeightedDiscreteValues, Sine, Cosine, Uniform, Normal, Exponential
+from bilby.core.prior import (Prior, Constraint, WeightedDiscreteValues, Sine, Cosine,
+                              Uniform, Normal, Exponential, PowerLaw)
 from gwpy.timeseries import TimeSeries
 
 from astropy import units as u, constants as c
@@ -206,7 +207,7 @@ def get_args(args=None):
     parser.add_argument('--post_trigger_duration', type=float, default=2.)
     parser.add_argument('--duration', type=float, default=4.)
     parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
-    parser.add_argument('--chirp', action='store_true', default=False)
+    parser.add_argument('--frodo', action='store_true', default=False)
 
     return parser.parse_args(args)
 
@@ -431,7 +432,11 @@ class Bilbo(magic.Ball):
 
         self.showtable = False
         self.galaxy = Spiral()
-        
+        self.waveform_arguments = {}
+        self.time_marginalization = False
+        self.phase_marginalization = False
+        self.distance_marginalization = False
+
         super().__init__()
     
         
@@ -517,9 +522,12 @@ class Bilbo(magic.Ball):
         # the Spiral source model. We also pass other parameters:
         # the waveform approximant and reference frequency and a parameter conversion
         # which allows us to sample in chirp mass and ratio rather than component mass
+        ifo = self.ifo_list[0]
         self.waveform_generator = bilby.gw.WaveformGenerator(
+            duration=ifo.duration, sampling_frequency=ifo.sampling_frequency, start_time=ifo.start_time,
             time_domain_source_model=self.tdsm,
             parameter_conversion=self.conversion,
+            waveform_arguments=self.waveform_arguments,
         )
 
     def pre_run(self):
@@ -531,9 +539,9 @@ class Bilbo(magic.Ball):
             self.ifo_list,
             self.waveform_generator,
             priors=self.priors,
-            time_marginalization=False,
-            phase_marginalization=False,
-            distance_marginalization=False,
+            time_marginalization=self.time_marginalization,
+            phase_marginalization=self.phase_marginalization,
+            distance_marginalization=self.distance_marginalization,
         )
 
         from bilby.core.sampler import dynesty
@@ -575,8 +583,7 @@ class Bilbo(magic.Ball):
             priors = bilby.core.prior.PriorDict(filename=filename.name)
         else:
             priors = bilby.core.prior.PriorDict(dict(
-                m1 = Uniform(name='m1', minimum=4, maximum=7),
-                m2 = Uniform(name='m2', minimum=4, maximum=7),
+                mass = Uniform(name='mass', minimum=4, maximum=7),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
                 theta =  Sine(name='theta'),
@@ -587,8 +594,6 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                logzboost = 0,
-                logscale = 0.,
                 minz = Uniform(name='minz', minimum=-18, maximum=-16., boundary='periodic'),
             ))
 
@@ -611,26 +616,9 @@ class Bilbo(magic.Ball):
         result = priors.copy()
 
         result['minz'] = 10**priors['minz']
-        result['m1'] = 10**priors['m1']
-        result['m2'] = 10**priors['m2']
+        result['mass'] = 10**priors['mass']
 
-        
-        m2 = np.where(result['m1'] < result['m2'], result['m2'], result['m1'])
-        m1 = np.where(result['m1'] < result['m2'], result['m1'], result['m2'])
-        result['m1'], result['m2'] = m1, m2
-
-        if self.args.chirp:
-            m1 = result['m1']
-            m2 = result['m2']
-
-            chirp = (m1*m2)**0.6/((m1+m2)**.2)
-
-            result['m1'] = chirp
-            result['m2'] = chirp * 0
-        
-        
         return result, None
-    
 
     def tstar1000(self, galaxy, zz=-0.999):
 
@@ -665,16 +653,13 @@ class Bilbo(magic.Ball):
     def tdsm(self,
             gtimes,
             geocent_time=None,
-            m1=None,
-            m2=None,
+            mass=None,
             theta=None,
             phi=None,
             dec=None,
             ra=None,
             psi=None,
             phase=None,
-            logzboost=None,
-            logscale=None,
             minz=None,
             post_trigger_duration=None):
         """Waveform generator
@@ -694,12 +679,12 @@ class Bilbo(magic.Ball):
         """
 
         galaxy = self.galaxy
-        galaxy.set_mcent((m1 * 3.0 * u.km << u.lyr).value)
+        galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
         galaxy.phi = phi
         galaxy.theta = theta
         scr = (galaxy.schwartzchild() << u.lightsecond).value 
         hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-        zboost = 10**logzboost
+        self.gtimes = gtimes
         #tstar = galaxy.tstar()
 
         # use time for z = -0.999 as start of event
@@ -707,7 +692,7 @@ class Bilbo(magic.Ball):
         tstar = self.tstar1000(galaxy, minz-1)
 
         # calculate some values based on theta/phi
-        ttt = (gtimes - gtimes[0]) * zboost / hubble_time
+        ttt = (gtimes - gtimes[0]) / hubble_time
 
         uuu = [galaxy.uoft(tstar + t) for t in ttt]
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
@@ -721,7 +706,6 @@ class Bilbo(magic.Ball):
         strain = np.zeros((len(ttt)))
 
 
-        kerrs = []
         tins = ttt[gtimes < geocent_time] * hubble_time / cos(theta)
 
         # distance from event horizon in seconds
@@ -731,18 +715,16 @@ class Bilbo(magic.Ball):
         tins = tins[::-1]
         delta_t = tins[1] - tins[0]
         epsilon = 1e9
-        for mass in m1, m2:
-            if not mass: continue
-            radius = mass * scr/m1
 
-            # gravitational length contraction near black hole this
-            # increases the frequency as tge event horizon approaches
-            # enhancing the effect of blueshift.
-            
-            # kerr depends on distance from the black hole centre
-            distance = tins + radius
-            kerr = ((radius**4)/(distance**3.) * c.c).value
-            kerrs.append([kerr, radius])
+        radius = scr
+
+        # gravitational length contraction near black hole this
+        # increases the frequency as tge event horizon approaches
+        # enhancing the effect of blueshift.
+        
+        # kerr depends on distance from the black hole centre
+        distance = tins + radius
+        kerr = ((radius**4)/(distance**3.) * c.c).value
 
         for ix, tt in enumerate(tins):
 
@@ -753,19 +735,19 @@ class Bilbo(magic.Ball):
             else:
                 ss, rd, uu = strain, ringdown, uuu0
 
-            for kerr, radius in kerrs:
-                weight = kerr[ix]
+            weight = kerr[ix]
 
-                lc = np.sqrt(1-radius/(tt+radius+epsilon)) * minz
+            lc = np.sqrt(1-radius/(tt+radius+epsilon)) * minz
 
-                wavelength = radius * lc
+            wavelength = radius * lc
             
-                ss += weight * rd * np.sin((uu/wavelength) + phase)
+            ss += weight * rd * np.sin((uu/wavelength) + phase)
 
+            # wonder if it would be easier to work in frequency domain?
             phase += delta_t / wavelength
             #print(kk.shape, uu.shape, ix)
 
-        kerr = np.concat((kerrs[0][0], np.zeros(len(gtimes)-len(kerr))))
+        kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
         #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
         #            uuu=uuu, zzz=zzz, xxx=xxx)
         return dict(strain=strain, kerr=kerr, ringdown=ringdown)
@@ -817,23 +799,22 @@ class Bilbo(magic.Ball):
 
     async def show_waveforms(self):
 
-        gtimes = np.linspace(self.args.trigger_time-self.args.post_trigger_duration,
-                             self.args.trigger_time+self.args.post_trigger_duration,
-                             10000)
+        #gtimes = np.linspace(self.args.trigger_time-self.args.post_trigger_duration,
+        #                     self.args.trigger_time+self.args.post_trigger_duration,
+        #                     10000)
         while True:
 
             sample = self.sample = self.sample_prior()
 
-            sample = self.conversion(sample)[0]
-
             parms = {k: v[0] for k,v in sample.items()}
 
-            waveform = self.waveform = self.tdsm(gtimes, **parms)
-
+            waveform = self.waveform = self.waveform_generator.time_domain_strain(parms)
+            
             for key in waveform.keys():
+                print(key, len(self.gtimes), len(waveform[key]))
                 ax = await self.get()
 
-                ax.plot(gtimes, waveform[key])
+                ax.plot(self.gtimes, waveform[key])
                 ax.set_title(key)
                 ax.show()
 
@@ -883,27 +864,86 @@ class Frodo(Bilbo):
 
     def __init__(self, args=None):
 
-        super.__init__(args)
+        super().__init__(args)
+
+        self.time_marginalization = True
+        self.phase_marginalization = False
+        self.distance_marginalization = True
+
+        self.waveform_arguments = {
+            "waveform_approximant": "IMRPhenomPv2",
+            "reference_frequency": 50,
+        }
 
     def conversion(self, prior):
-        pass
-
-    def load_prior(self):
-        pass
-
-    #tdsm = bilby.gw.
-
         
+        return bilby.gw.conversion.convert_to_lal_binary_black_hole_parameters(prior)
 
+    def tdsm(self,
+             frequency_array=None,
+             mass_1=None,
+             mass_2=None,
+             luminosity_distance=None,
+             a_1=None,
+             tilt_1=None,
+             phi_12=None,
+             a_2=None,
+             tilt_2=None,
+             phi_jl=None,
+             theta_jn=None,
+             phase=None, **kwargs):
 
+        return bilby.gw.source.lal_binary_black_hole(
+            frequency_array, mass_1, mass_2, luminosity_distance, a_1, tilt_1,
+            phi_12, a_2, tilt_2, phi_jl, theta_jn, phase, **kwargs)
+
+    def load_priors(self):
+        label = args.label
+        trigger_time = args.trigger_time or datasets.gps_time(label)
+        filename = magic.Path(label + ".prior")
+        if filename.exists():
+            priors = bilby.core.prior.PriorDict(filename=filename.name)
+        else:
+            priors = bilby.core.prior.PriorDict(dict(
+                chirp_mass = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=25, maximum=35, unit='$M_{\\odot}$'),
+                mass_ratio = bilby.gw.prior.UniformInComponentsMassRatio(name='mass_ratio', minimum=0.125, maximum=1),
+                mass_1 = Constraint(name='mass_1', minimum=10, maximum=80),
+                mass_2 = Constraint(name='mass_2', minimum=10, maximum=80),
+                a_1 = Uniform(name='a_1', minimum=0, maximum=0.99),
+                a_2 = Uniform(name='a_2', minimum=0, maximum=0.99),
+                tilt_1 = Sine(name='tilt_1'),
+                tilt_2 = Sine(name='tilt_2'),
+                phi_12 = Uniform(name='phi_12', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                phi_jl = Uniform(name='phi_jl', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                luminosity_distance = PowerLaw(alpha=2, name='luminosity_distance', minimum=50, maximum=2000, unit='Mpc', latex_label='$d_L$'),
+                dec =  Cosine(name='dec'),
+                ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                theta_jn =  Sine(name='theta_jn'),
+                psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
+                phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+            ))
+
+        # Add the geocent time prior if it is not already there
+        if "geocent_time" not in priors:
+            priors["geocent_time"] = bilby.core.prior.Uniform(
+                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
+                boundary='periodic'
+            )
+
+        return priors
 
 
 if __name__ == '__main__':
 
     args = get_args()
 
-    baggins = Bilbo(args)
+    baggins = Frodo(args), Bilbo(args)
+
+    if args.frodo:
+        baggins = baggins[::-1]
 
     land = farm.Farm()
-    land.add(baggins)
+
+    for bag in baggins:
+        land.add(bag)
     farm.run(land)
