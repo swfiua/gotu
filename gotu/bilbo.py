@@ -192,7 +192,7 @@ import bilby
 from bilby.core.prior import (Prior, Constraint, WeightedDiscreteValues, Sine, Cosine,
                               Uniform, Normal, Exponential, PowerLaw)
 from gwpy.timeseries import TimeSeries
-
+from gwpy.signal.filter_design import bandpass, concatenate_zpks
 from astropy import units as u, constants as c
 from mpmath import mp, mpf
 mp.dps = 40
@@ -762,9 +762,19 @@ class Bilbo(magic.Ball):
         #            uuu=uuu, zzz=zzz, xxx=xxx)
 
         # maybe pass strain through a filter to remove low frequency noise.
+        fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
         
-        return dict(strain=strain, kerr=kerr, ringdown=ringdown)
+        return dict(strain=strain, kerr=kerr, ringdown=ringdown, fstrain=np.array(fstrain))
 
+    def filter_strain(self, strain,  dt):
+
+        ts = TimeSeries(strain, unit=u.s, dt=dt)
+
+        zpks = bandpass(50, 500, self.ifo_list[0].strain_data.sampling_frequency)
+
+        zpk = concatenate_zpks(zpks)
+
+        return ts.filter(zpk, filtfilt=False)
 
     def hifi_zandx(self, ttt):
         """ Approximate zandx for large phi
