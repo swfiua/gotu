@@ -19,6 +19,10 @@ the sample before calling the waveform generator.
 .. _bilby: https://pypi.org/project/bilby/
 
 
+2026/08/01
+==========
+
+
 2026/07/03
 ==========
 
@@ -430,7 +434,6 @@ class Bilbo(magic.Ball):
 
         self.args = args
 
-        self.showtable = False
         self.galaxy = Spiral()
         self.waveform_arguments = {}
         self.time_marginalization = False
@@ -438,8 +441,8 @@ class Bilbo(magic.Ball):
         self.distance_marginalization = False
 
         super().__init__()
-    
-        
+
+
     def load_ifos(self):
         """ Load the list of observations """
         logger = bilby.core.utils.logger
@@ -595,6 +598,7 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 minz = Uniform(name='minz', minimum=-18, maximum=-16., boundary='periodic'),
+                alpha = Uniform(name='alpha', minimum=0, maximum=1., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -661,6 +665,7 @@ class Bilbo(magic.Ball):
             psi=None,
             phase=None,
             minz=None,
+            alpha=None,
             post_trigger_duration=None):
         """Waveform generator
 
@@ -726,6 +731,7 @@ class Bilbo(magic.Ball):
         distance = tins + radius
         kerr = ((radius**4)/(distance**3.) * c.c).value
 
+        last_wavelength = None
         for ix, tt in enumerate(tins):
 
             if ix:
@@ -744,12 +750,19 @@ class Bilbo(magic.Ball):
             ss += weight * rd * np.sin((uu/wavelength) + phase)
 
             # wonder if it would be easier to work in frequency domain?
-            phase += delta_t / wavelength
+
+            # this is approximate -- think it leads to artifacts
+            # 
+            phase += delta_t / ((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength)))
             #print(kk.shape, uu.shape, ix)
+            last_wavelength = wavelength
 
         kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
         #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
         #            uuu=uuu, zzz=zzz, xxx=xxx)
+
+        # maybe pass strain through a filter to remove low frequency noise.
+        
         return dict(strain=strain, kerr=kerr, ringdown=ringdown)
 
 
@@ -782,14 +795,8 @@ class Bilbo(magic.Ball):
         args = self.args
 
         priors = self.priors
-        for key in priors:
-            if isinstance(priors[key], Prior):
-                print(key, priors[key].is_fixed)
 
-        print(priors.sample_subset(priors.keys(), size=1))
-        #import pdb
-        #pdb.set_trace()
-        
+        print(self.conversion(self.sample_prior()))
 
         # Finally, we run the sampler. This function takes the likelihood and prior
         # along with some options for how to do the sampling and how to save the data
@@ -811,15 +818,13 @@ class Bilbo(magic.Ball):
             waveform = self.waveform = self.waveform_generator.time_domain_strain(parms)
             
             for key in waveform.keys():
-                print(key, len(self.gtimes), len(waveform[key]))
                 ax = await self.get()
 
                 ax.plot(self.gtimes, waveform[key])
                 ax.set_title(key)
                 ax.show()
 
-            if self.showtable:
-                self.put_nowait(sorted(sample.items()), 'help')
+            self.put_nowait(sorted(sample.items()), 'help')
             await magic.sleep(self.sleep)
 
     def sample_prior(self):
