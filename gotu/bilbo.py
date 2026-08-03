@@ -440,6 +440,9 @@ class Bilbo(magic.Ball):
         self.phase_marginalization = False
         self.distance_marginalization = False
 
+        self.conversion_function = None
+        self.result_class = None
+
         super().__init__()
 
 
@@ -547,31 +550,6 @@ class Bilbo(magic.Ball):
             distance_marginalization=self.distance_marginalization,
         )
 
-        from bilby.core.sampler import dynesty
-
-        label = args.label
-        outdir = args.outdir or label
-
-        meta_data = dict()
-        self.likelihood.label = label
-        self.likelihood.outdir = outdir
-
-        bcu = bilby.core.utils
-        meta_data["likelihood"] = self.likelihood.meta_data
-        meta_data["loaded_modules"] = bcu.loaded_modules_dict()
-        meta_data["environment_packages"] = bcu.env_package_list(as_dataframe=True)
-        meta_data["global_meta_data"] = bcu.global_meta_data
-
-        self.sampler = dynesty.Dynesty(
-            self.likelihood,
-            priors=self.priors,
-            outdir=outdir,
-            label=label,
-            plot=False,
-            npool=1,
-            meta_data=meta_data,
-        )
-        
     def load_priors(self):
         
         # We now define the prior.
@@ -804,15 +782,41 @@ class Bilbo(magic.Ball):
         logger = bilby.core.utils.logger
         args = self.args
 
-        priors = self.priors
+        label = args.label
+        outdir = args.outdir or label
 
-        print(self.conversion(self.sample_prior()))
+        self.likelihood.label = label
+        self.likelihood.outdir = outdir
+
+        bcu = bilby.core.utils
+        meta_data = dict()
+        meta_data["likelihood"] = self.likelihood.meta_data
+        meta_data["loaded_modules"] = bcu.loaded_modules_dict()
+        meta_data["environment_packages"] = bcu.env_package_list(as_dataframe=True)
+        meta_data["global_meta_data"] = bcu.global_meta_data
+
 
         # Finally, we run the sampler. This function takes the likelihood and prior
         # along with some options for how to do the sampling and how to save the data
-        result = self.sampler.run_sampler()
-
+        result = bilby.run_sampler(
+            self.likelihood,
+            self.priors,
+            outdir=outdir,
+            label=label,
+            nlive=1000,
+            check_point_delta_t=600,
+            check_point_plot=True,
+            npool=1,
+            #meta_data=meta_data,
+            conversion_function=self.conversion_function,
+            result_class=self.result_class)
+        
         result.plot_corner()
+
+        self.result = result
+
+        return result
+
 
     async def show_waveforms(self):
 
@@ -884,6 +888,9 @@ class Frodo(Bilbo):
         self.time_marginalization = True
         self.phase_marginalization = False
         self.distance_marginalization = True
+
+        self.conversion_function = bilby.gw.conversion.generate_all_bbh_parameters
+        self.result_class = bilby.gw.result.CBCResult
 
         self.waveform_arguments = {
             "waveform_approximant": "IMRPhenomPv2",
