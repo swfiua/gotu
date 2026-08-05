@@ -205,7 +205,7 @@ def get_args(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--outdir')
+    parser.add_argument('--outdir', default='outdir')
     parser.add_argument('--label', default='GW150914')
     parser.add_argument('--trigger_time', type=float, default=1126259462.4)
     parser.add_argument('--post_trigger_duration', type=float, default=2.)
@@ -452,7 +452,7 @@ class Bilbo(magic.Ball):
         args = self.args
 
         label = args.label
-        outdir = args.outdir or label
+        outdir = args.outdir
         
         trigger_time = args.trigger_time or datasets.gps_time(label)
 
@@ -479,6 +479,7 @@ class Bilbo(magic.Ball):
             ifo = bilby.gw.detector.get_empty_interferometer(det)
 
             filename = magic.Path(outdir, det + label + form)
+            logger.info(f"looking for {filename}")
             if filename.exists():
                 logger.info("Reading cached analysis data for ifo {}".format(det))
                 data = TimeSeries.read(filename)
@@ -533,7 +534,6 @@ class Bilbo(magic.Ball):
             duration=ifo.duration, sampling_frequency=ifo.sampling_frequency, start_time=ifo.start_time,
             time_domain_source_model=self.tdsm,
             parameter_conversion=self.conversion,
-            waveform_arguments=self.waveform_arguments,
         )
 
     def pre_run(self):
@@ -820,9 +820,6 @@ class Bilbo(magic.Ball):
 
     async def show_waveforms(self):
 
-        #gtimes = np.linspace(self.args.trigger_time-self.args.post_trigger_duration,
-        #                     self.args.trigger_time+self.args.post_trigger_duration,
-        #                     10000)
         while True:
 
             sample = self.sample = self.sample_prior()
@@ -834,7 +831,7 @@ class Bilbo(magic.Ball):
             for key in waveform.keys():
                 ax = await self.get()
 
-                ax.plot(self.gtimes, waveform[key])
+                ax.plot(self.waveform_generator.time_array, waveform[key])
                 ax.set_title(key)
                 ax.show()
 
@@ -896,6 +893,32 @@ class Frodo(Bilbo):
             "waveform_approximant": "IMRPhenomPv2",
             "reference_frequency": 50,
         }
+
+
+    async def start(self):
+
+        label = args.label
+        outdir = args.outdir or label
+
+        self.ifo_list = self.load_ifos()
+        if not hasattr(self, 'priors'):
+            self.priors = self.load_priors()
+
+        # In this step we define a `waveform_generator`. This is the object which
+        # creates the frequency-domain strain. In this instance, we are using the
+        # the Spiral source model. We also pass other parameters:
+        # the waveform approximant and reference frequency and a parameter conversion
+        # which allows us to sample in chirp mass and ratio rather than component mass
+        ifo = self.ifo_list[0]
+        self.waveform_generator = bilby.gw.WaveformGenerator(
+            duration=ifo.duration, sampling_frequency=ifo.sampling_frequency, start_time=ifo.start_time,
+            frequency_domain_source_model=bilby.gw.source.lal_binary_black_hole,
+            parameter_conversion=self.conversion,
+            waveform_arguments={
+                "waveform_approximant": "IMRPhenomPv2",
+                "reference_frequency": 50,
+            },
+        )
 
     def conversion(self, prior):
         
