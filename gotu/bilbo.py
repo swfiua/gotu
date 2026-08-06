@@ -731,7 +731,7 @@ class Bilbo(magic.Ball):
 
             # this is approximate -- think it leads to artifacts
             # 
-            phase += delta_t / ((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength)))
+            phase += delta_t / (((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength))) * 2 * pi)
             #print(kk.shape, uu.shape, ix)
             last_wavelength = wavelength
 
