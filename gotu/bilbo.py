@@ -706,10 +706,10 @@ class Bilbo(magic.Ball):
         # enhancing the effect of blueshift.
         
         # kerr depends on distance from the black hole centre
-        distance = tins + radius
+        distance = tins+radius
+
         kerr = ((radius**4)/(distance**3.) * c.c).value
 
-        last_wavelength = None
         for ix, tt in enumerate(tins):
 
             if ix:
@@ -721,20 +721,21 @@ class Bilbo(magic.Ball):
 
             weight = kerr[ix]
 
-            lc = np.sqrt(1-radius/(tt+radius+epsilon)) * minz
+            lc = np.sqrt(1-radius/(radius+tt+epsilon)) * minz
 
             wavelength = radius * lc
             
-            ss += weight * rd * np.sin((uu/wavelength) + phase)
+            ss += weight * rd
 
             # wonder if it would be easier to work in frequency domain?
 
             # this is approximate -- think it leads to artifacts
             # 
-            phase += delta_t / (((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength))) * 2 * pi)
+            #phase += delta_t / (((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength))) * 2 * pi)
             #print(kk.shape, uu.shape, ix)
-            last_wavelength = wavelength
 
+        # Now apply sine wave of varying frequency to the strain 
+        #strain = strain * np.sin((uu/wavelength) + phase)
         kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
         #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
         #            uuu=uuu, zzz=zzz, xxx=xxx)
