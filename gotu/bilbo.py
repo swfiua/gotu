@@ -598,7 +598,7 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 minz = Uniform(name='minz', minimum=-20, maximum=-16),
-                fudge = Uniform(name='fudge', minimum=-6, maximum=-3., boundary='periodic'),
+                fudge = Uniform(name='fudge', minimum=-8, maximum=-3., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -763,9 +763,9 @@ class Bilbo(magic.Ball):
         #            uuu=uuu, zzz=zzz, xxx=xxx)
 
         # maybe pass strain through a filter to remove low frequency noise.
-        fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
+        #fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
         
-        return dict(strain=strain, kerr=kerr, ringdown=ringdown, fstrain=np.array(fstrain))
+        return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
 
     def filter_strain(self, strain,  dt):
 
