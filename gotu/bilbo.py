@@ -19,8 +19,30 @@ the sample before calling the waveform generator.
 .. _bilby: https://pypi.org/project/bilby/
 
 
-2026/08/01
+2026/08/12
 ==========
+
+We just has a partial solar eclipse.  Not much of the sun was occluded
+where I was, but the wildlife and my cat Piri, very much felt it.
+
+Piri was agitated at the start, eventually settled as all the animal
+life went silent, then towards the end came to me, but faced the Sun
+which meant he appeart to be looking at the fence in front of him.
+
+It was then I realised a problem with my current implmentation of the
+waveform generator.  I use the Schwartzchild radius as both the
+amplitude and wavelength of the signal.  I believe it makes much more
+sense to use the radius of the Eddington sphere for the wavelength.
+
+Further, the Eddington radius can be calculated if we know the
+redshift of the source.  This will tie everything together, including
+estimates of any associated gamma-ray bursts.
+
+I suspect the objects we are seeing are high redshift, so the
+Eddington radius will actually be close to the Schwartzchild radius.
+
+Nonetheless, the period of rotation of the object is likely to be less
+than a maximally spinning black hole.
 
 
 2026/07/03
@@ -575,8 +597,8 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                minz = Uniform(name='minz', minimum=-18, maximum=-16., boundary='periodic'),
-                alpha = Uniform(name='alpha', minimum=0, maximum=1., boundary='periodic'),
+                minz = Uniform(name='minz', minimum=-20, maximum=-16),
+                fudge = Uniform(name='fudge', minimum=-6, maximum=-3., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -599,6 +621,7 @@ class Bilbo(magic.Ball):
 
         result['minz'] = 10**priors['minz']
         result['mass'] = 10**priors['mass']
+        result['fudge'] = 10**priors['fudge']
 
         return result, None
 
@@ -643,7 +666,7 @@ class Bilbo(magic.Ball):
             psi=None,
             phase=None,
             minz=None,
-            alpha=None,
+            fudge=None,
             post_trigger_duration=None):
         """Waveform generator
 
@@ -665,7 +688,7 @@ class Bilbo(magic.Ball):
         galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
         galaxy.phi = phi
         galaxy.theta = theta
-        scr = (galaxy.schwartzchild() << u.lightsecond).value 
+        scr = (galaxy.schwartzchild() << u.lightsecond).value
         hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
         self.gtimes = gtimes
         #tstar = galaxy.tstar()
@@ -689,7 +712,7 @@ class Bilbo(magic.Ball):
         strain = np.zeros((len(ttt)))
 
 
-        tins = ttt[gtimes < geocent_time] * hubble_time / cos(theta)
+        tins = ttt[gtimes < geocent_time] * hubble_time / abs(cos(theta))
 
         # distance from event horizon in seconds
 
@@ -710,30 +733,29 @@ class Bilbo(magic.Ball):
 
         kerr = ((radius**4)/(distance**3.) * c.c).value
 
+        last_wavelength = 0
         for ix, tt in enumerate(tins):
-
-            if ix:
-                ss = strain[ix:]
-                rd = ringdown[:-ix]
-                uu = uuu0[:-ix]
-            else:
-                ss, rd, uu = strain, ringdown, uuu0
 
             weight = kerr[ix]
 
             lc = np.sqrt(1-radius/(radius+tt+epsilon)) * minz
 
-            wavelength = radius * lc
+            wavelength = radius * lc / fudge
             
-            ss += weight * rd
+            strain[ix] += ringdown[0] * weight * sin(phase) 
 
             # wonder if it would be easier to work in frequency domain?
 
             # this is approximate -- think it leads to artifacts
             # 
-            #phase += delta_t / (((alpha*wavelength)+((1-alpha)*(last_wavelength or wavelength))) * 2 * pi)
-            #print(kk.shape, uu.shape, ix)
+            phase += delta_t / (((wavelength+(last_wavelength or wavelength))) * pi)
 
+            last_wavelength = wavelength
+
+        rd = ringdown[:len(ringdown)-len(tins)]
+        uu = uuu0[:len(ringdown)-len(tins)]
+
+        strain[len(tins):] = rd * radius * c.c.value * np.sin(phase + (fudge*uu/radius))
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
         kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
