@@ -671,7 +671,8 @@ class Bilbo(magic.Ball):
         """Waveform generator
 
         Events are known to be strongly biassed to short blueshift
-        period, but these have very large phi.
+        period, these have very large phi.  For a given phi, the
+        shortest blue shift periods have small theta.
 
         We are also interested in just the a few seconds of time, when
         the radius of curvature is of the order 1e18 seconds.
@@ -681,7 +682,8 @@ class Bilbo(magic.Ball):
 
         This affects the calculation of z and x for the ringdown.
 
-        hifi_zandx tries to get around this
+        Here the mpmath package comes to the rescue, with arbitrary
+        precision floats, albeit with a performance hit.
         """
 
         galaxy = self.galaxy
@@ -694,7 +696,7 @@ class Bilbo(magic.Ball):
         #tstar = galaxy.tstar()
 
         minz = sqrt(scr / (c.c.value * amax * hubble_time**2))
-        minz = amax * 1000
+        minz = amax
 
         # use time for z = -0.999 as start of event
         # minz is actually z+1
@@ -708,10 +710,10 @@ class Bilbo(magic.Ball):
         print('amax minz', amax, minz, zandx[0])
 
         zzz = np.array([float(zx[0]) for zx in zandx])
-        zz1 = np.array([float(1+zx[0]) for zx in zandx])
         xxx = np.array([float(zx[1]) for zx in zandx])
 
-        ringdown = 1. / (zz1*xxx*hubble_time)**2
+        # amplitude of wave is inversely proportional to distance travelled
+        ringdown = 1. /  (xxx*hubble_time)**2
 
         strain = np.zeros((len(ttt)))
 
@@ -738,6 +740,7 @@ class Bilbo(magic.Ball):
         kerr = ((radius**4)/(distance**3.) * c.c).value
 
         last_wavelength = 0
+
         for ix, tt in enumerate(tins):
 
             weight = kerr[ix]
@@ -769,7 +772,8 @@ class Bilbo(magic.Ball):
         # maybe pass strain through a filter to remove low frequency noise.
         #fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
         
-        return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
+        #return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
+        return dict(strain=strain)
 
     def filter_strain(self, strain,  dt):
 
