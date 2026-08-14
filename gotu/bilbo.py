@@ -597,7 +597,7 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                minz = Uniform(name='minz', minimum=-20, maximum=-16),
+                amax = Uniform(name='amax', minimum=-22, maximum=-21),
                 fudge = Uniform(name='fudge', minimum=-8, maximum=-3., boundary='periodic'),
             ))
 
@@ -619,7 +619,7 @@ class Bilbo(magic.Ball):
 
         result = priors.copy()
 
-        result['minz'] = 10**priors['minz']
+        result['amax'] = 10**priors['amax']
         result['mass'] = 10**priors['mass']
         result['fudge'] = 10**priors['fudge']
 
@@ -665,7 +665,7 @@ class Bilbo(magic.Ball):
             ra=None,
             psi=None,
             phase=None,
-            minz=None,
+            amax=None,
             fudge=None,
             post_trigger_duration=None):
         """Waveform generator
@@ -693,6 +693,9 @@ class Bilbo(magic.Ball):
         self.gtimes = gtimes
         #tstar = galaxy.tstar()
 
+        minz = sqrt(scr / (c.c.value * amax * hubble_time**2))
+        minz = amax * 1000
+
         # use time for z = -0.999 as start of event
         # minz is actually z+1
         tstar = self.tstar1000(galaxy, minz-1)
@@ -702,6 +705,7 @@ class Bilbo(magic.Ball):
 
         uuu = [galaxy.uoft(tstar + t) for t in ttt]
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
+        print('amax minz', amax, minz, zandx[0])
 
         zzz = np.array([float(zx[0]) for zx in zandx])
         zz1 = np.array([float(1+zx[0]) for zx in zandx])
