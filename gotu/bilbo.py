@@ -711,7 +711,7 @@ class Bilbo(magic.Ball):
         zz1 = np.array([float(1+zx[0]) for zx in zandx])
         xxx = np.array([float(zx[1]) for zx in zandx])
 
-        ringdown = 1. / (zz1.clip(1+minz)*xxx*hubble_time)**2
+        ringdown = 1. / (zz1*xxx*hubble_time)**2
 
         strain = np.zeros((len(ttt)))
 
