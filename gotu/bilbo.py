@@ -707,7 +707,7 @@ class Bilbo(magic.Ball):
 
         uuu = [galaxy.uoft(tstar + t) for t in ttt]
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
-        print('amax minz', amax, minz, zandx[0])
+        #print('amax minz', amax, minz, zandx[0])
 
         zzz = np.array([float(zx[0]) for zx in zandx])
         xxx = np.array([float(zx[1]) for zx in zandx])
@@ -741,31 +741,25 @@ class Bilbo(magic.Ball):
 
         last_wavelength = 0
 
-        for ix, tt in enumerate(tins):
+        lc = np.sqrt(1-radius/(radius+tins+epsilon)) * minz
 
-            weight = kerr[ix]
+        wavelength = radius * lc / fudge
 
-            lc = np.sqrt(1-radius/(radius+tt+epsilon)) * minz
+        nins = len(tins)
+        phases = np.zeros(nins)
+        phases[0] = phase
+        phases[1:] = delta_t / ((wavelength[0:-1]+wavelength[1:])*pi)
+        phases = np.cumsum(phases)
 
-            wavelength = radius * lc / fudge
-            
-            strain[ix] += ringdown[0] * weight * sin(phase) 
+        strain[:nins] = ringdown[0] * kerr[:nins] * np.sin(phases)
+        
+        rd = ringdown[:len(ringdown)-nins]
+        uu = uuu0[:len(ringdown)-nins]
 
-            # wonder if it would be easier to work in frequency domain?
-
-            # this is approximate -- think it leads to artifacts
-            # 
-            phase += delta_t / (((wavelength+(last_wavelength or wavelength))) * pi)
-
-            last_wavelength = wavelength
-
-        rd = ringdown[:len(ringdown)-len(tins)]
-        uu = uuu0[:len(ringdown)-len(tins)]
-
-        strain[len(tins):] = rd * radius * c.c.value * np.sin(phase + (fudge*uu/radius))
+        strain[nins:] = rd * radius * c.c.value * np.sin(phase + (fudge*uu/radius))
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
-        kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
+        #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
         #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
         #            uuu=uuu, zzz=zzz, xxx=xxx)
 
@@ -773,7 +767,7 @@ class Bilbo(magic.Ball):
         #fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
         
         #return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
-        return dict(strain=strain)
+        return dict(plus=strain, cross=strain)
 
     def filter_strain(self, strain,  dt):
 
