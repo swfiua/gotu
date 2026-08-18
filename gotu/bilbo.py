@@ -19,6 +19,41 @@ the sample before calling the waveform generator.
 .. _bilby: https://pypi.org/project/bilby/
 
 
+2026/08/17
+==========
+
+The last update turned out to be a partial blind alley, but has lead
+to much progress.
+
+The big news is that my waves are close enough to the observations
+that the bilby hill-climb is working.  As I write this it my laptop
+fan is whirring as bilby works on GW170817.
+
+I now have a model that I think I believe and the exciting bit is that
+it could be little red dots that JWST seeing.  The full story is a
+little complex, so here goes.
+
+
+
+
+
+
+First imaging a Little Red Dot in the distant universe.  Let's say it
+has a companion of roughly similar mass, as many little red dots seem
+to do.
+
+At the centre of each a mass of a few tens of thousands of solar
+masses.   A few rotations per second.
+
+The angular momentum of the two masses carves out a Kerr shaped ripple
+in space time, which propogates at the speed of light.
+
+Now imagine the wave front of the wave, as an object approaches
+through curved space time.
+
+
+
+
 2026/08/12
 ==========
 
@@ -586,10 +621,10 @@ class Bilbo(magic.Ball):
             priors = bilby.core.prior.PriorDict(filename=filename.name)
         else:
             priors = bilby.core.prior.PriorDict(dict(
-                mass = Uniform(name='mass', minimum=4, maximum=7),
+                mass = Uniform(name='mass', minimum=3., maximum=4.8),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
-                theta =  Sine(name='theta'),
+                theta =  Sine(name='theta', maximum=0.001),
                 #theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
                 #theta =  0.001,
                 dec =  Cosine(name='dec'),
@@ -598,7 +633,7 @@ class Bilbo(magic.Ball):
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 amax = Uniform(name='amax', minimum=-22, maximum=-21),
-                fudge = Uniform(name='fudge', minimum=-8, maximum=-3., boundary='periodic'),
+                #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
@@ -621,7 +656,7 @@ class Bilbo(magic.Ball):
 
         result['amax'] = 10**priors['amax']
         result['mass'] = 10**priors['mass']
-        result['fudge'] = 10**priors['fudge']
+        #result['fudge'] = 10**priors['fudge']
 
         return result, None
 
@@ -666,7 +701,6 @@ class Bilbo(magic.Ball):
             psi=None,
             phase=None,
             amax=None,
-            fudge=None,
             post_trigger_duration=None):
         """Waveform generator
 
@@ -743,7 +777,7 @@ class Bilbo(magic.Ball):
 
         lc = np.sqrt(1-radius/(radius+tins+epsilon)) * minz
 
-        wavelength = radius * lc / fudge
+        wavelength = radius * lc 
 
         nins = len(tins)
         phases = np.zeros(nins)
@@ -756,7 +790,7 @@ class Bilbo(magic.Ball):
         rd = ringdown[:len(ringdown)-nins]
         uu = uuu0[:len(ringdown)-nins]
 
-        strain[nins:] = rd * radius * c.c.value * np.sin(phase + (fudge*uu/radius))
+        strain[nins:] = rd * radius * c.c.value * np.sin(phase + (uu/radius))
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
         #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
@@ -800,7 +834,12 @@ class Bilbo(magic.Ball):
         galaxy.phi = phi
         galaxy.theta = theta
 
+
     async def run(self):
+
+        await self.show_waveforms()
+        
+    def runbilby(self):
 
         self.pre_run()
         
@@ -832,7 +871,7 @@ class Bilbo(magic.Ball):
             check_point_delta_t=600,
             check_point_plot=True,
             npool=1,
-            #meta_data=meta_data,
+            meta_data=meta_data,
             conversion_function=self.conversion_function,
             result_class=self.result_class)
         

@@ -199,6 +199,8 @@ There was a weak burst of gamma-ray energy.
 
 """
 
+from math import *
+
 from astropy import table, io, units as u, constants as c
 
 from pycbc import waveform
@@ -304,6 +306,31 @@ class View(magic.Ball):
         ax.plot(redshift)
         ax.show()
 
+    async def massguess(self):
+            
+        data = self.table
+        
+        m1 = data['mass_1_source']
+        m2 = data['mass_2_source']
+
+        #chirp = ((m1 * m2)**0.6)/((m1 + m2)**0.2)
+        
+        z = data['redshift']
+
+        # the period of the wave we detect at merge
+        # for most of the inspiral the bodies are tens of schwartzchild radii apart
+        # TODO: figure this out
+        period = (2 * pi * (m1 + m2)) * (1+z)
+
+        # for mass arrival we need to scale up the masses for a factor
+        # based on the distance apart at some t before merger
+        print(period)
+
+        ax = await self.get()
+
+        ax.hist(period)
+        ax.show()
+        
 
     def to_spiral(self, m1, m2, redshift, blueshift, distance):
         """Create a Spiral object with mass based on this observation
