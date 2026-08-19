@@ -246,8 +246,8 @@ np = magic.np
 from gotu.spiral import RandomPhi, Spiral
 
 import bilby
-from bilby.core.prior import (Prior, Constraint, WeightedDiscreteValues, Sine, Cosine,
-                              Uniform, Normal, Exponential, PowerLaw)
+from bilby.core.prior import (Prior, PriorDict, Constraint, WeightedDiscreteValues, Sine, Cosine,
+                              Uniform, Normal, Exponential, PowerLaw, DeltaFunction)
 from gwpy.timeseries import TimeSeries
 from gwpy.signal.filter_design import bandpass, concatenate_zpks
 from astropy import units as u, constants as c
@@ -618,10 +618,10 @@ class Bilbo(magic.Ball):
         trigger_time = args.trigger_time or datasets.gps_time(label)
         filename = magic.Path(label + ".prior")
         if filename.exists():
-            priors = bilby.core.prior.PriorDict(filename=filename.name)
+            priors = PriorDict(filename=filename.name)
         else:
-            priors = bilby.core.prior.PriorDict(dict(
-                mass = Uniform(name='mass', minimum=3., maximum=4.8),
+            priors = PriorDict(dict(
+                mass = Uniform(name='mass', minimum=3., maximum=8),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
                 theta =  Sine(name='theta', maximum=0.001),
@@ -632,18 +632,21 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                amax = Uniform(name='amax', minimum=-22, maximum=-21),
+                amax = Uniform(name='amax', minimum=-19, maximum=-17),
+                baoperiod = DeltaFunction(name='baoperiod', peak=490e6),
+                baosize = Uniform(name='baosize', minimum=.001, maximum=.1),
+                baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
             ))
 
         # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
-        priors["post_trigger_duration"] = bilby.core.prior.DeltaFunction(
+        priors["post_trigger_duration"] = DeltaFunction(
                 peak=args.post_trigger_duration, name="post_trigger_duration",
             )
 
         # Add the geocent time prior if it is not already there
         if "geocent_time" not in priors:
-            priors["geocent_time"] = bilby.core.prior.Uniform(
+            priors["geocent_time"] = Uniform(
                 trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
                 boundary='periodic'
             )
@@ -701,6 +704,9 @@ class Bilbo(magic.Ball):
             psi=None,
             phase=None,
             amax=None,
+            baosize=None,
+            baoperiod=None,
+            baophase=None,
             post_trigger_duration=None):
         """Waveform generator
 
@@ -729,7 +735,6 @@ class Bilbo(magic.Ball):
         self.gtimes = gtimes
         #tstar = galaxy.tstar()
 
-        minz = sqrt(scr / (c.c.value * amax * hubble_time**2))
         minz = amax
 
         # use time for z = -0.999 as start of event
@@ -791,6 +796,25 @@ class Bilbo(magic.Ball):
         uu = uuu0[:len(ringdown)-nins]
 
         strain[nins:] = rd * radius * c.c.value * np.sin(phase + (uu/radius))
+
+
+        # add a universal wobble from the bao to the mix
+        # 480 million years at minz
+        baoperiod *= (minz * u.year << u.s).value / hubble_time
+        #aosize = baoperiod / (2*pi)
+        baooffset = np.int64((baosize * np.sin(baophase+ttt/baoperiod))/delta_t)
+        print(baoperiod, baosize)
+        #print(magic.describe(baooffset))
+        print('log(z) distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance/1e6)
+
+        # need to pad strain with zeroes
+        pre = abs(min(baooffset))
+        picks = np.concat((np.zeros(pre, dtype=int),
+                           strain,
+                           np.zeros(max(baooffset), dtype=int)))
+
+        strain = picks[baooffset+np.arange(len(strain))]
+
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
         #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
@@ -1011,9 +1035,9 @@ class Frodo(Bilbo):
         trigger_time = args.trigger_time or datasets.gps_time(label)
         filename = magic.Path(label + ".prior")
         if filename.exists():
-            priors = bilby.core.prior.PriorDict(filename=filename.name)
+            priors = PriorDict(filename=filename.name)
         else:
-            priors = bilby.core.prior.PriorDict(dict(
+            priors = PriorDict(dict(
                 chirp_mass = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=25, maximum=35, unit='$M_{\\odot}$'),
                 mass_ratio = bilby.gw.prior.UniformInComponentsMassRatio(name='mass_ratio', minimum=0.125, maximum=1),
                 mass_1 = Constraint(name='mass_1', minimum=10, maximum=80),
@@ -1034,7 +1058,7 @@ class Frodo(Bilbo):
 
         # Add the geocent time prior if it is not already there
         if "geocent_time" not in priors:
-            priors["geocent_time"] = bilby.core.prior.Uniform(
+            priors["geocent_time"] = Uniform(
                 trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
                 boundary='periodic'
             )
