@@ -75,6 +75,10 @@ A module for each chapter
 
    birch
 
+   bilbo
+
+   lrd
+
    apersonalview
 
 

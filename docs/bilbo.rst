@@ -5,7 +5,7 @@ What if black holes do not merge?
 =================================
 
 
-.. automodule:: gotu.bilby
+.. automodule:: gotu.bilbo
     :members:
 
 
