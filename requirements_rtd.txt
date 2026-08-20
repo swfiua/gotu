@@ -7,3 +7,4 @@ scipy
 healpy
 sphinx_collections
 psutil
+mpmath
