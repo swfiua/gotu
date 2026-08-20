@@ -8,3 +8,4 @@ healpy
 sphinx_collections
 psutil
 mpmath
+bilby
