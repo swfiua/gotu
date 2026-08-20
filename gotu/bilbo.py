@@ -251,6 +251,7 @@ from bilby.core.prior import (Prior, PriorDict, Constraint, WeightedDiscreteValu
 from gwpy.timeseries import TimeSeries
 from gwpy.signal.filter_design import bandpass, concatenate_zpks
 from astropy import units as u, constants as c
+from astropy import table
 from mpmath import mp, mpf
 mp.dps = 40
 
@@ -262,6 +263,7 @@ def get_args(args=None):
         args = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--events', default=None)
     parser.add_argument('--outdir', default='outdir')
     parser.add_argument('--label', default='GW150914')
     parser.add_argument('--trigger_time', type=float, default=1126259462.4)
@@ -657,11 +659,20 @@ class Bilbo(magic.Ball):
 
         result = priors.copy()
 
-        result['amax'] = 10**priors['amax']
-        result['mass'] = 10**priors['mass']
+        minz = result['amax'] = 10**priors['amax']
+        mass = result['mass'] = 10**priors['mass']
         #result['fudge'] = 10**priors['fudge']
 
-        return result, None
+        galaxy = self.galaxy
+        galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
+        galaxy.phi = result['phi']
+        galaxy.theta = result['theta']
+        tstar = self.tstar1000(galaxy, minz-1)
+
+        zandx = galaxy.zandx(tstar)
+        result['distance'] = zandx[1]
+ 
+        return result, ['distance']
 
     def tstar1000(self, galaxy, zz=-0.999):
 
@@ -803,9 +814,10 @@ class Bilbo(magic.Ball):
         baoperiod *= (minz * u.year << u.s).value / hubble_time
         #aosize = baoperiod / (2*pi)
         baooffset = np.int64((baosize * np.sin(baophase+ttt/baoperiod))/delta_t)
+        xbaooffset = np.int64((baosize * np.sin(pi+baophase+ttt/baoperiod))/delta_t)
         print(baoperiod, baosize)
         #print(magic.describe(baooffset))
-        print('log(z) distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance/1e6)
+        print('z distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance << u.Mlyr)
 
         # need to pad strain with zeroes
         pre = abs(min(baooffset))
@@ -814,7 +826,7 @@ class Bilbo(magic.Ball):
                            np.zeros(max(baooffset), dtype=int)))
 
         strain = picks[baooffset+np.arange(len(strain))]
-
+        xstrain = picks[baooffset+np.arange(len(strain))]
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
         #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
@@ -825,7 +837,7 @@ class Bilbo(magic.Ball):
         #fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
         
         #return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
-        return dict(plus=strain, cross=strain)
+        return dict(plus=strain, cross=xstrain)
 
     def filter_strain(self, strain,  dt):
 
@@ -1000,7 +1012,7 @@ class Frodo(Bilbo):
         ifo = self.ifo_list[0]
         self.waveform_generator = bilby.gw.WaveformGenerator(
             duration=ifo.duration, sampling_frequency=ifo.sampling_frequency, start_time=ifo.start_time,
-            frequency_domain_source_model=bilby.gw.source.lal_binary_black_hole,
+            frequency_domain_source_model=self.fdsm,
             parameter_conversion=self.conversion,
             waveform_arguments={
                 "waveform_approximant": "IMRPhenomPv2",
@@ -1012,7 +1024,7 @@ class Frodo(Bilbo):
         
         return bilby.gw.conversion.convert_to_lal_binary_black_hole_parameters(prior)
 
-    def tdsm(self,
+    def fdsm(self,
              frequency_array=None,
              mass_1=None,
              mass_2=None,
@@ -1026,9 +1038,20 @@ class Frodo(Bilbo):
              theta_jn=None,
              phase=None, **kwargs):
 
-        return bilby.gw.source.lal_binary_black_hole(
+        result = bilby.gw.source.lal_binary_black_hole(
             frequency_array, mass_1, mass_2, luminosity_distance, a_1, tilt_1,
             phi_12, a_2, tilt_2, phi_jl, theta_jn, phase, **kwargs)
+
+        import pickle
+        
+        ofile = open('wave.pickle', 'wb')
+        print('writing pickle')
+        from bilby.core.utils import infft
+        twave = infft(result['cross'], self.waveform_generator.sampling_frequency)
+        pickle.dump(twave, ofile)
+        ofile.close()
+
+        return result
 
     def load_priors(self):
         label = args.label
@@ -1068,7 +1091,20 @@ class Frodo(Bilbo):
 
 if __name__ == '__main__':
 
+    from .gw150914 import View, read_csv, transdict
     args = get_args()
+
+    if args.events:
+        data = list(read_csv(open(args.events)))
+        data = transdict(data)
+        table = table.Table(data)
+        for row in table:
+            print(args.label, row['name'])
+            if args.label in row['name']:
+                args.label = row['name']
+                args.trigger_time = row['gps']
+                break
+        print(args)
 
     baggins = Frodo(args), Bilbo(args)
 
