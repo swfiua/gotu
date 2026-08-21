@@ -9,3 +9,4 @@ sphinx_collections
 psutil
 mpmath
 bilby
+pycbc
