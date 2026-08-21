@@ -30,7 +30,7 @@ they were wrong.
 It was Fred that coined the term Big Bang.  Fred looked at the
 Universe through the biggest telescopes of the day.
 
-.. image:: images/m31.png
+.. figure:: images/m31.png
 
    The Andromeda Galaxy
 

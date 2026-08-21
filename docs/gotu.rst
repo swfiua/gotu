@@ -53,7 +53,7 @@ of space dimensions intertwined with a dimension of time.  If we fix
 one dimension, then 3-spheres emerge.
 
 A not so brief history
----------------------
+----------------------
 
 The book many ways it is the antidote to the biggest selling book on
 theoretical physics, *A brief history of time*.

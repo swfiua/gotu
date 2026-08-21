@@ -252,7 +252,7 @@ Some general observations:
 If we assume that all redshift is cosmological, then the result is
 that the stars around small quasars will appear blue-shifted.
 
-.. image:: images/blueshift
+.. image:: images/blueshift.png
 
 6/3/2025
 ========
