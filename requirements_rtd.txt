@@ -10,3 +10,4 @@ psutil
 mpmath
 bilby
 pycbc
+gwpy
