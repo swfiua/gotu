@@ -33,11 +33,6 @@ I now have a model that I think I believe and the exciting bit is that
 it could be little red dots that JWST seeing.  The full story is a
 little complex, so here goes.
 
-
-
-
-
-
 First imaging a Little Red Dot in the distant universe.  Let's say it
 has a companion of roughly similar mass, as many little red dots seem
 to do.
@@ -48,8 +43,36 @@ masses.   A few rotations per second.
 The angular momentum of the two masses carves out a Kerr shaped ripple
 in space time, which propogates at the speed of light.
 
+Or rather, to the extent that the body has angular momentum, modulo
+the oscillations of the universe, it carves out a Kerr shaped ripple
+in space time.
+
+It turns out this is critical to the model developed here, as well as
+the argument that black holes do not merge.
+
+The Kerr metric penalty that bodies pay for rotating also applies to
+the universe.  If a body does not follow the rotation of the universe
+then it is given a small nudge in the direction of the universe.
+
+In essence it becomes quantum entangled with the universe itself, to
+the extent it is able to do so.  It is also this entanglement that
+gives rise to the force of gravity itself, the curvature of space
+time.
+
+[quantum information universe]
+
 Now imagine the wave front of the wave, as an object approaches
-through curved space time.
+through curved space time.  I like to think of it as a wave
+approaching a long beach at a slight angle.  It breaks along it's full
+length at almost the same time.
+
+The wave rises quickly, in a few seconds assumin the arrival's
+schwartzchild radius is of the order of seconds.
+
+The initial gap between waves is also this order, but as the waves get
+larger the frequency drops due to the approach of the black hole
+(specifically, length contraction due to the intense gravitational
+field).
 
 
 
@@ -253,26 +276,9 @@ from gwpy.signal.filter_design import bandpass, concatenate_zpks
 from astropy import units as u, constants as c
 from astropy import table
 from mpmath import mp, mpf
-mp.dps = 40
+mp.dps = 50
 
 import argparse
-
-def get_args(args=None):
-
-    if args is None:
-        args = sys.argv[1:]
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--events', default=None)
-    parser.add_argument('--outdir', default='outdir')
-    parser.add_argument('--label', default='GW150914')
-    parser.add_argument('--trigger_time', type=float, default=1126259462.4)
-    parser.add_argument('--post_trigger_duration', type=float, default=2.)
-    parser.add_argument('--duration', type=float, default=4.)
-    parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
-    parser.add_argument('--frodo', action='store_true', default=False)
-
-    return parser.parse_args(args)
 
 def find_r(galaxy, tdash, utest=-5., factor=1000):
     """
@@ -636,7 +642,7 @@ class Bilbo(magic.Ball):
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
                 amax = Uniform(name='amax', minimum=-19, maximum=-17),
                 baoperiod = DeltaFunction(name='baoperiod', peak=490e6),
-                baosize = Uniform(name='baosize', minimum=.001, maximum=.1),
+                baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
                 baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
             ))
@@ -813,20 +819,24 @@ class Bilbo(magic.Ball):
         # 480 million years at minz
         baoperiod *= (minz * u.year << u.s).value / hubble_time
         #aosize = baoperiod / (2*pi)
-        baooffset = np.int64((baosize * np.sin(baophase+ttt/baoperiod))/delta_t)
-        xbaooffset = np.int64((baosize * np.sin(pi+baophase+ttt/baoperiod))/delta_t)
-        print(baoperiod, baosize)
-        #print(magic.describe(baooffset))
-        print('z distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance << u.Mlyr)
+        baosize -= scr
+        if baosize > 0:
+            baooffset = np.int64((baosize * np.sin(baophase+ttt/baoperiod))/delta_t)
+            xbaooffset = np.int64((baosize * np.sin(pi+baophase+ttt/baoperiod))/delta_t)
+            print(baoperiod, baosize)
+            #print(magic.describe(baooffset))
+            print('z distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance << u.Mlyr)
 
-        # need to pad strain with zeroes
-        pre = abs(min(baooffset))
-        picks = np.concat((np.zeros(pre, dtype=int),
-                           strain,
-                           np.zeros(max(baooffset), dtype=int)))
+            # need to pad strain with zeroes
+            pre = abs(min(baooffset))
+            picks = np.concat((np.zeros(pre, dtype=int),
+                               strain,
+                               np.zeros(max(baooffset), dtype=int)))
 
-        strain = picks[baooffset+np.arange(len(strain))]
-        xstrain = picks[baooffset+np.arange(len(strain))]
+            strain = picks[baooffset+np.arange(len(strain))]
+            xstrain = picks[xbaooffset+np.arange(len(strain))]
+        else:
+            xstrain = strain = strain * abs(baosize/scr)
         # Now apply sine wave of varying frequency to the strain 
         #strain = strain * np.sin((uu/wavelength) + phase)
         #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
@@ -1089,6 +1099,145 @@ class Frodo(Bilbo):
         return priors
 
 
+class Gandalf(Bilbo):
+    """ Wizard to estimate Bilbo parameters given GWOSC event parameters
+
+    
+    """
+
+    def __init__(self, args=None):
+
+        super().__init__(args)
+
+    def load_priors(self):
+
+        parms = self.args.parameters
+
+        redshift = parms['redshift']
+        luminosity_distance = parms['luminosity_distance']
+        chirp_mass = parms['chirp_mass_source']
+        m1 = parms['mass_1_source']
+        m2 = parms['mass_2_source']
+
+        r = k * (m1+m2)
+        period = 2 * pi * (m1+m2) * (1+redshift) * (k*3)
+        
+        # We now define the prior.
+        # We have defined our prior distribution in a local file, GW150914.prior
+        # The prior is printed to the terminal at run-time.
+        # You can overwrite this using the syntax below in the file,
+        # or choose a fixed value by just providing a float value as the prior.
+        label = args.label
+        trigger_time = args.trigger_time or datasets.gps_time(label)
+        filename = magic.Path(label + ".prior")
+        if filename.exists():
+            priors = PriorDict(filename=filename.name)
+        else:
+            priors = PriorDict(dict(
+                mass = Uniform(name='mass', minimum=3., maximum=8),
+                #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
+                phi = Uniform(name='phi', maximum=42., minimum=38),
+                theta =  Sine(name='theta', maximum=0.001),
+                #theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
+                #theta =  0.001,
+                dec =  Cosine(name='dec'),
+                ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
+                phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
+                amax = Uniform(name='amax', minimum=-19, maximum=-17),
+                baoperiod = DeltaFunction(name='baoperiod', peak=490e6),
+                baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
+                baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
+            ))
+
+        # Add post trigger duration.  geocent_time + post_trigger_duration is end of inspiral
+        priors["post_trigger_duration"] = DeltaFunction(
+                peak=args.post_trigger_duration, name="post_trigger_duration",
+            )
+
+        # Add the geocent time prior if it is not already there
+        if "geocent_time" not in priors:
+            priors["geocent_time"] = Uniform(
+                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
+                boundary='periodic'
+            )
+
+        return priors
+
+    def conversion(self, priors):
+
+        result = priors.copy()
+
+        minz = result['amax'] = 10**priors['amax']
+        mass = result['mass'] = 10**priors['mass']
+        #result['fudge'] = 10**priors['fudge']
+
+        galaxy = self.galaxy
+        galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
+        galaxy.phi = result['phi']
+        galaxy.theta = result['theta']
+        tstar = self.tstar1000(galaxy, minz-1)
+
+        zandx = galaxy.zandx(tstar)
+        result['distance'] = zandx[1]
+ 
+        return result, ['distance']
+
+    def frodo_load_priors(self):
+        label = args.label
+        trigger_time = args.trigger_time or datasets.gps_time(label)
+        filename = magic.Path(label + ".prior")
+        if filename.exists():
+            priors = PriorDict(filename=filename.name)
+        else:
+            priors = PriorDict(dict(
+                chirp_mass = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=25, maximum=35, unit='$M_{\\odot}$'),
+                mass_ratio = bilby.gw.prior.UniformInComponentsMassRatio(name='mass_ratio', minimum=0.125, maximum=1),
+                mass_1 = Constraint(name='mass_1', minimum=10, maximum=80),
+                mass_2 = Constraint(name='mass_2', minimum=10, maximum=80),
+                a_1 = Uniform(name='a_1', minimum=0, maximum=0.99),
+                a_2 = Uniform(name='a_2', minimum=0, maximum=0.99),
+                tilt_1 = Sine(name='tilt_1'),
+                tilt_2 = Sine(name='tilt_2'),
+                phi_12 = Uniform(name='phi_12', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                phi_jl = Uniform(name='phi_jl', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                luminosity_distance = PowerLaw(alpha=2, name='luminosity_distance', minimum=50, maximum=2000, unit='Mpc', latex_label='$d_L$'),
+                dec =  Cosine(name='dec'),
+                ra =  Uniform(name='ra', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+                theta_jn =  Sine(name='theta_jn'),
+                psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
+                phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
+            ))
+
+        # Add the geocent time prior if it is not already there
+        if "geocent_time" not in priors:
+            priors["geocent_time"] = Uniform(
+                trigger_time - 0.1, trigger_time + 0.1, name="geocent_time",
+                boundary='periodic'
+            )
+
+        return priors
+
+def get_args(args=None):
+
+    if args is None:
+        args = sys.argv[1:]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--events', default=None)
+    parser.add_argument('--outdir', default='outdir')
+    parser.add_argument('--label', default='GW150914')
+    parser.add_argument('--trigger_time', type=float, default=1126259462.4)
+    parser.add_argument('--post_trigger_duration', type=float, default=2.)
+    parser.add_argument('--duration', type=float, default=4.)
+    parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
+    parser.add_argument('--who', choices=['gandalf', 'frodo', 'bilbo'], default='gandalf')
+
+    return parser.parse_args(args)
+
+
 if __name__ == '__main__':
 
     from .gw150914 import View, read_csv, transdict
@@ -1103,16 +1252,13 @@ if __name__ == '__main__':
             if args.label in row['name']:
                 args.label = row['name']
                 args.trigger_time = row['gps']
+                args.parameters = dict(row)
                 break
         print(args)
 
-    baggins = Frodo(args), Bilbo(args)
-
-    if args.frodo:
-        baggins = baggins[::-1]
+    baggins = locals()[args.who.capitalize()]
 
     land = farm.Farm()
 
-    for bag in baggins:
-        land.add(bag)
+    land.add(baggins(args))
     farm.run(land)
