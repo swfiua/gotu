@@ -5,6 +5,21 @@
 I will try to give updates from time to time as to what is happening
 here
 
+30/08/26
+========
+
+Exciting news regarding :ref:`bilbo`.   I now have a version that
+impliments a model that matches the waves we are seeing.
+
+There is a lot of work to do, in particular document the model and how
+it relates to the merging black hole model.
+
+My current focus is on :ref:`gotu.bilbo.Gandalf` which will attempt to
+fit a model to all the events in the GWOSC catalogue to estimate
+fundamental parameters of the Universe.
+
+For the next month I will be busy writing *A Bogtrotter's guide to the Universe*.
+
 24/11/2025
 ==========
 

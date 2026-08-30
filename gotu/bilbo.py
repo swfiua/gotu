@@ -629,7 +629,7 @@ class Bilbo(magic.Ball):
             priors = PriorDict(filename=filename.name)
         else:
             priors = PriorDict(dict(
-                mass = Uniform(name='mass', minimum=3., maximum=8),
+                mass = Uniform(name='mass', minimum=1., maximum=10),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
                 theta =  Sine(name='theta', maximum=0.001),
@@ -640,9 +640,10 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                amax = Uniform(name='amax', minimum=-19, maximum=-17),
+                amax = Uniform(name='amax', minimum=-21, maximum=-17),
                 baoperiod = DeltaFunction(name='baoperiod', peak=490e6),
-                baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
+                #baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
+                baosize = DeltaFunction(name='baosize', peak=1.),
                 baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
             ))
@@ -1356,7 +1357,6 @@ if __name__ == '__main__':
         data = transdict(data)
         table = table.Table(data)
         for row in table:
-            print(args.label, row['name'])
             if args.label in row['name']:
                 args.label = row['name']
                 args.trigger_time = row['gps']
