@@ -18,7 +18,8 @@ My current focus is on :ref:`gotu.bilbo.Gandalf` which will attempt to
 fit a model to all the events in the GWOSC catalogue to estimate
 fundamental parameters of the Universe.
 
-For the next month I will be busy writing *A Bogtrotter's guide to the Universe*.
+For the next month I will be busy writing *A Bogtrotter's guide to the
+Universe*. 
 
 24/11/2025
 ==========

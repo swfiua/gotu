@@ -1101,9 +1101,42 @@ class Frodo(Bilbo):
 
 
 class Gandalf(Bilbo):
-    """ Wizard to estimate Bilbo parameters given GWOSC event parameters
+    """Wizard to estimate Bilbo parameters given GWOSC event parameters
 
+    The merging black-hole model aims to estimate the wave that angular momentum
+    disappearing over the horizons of black holes makes in our visible universe.
+
+    The arriving mass model gives new angular momentum entering our universe.
+
+    The wavefront, shaped by the same Kerr metric.
+
+    We expect them to look the same.
+
+    We can use the parameters from GWSOC to constrain the parameter space
+    in the arriving model.
+
+    theta, phi and amax determine the distance of the body was when the burst arrived.
+
+    so we can remove amax and use the arrival distance per theta, phi.
+
+
+    the issue is whether there is any reason the distance of the event
+    should match the distance for the black hole merger model.
+
+    a more distant event will require a larger mass, and also the wave
+    that is received will be redshifted.
+
+    a nearer event will require a smaller mass, be less red-shifted
+    and higher frequency.
+
+    with the new arrival model, the wave is modulated by the BAO, but
+    the amplitude of that modulation decreases with increasing mass.
     
+    amax also modulates the frequency of the event, so an increase in
+    mass will require a decrease in amax
+
+    An increase in mass causes a reduction in the baosize experienced
+
     """
 
     def __init__(self, args=None):
