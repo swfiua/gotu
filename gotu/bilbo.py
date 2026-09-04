@@ -270,7 +270,7 @@ from gotu.spiral import RandomPhi, Spiral
 
 import bilby
 from bilby.core.prior import (Prior, PriorDict, Constraint, WeightedDiscreteValues, Sine, Cosine,
-                              Uniform, Normal, Exponential, PowerLaw, DeltaFunction)
+                              Uniform, Normal, Exponential, PowerLaw, DeltaFunction, LogNormal)
 from gwpy.timeseries import TimeSeries
 from gwpy.signal.filter_design import bandpass, concatenate_zpks
 from astropy import units as u, constants as c
@@ -582,9 +582,6 @@ class Bilbo(magic.Ball):
 
     async def start(self):
 
-        label = args.label
-        outdir = args.outdir or label
-
         self.ifo_list = self.load_ifos()
         if not hasattr(self, 'priors'):
             self.priors = self.load_priors()
@@ -629,10 +626,10 @@ class Bilbo(magic.Ball):
             priors = PriorDict(filename=filename.name)
         else:
             priors = PriorDict(dict(
-                mass = Uniform(name='mass', minimum=1., maximum=10),
+                mass = LogNormal(name='mass', mu=1., sigma=0.3),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
-                theta =  Sine(name='theta', maximum=0.001),
+                theta =  Sine(name='theta', minimum=0.00001, maximum=0.001),
                 #theta =  Uniform(name='theta',  minimum=1e-4, maximum=0.001),
                 #theta =  0.001,
                 dec =  Cosine(name='dec'),
@@ -640,8 +637,8 @@ class Bilbo(magic.Ball):
                 psi =  Uniform(name='psi', minimum=0, maximum=np.pi, boundary='periodic'),
                 phase =  Uniform(name='phase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #logzboost =  Uniform(name='logzboost', minimum=0, maximum=17, boundary='periodic'),
-                amax = Uniform(name='amax', minimum=-21, maximum=-17),
-                baoperiod = DeltaFunction(name='baoperiod', peak=490e6),
+                amax = Uniform(name='amax', minimum=-19, maximum=-17),
+                baoperiod = DeltaFunction(name='baoperiod', peak=245e6),
                 #baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
                 baosize = DeltaFunction(name='baosize', peak=1.),
                 baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
@@ -665,7 +662,6 @@ class Bilbo(magic.Ball):
     def conversion(self, priors):
 
         result = priors.copy()
-
         minz = result['amax'] = 10**priors['amax']
         mass = result['mass'] = 10**priors['mass']
         #result['fudge'] = 10**priors['fudge']
@@ -893,7 +889,7 @@ class Bilbo(magic.Ball):
         logger = bilby.core.utils.logger
         args = self.args
 
-        label = args.label
+        label = args.label + '_' + args.who
         outdir = args.outdir or label
 
         self.likelihood.label = label
@@ -936,9 +932,11 @@ class Bilbo(magic.Ball):
             sample = self.sample = self.sample_prior()
 
             parms = {k: v[0] for k,v in sample.items()}
-            parms = self.conversion(parms)[0]
+            #print(parms)
+            #print('wfg')
+            #print(parms)
             waveform = self.waveform = self.waveform_generator.time_domain_strain(parms)
-            
+            #print()
             for key in waveform.keys():
                 ax = await self.get()
 
@@ -946,6 +944,7 @@ class Bilbo(magic.Ball):
                 ax.set_title(key)
                 ax.show()
 
+            parms = self.waveform_generator._format_parameters(parms)
             self.put_nowait(sorted(parms.items()), 'help')
             await magic.sleep(self.sleep)
 
@@ -1152,7 +1151,7 @@ class Gandalf(Bilbo):
             priors = PriorDict(filename=filename.name)
         else:
             priors = PriorDict(dict(
-                scale = Uniform(name='scale', minimum=1., maximum=10.),
+                scale = Uniform(name='scale', minimum=1., maximum=6.),
                 #phi = Sinh2(name='phi', maximum=39., minimum=38.9999, n=1000),
                 phi = Uniform(name='phi', maximum=42., minimum=38),
                 theta =  Sine(name='theta', maximum=0.001),
@@ -1166,6 +1165,7 @@ class Gandalf(Bilbo):
                 amax = Uniform(name='amax', minimum=-19, maximum=-17),
                 baoperiod = DeltaFunction(name='baoperiod', peak=245e6),
                 baosize = Uniform(name='baosize', minimum=.0001, maximum=1.),
+                #baosize = DeltaFunction(name='baosize', peak=1.),
                 baophase = Uniform(name='baophase', minimum=0, maximum=2 * np.pi, boundary='periodic'),
                 #fudge = Uniform(name='fudge', minimum=0, maximum=0., boundary='periodic'),
             ))
@@ -1194,12 +1194,11 @@ class Gandalf(Bilbo):
         luminosity_distance = parms['luminosity_distance']
         chirp_mass = parms['chirp_mass_source']
 
-        k = result['scale']
+        k = 10**result['scale']
 
-        period = 2 * pi * chirp_mass * sqrt(k**3) * (1+redshift)
-        
+        mass = k * chirp_mass
+
         minz = result['amax'] = 10**priors['amax']
-
         galaxy = self.galaxy
         galaxy.phi = result['phi']
         galaxy.theta = result['theta']
@@ -1208,158 +1207,18 @@ class Gandalf(Bilbo):
         zandx = galaxy.zandx(tstar)
         distance = result['distance'] = float(zandx[1])
 
-        # want a mass that gives the same period at our distance
-        hd = (galaxy.cosmo.hubble_distance << u.Mpc).value
-        factor = (distance * hd / luminosity_distance) ** 2
-
-        mass = factor * chirp_mass
-        print('t d ld f m p', tstar, distance * hd, luminosity_distance, factor, mass, chirp_mass, period)
-        result['mass'] = mass
-        result['scale'] = factor**(1/3)
+        # use distance and scale to create mass
+        cosmo = galaxy.cosmo.cosmo
         
+        hd = (galaxy.cosmo.hubble_distance << u.Mpc).value
+        factor = (distance * hd / luminosity_distance) 
+
+        mass = factor * chirp_mass * k
+        result['mass'] = mass
         galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
  
-        return result, ['distance', 'mass']
+        return result, ['distance', 'mass', 'theta']
 
-    def tdsm(self,
-            gtimes,
-            geocent_time=None,
-            mass=None,
-            theta=None,
-            phi=None,
-            dec=None,
-            ra=None,
-            psi=None,
-            phase=None,
-            amax=None,
-            baosize=None,
-            baoperiod=None,
-            baophase=None,
-            scale=None,
-            post_trigger_duration=None):
-        """Waveform generator
-
-        Events are known to be strongly biassed to short blueshift
-        period, these have very large phi.  For a given phi, the
-        shortest blue shift periods have small theta.
-
-        We are also interested in just the a few seconds of time, when
-        the radius of curvature is of the order 1e18 seconds.
-
-        The problem here is that the events we are seeing are
-        for large (10-100) phi and there are numerical precision errors.
-
-        This affects the calculation of z and x for the ringdown.
-
-        Here the mpmath package comes to the rescue, with arbitrary
-        precision floats, albeit with a performance hit.
-        """
-
-        galaxy = self.galaxy
-        galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
-        galaxy.phi = phi
-        galaxy.theta = theta
-        scr = (galaxy.schwartzchild() << u.lightsecond).value
-        hubble_time = (galaxy.cosmo.cosmo.hubble_time << u.s).value
-        self.gtimes = gtimes
-        #tstar = galaxy.tstar()
-
-        minz = amax
-
-        # use time for z = -0.999 as start of event
-        # minz is actually z+1
-        tstar = self.tstar1000(galaxy, minz-1)
-
-        # calculate some values based on theta/phi
-        ttt = (gtimes - gtimes[0]) / hubble_time
-
-        uuu = [galaxy.uoft(tstar + t) for t in ttt]
-        zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
-        #print('amax minz', amax, minz, zandx[0])
-
-        zzz = np.array([float(zx[0]) for zx in zandx])
-        xxx = np.array([float(zx[1]) for zx in zandx])
-
-        # amplitude of wave is inversely proportional to distance travelled
-        ringdown = 1. /  (xxx*hubble_time)**2
-
-        strain = np.zeros((len(ttt)))
-
-
-        tins = ttt[gtimes < geocent_time] * hubble_time / abs(cos(theta))
-
-        # distance from event horizon in seconds
-
-        uuu0 = np.array([float(uu.real - uuu[0].real) for uu in uuu]) * 2 * pi * hubble_time
-        
-        tins = tins[::-1]
-        delta_t = tins[1] - tins[0]
-        epsilon = 1e9
-
-        radius = scr
-
-        # gravitational length contraction near black hole this
-        # increases the frequency as tge event horizon approaches
-        # enhancing the effect of blueshift.
-        
-        # kerr depends on distance from the black hole centre
-        distance = tins+radius
-
-        kerr = ((radius**4)/(distance**3.) * c.c).value
-
-        last_wavelength = 0
-
-        lc = np.sqrt(1-radius/(radius+tins+epsilon)) * minz
-
-        wavelength = scale * radius * lc 
-
-        nins = len(tins)
-        phases = np.zeros(nins)
-        phases[0] = phase
-        phases[1:] = delta_t / ((wavelength[0:-1]+wavelength[1:])*pi)
-        phases = np.cumsum(phases)
-
-        strain[:nins] = ringdown[0] * kerr[:nins] * np.sin(phases)
-        
-        rd = ringdown[:len(ringdown)-nins]
-        uu = uuu0[:len(ringdown)-nins]
-
-        strain[nins:] = rd * radius * c.c.value * np.sin(phase + (uu/radius))
-
-
-        # add a universal wobble from the bao to the mix
-        # 480 million years at minz
-        baoperiod *= (minz * u.year << u.s).value / hubble_time
-        #aosize = baoperiod / (2*pi)
-        baosize -= scr
-        if baosize > 0:
-            baooffset = np.int64((baosize * np.sin(baophase+ttt/baoperiod))/delta_t)
-            xbaooffset = np.int64((baosize * np.sin(pi+baophase+ttt/baoperiod))/delta_t)
-            print(baoperiod, baosize)
-            #print(magic.describe(baooffset))
-            print('z distance=(Mlyr)', zandx[0][0], zandx[0][1] * self.galaxy.cosmo.hubble_distance << u.Mlyr)
-
-            # need to pad strain with zeroes
-            pre = abs(min(baooffset))
-            picks = np.concat((np.zeros(pre, dtype=int),
-                               strain,
-                               np.zeros(max(baooffset), dtype=int)))
-
-            strain = picks[baooffset+np.arange(len(strain))]
-            xstrain = picks[xbaooffset+np.arange(len(strain))]
-        else:
-            xstrain = strain = strain * abs(baosize/scr)
-        # Now apply sine wave of varying frequency to the strain 
-        #strain = strain * np.sin((uu/wavelength) + phase)
-        #kerr = np.concat((kerr, np.zeros(len(gtimes)-len(kerr))))
-        #return dict(strain=strain, ringdown=ringdown, kerr=kerr,
-        #            uuu=uuu, zzz=zzz, xxx=xxx)
-
-        # maybe pass strain through a filter to remove low frequency noise.
-        #fstrain = self.filter_strain(strain, (gtimes[-1]-gtimes[0])/len((gtimes)-1))
-        
-        #return dict(strain=strain, kerr=kerr, ringdown=ringdown)   #, fstrain=np.array(fstrain))
-        return dict(plus=strain, cross=xstrain)
 
 
 def get_args(args=None):
