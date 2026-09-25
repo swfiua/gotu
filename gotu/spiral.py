@@ -378,7 +378,7 @@ def mass_length():
 
     
 
-def planck_radiance_law_wavelength(wavelength, T=None):
+def planck_radiance_law_wavelength_u(wavelength, T=None):
     """ Energy emitted in wavelength at temperature T
 
     wavelength: a float, wavelength in meters
@@ -399,7 +399,12 @@ def planck_radiance_law_wavelength(wavelength, T=None):
     # in terms of frequency v
     blam = (2*hh*cc**2/(lam**5)) / (ee(hh*cc/(lam*kT)) - 1)
 
-    return blam.value
+    return blam
+
+def planck_radiance_law_wavelength(wavelength, T=None):
+
+    return planck_radiance_law_wavelength_u(
+        wavelength, T).value
 
 
 def hubble_tension(cmb=cosmology.Planck18.H0, near=None):

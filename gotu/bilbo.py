@@ -985,6 +985,28 @@ class Bilbo(magic.Ball):
         await adoplot(tt, den, 't v den')
         await adoplot(tt, U, 't v U')
 
+    async def lightcone(self):
+        """ Visualise what the forward lightcone looks like.
+
+        A cone with eobbles from the BAO.
+        """
+
+        ax = await self.get()
+
+        ax.plot((0, 1), (0,1))
+        #ax.plot((0, -1), (0, 1))
+
+        xx = np.linspace(0, 1, 5000)
+
+        wobble = np.sin(xx * 50)
+
+        for amp in (0.01, 0.02, 0.05, 0.1):
+            wob = wobble * amp
+            ax.plot(xx+wob, xx-wob)
+        
+        #ax.plot(-xx, xx+wobble)
+
+        ax.show()
 
 class Frodo(Bilbo):
 

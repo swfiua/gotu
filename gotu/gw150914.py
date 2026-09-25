@@ -203,8 +203,6 @@ from math import *
 
 from astropy import table, io, units as u, constants as c
 
-from pycbc import waveform
-
 import csv
 
 import random
@@ -520,6 +518,8 @@ class View(magic.Ball):
         ax.show()
 
     async def run(self):
+
+        from pycbc import waveform
 
         fields = ['mass_1_source', 'mass_2_source', 'redshift', 'luminosity_distance']
         blueshift = -0.999
