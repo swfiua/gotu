@@ -724,6 +724,20 @@ class Bilbo(magic.Ball):
             post_trigger_duration=None):
         """Waveform generator
 
+        If you are looking for the waveform generator, here you go!
+
+        self.prior will have thr priors for the paramaters.  see load_prior
+
+        this version assumes a single mass, in effect we are just
+        modelling the chirp mass.  See Gandalf for more on this.
+
+        dec, ra, and psi (not sure what psi is ???) are included
+        because we are using the standard geometric model provided by
+        Bilby, that deals with the geometry of the LIGO/VIRGO/KAGRA
+        network.
+
+        Now on to the new arrival model.
+
         Events are known to be strongly biassed to short blueshift
         period, these have very large phi.  For a given phi, the
         shortest blue shift periods have small theta.
@@ -738,8 +752,14 @@ class Bilbo(magic.Ball):
 
         Here the mpmath package comes to the rescue, with arbitrary
         precision floats, albeit with a performance hit.
+
+        Now back to the actual model here.  self.lightcone() is worth
+        exploring.  sorry about the async thing, but works good with
+        blume.
+
         """
 
+        # initialise some variables, begin by configuring self.galaxy, the new arrival.
         galaxy = self.galaxy
         galaxy.set_mcent((mass * 3.0 * u.km << u.lyr).value)
         galaxy.phi = phi
@@ -749,32 +769,40 @@ class Bilbo(magic.Ball):
         self.gtimes = gtimes
         #tstar = galaxy.tstar()
 
+        # minz is actually z+1, the smaller, the higher the blueshift.
         minz = amax
 
-        # use time for z = -0.999 as start of event
-        # minz is actually z+1
+        # use time for z = minz-1, as start of event - the idea here is using this to
+        # model the fact that the wobbles of spacetime thermalise these waves, as they do light,
+        # so that there is a maximum distance before waves are thoroughly diverted from their
+        # original direction.
         tstar = self.tstar1000(galaxy, minz-1)
 
         # calculate some values based on theta/phi
+
+        # we measure time in natural units c = G = H = 1
         ttt = (gtimes - gtimes[0]) / hubble_time
 
+        # turn our times into their times, think of as the point u of their time, we see at t
         uuu = [galaxy.uoft(tstar + t) for t in ttt]
+
+        # what is the z and x (distance) at this time?
         zandx = [galaxy.zandx(tstar+t, u) for t, u  in zip(ttt, uuu)]
         #print('amax minz', amax, minz, zandx[0])
 
         zzz = np.array([float(zx[0]) for zx in zandx])
         xxx = np.array([float(zx[1]) for zx in zandx])
 
-        # amplitude of wave is inversely proportional to distance travelled
+        # amplitude of wave is inversely proportional to distance travelled squared
         ringdown = 1. /  (xxx*hubble_time)**2
 
         strain = np.zeros((len(ttt)))
 
 
+        # theta relates to the geometry of the arrival. it is likely small so not much effect?
         tins = ttt[gtimes < geocent_time] * hubble_time / abs(cos(theta))
 
         # distance from event horizon in seconds
-
         uuu0 = np.array([float(uu.real - uuu[0].real) for uu in uuu]) * 2 * pi * hubble_time
         
         tins = tins[::-1]
@@ -784,7 +812,7 @@ class Bilbo(magic.Ball):
         radius = scr
 
         # gravitational length contraction near black hole this
-        # increases the frequency as tge event horizon approaches
+        # increases the frequency as the event horizon approaches
         # enhancing the effect of blueshift.
         
         # kerr depends on distance from the black hole centre
