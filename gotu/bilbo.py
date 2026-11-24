@@ -962,7 +962,7 @@ class Bilbo(magic.Ball):
             parms = {k: v[0] for k,v in sample.items()}
             #print(parms)
             #print('wfg')
-            #print(parms)
+            #print(parms)   
             waveform = self.waveform = self.waveform_generator.time_domain_strain(parms)
             #print()
             for key in waveform.keys():
@@ -1036,7 +1036,7 @@ class Bilbo(magic.Ball):
 
         ax.show()
 
-class Frodo(Bilbo):
+class Sam(Bilbo):
 
     def __init__(self, args=None):
 
@@ -1148,6 +1148,38 @@ class Frodo(Bilbo):
 
         return priors
 
+
+class Frodo(Bilbo):
+    """Fast Radio Bursts
+
+    These events have much in common with gamma-ray bursts.
+
+    High energy events from all parts of the sky that are difficult to
+    explain in conventional cosmology.
+
+    What if we are seeing new arrivals in our visible universe?
+
+    The signals arrive with 400MHz and then drop in frequency, over a short period of time,
+    a fraction of a second or so.
+
+    The late arrival of the lower frequencies is attributed to
+    dispersion caused by interaction with ionised matter in the
+    inter-galactic medium.
+
+    This has been studied within the Milky Way and has been used as a measure of distance.
+
+    Many FRBs have shown high dispersion, indicating they are of extra-galactic origin.
+
+    Note that in the arriving object model the frequency starts high
+    and then drops rapidly, so some of the dispersion is inherent to
+    the signal.
+
+    Regardless, we can try to fit the same model as for gravitational
+    waves to the FRBs.  There is a good model for dispersion in the
+    Milky Way, so we can factor that out before fitting.
+
+    """
+    pass
 
 class Gandalf(Bilbo):
     """Wizard to estimate Bilbo parameters given GWOSC event parameters
@@ -1284,7 +1316,7 @@ def get_args(args=None):
     parser.add_argument('--post_trigger_duration', type=float, default=2.)
     parser.add_argument('--duration', type=float, default=4.)
     parser.add_argument('--detectors', nargs='+', default=["H1", "L1"])
-    parser.add_argument('--who', choices=['gandalf', 'frodo', 'bilbo'], default='gandalf')
+    parser.add_argument('--who', choices=['gandalf', 'frodo', 'bilbo', 'sam'], default='gandalf')
 
     return parser.parse_args(args)
 
